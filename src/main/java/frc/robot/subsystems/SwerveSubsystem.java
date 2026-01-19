@@ -103,7 +103,7 @@ public class SwerveSubsystem extends SubsystemBase {
     }
 
     public void setupLimeLight() {
-        limelight = new Limelight("limelight");
+        limelight = new Limelight("limelight-a");
         limelight.getSettings()
                 .withLimelightLEDMode(LEDMode.PipelineControl)
                 .withCameraOffset(cameraOffset)
