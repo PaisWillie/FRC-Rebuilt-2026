@@ -17,8 +17,10 @@ import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.OperatorConstants;
+import frc.robot.Constants.SwerveConstants;
 import frc.robot.subsystems.SwerveSubsystem;
 import swervelib.SwerveInputStream;
 
@@ -37,7 +39,7 @@ public class RobotContainer {
             () -> m_driverController.getLeftX() * -1)
             .withControllerRotationAxis(m_driverController::getRightX)
             .deadband(OperatorConstants.DEADBAND)
-            .scaleTranslation(0.8)
+            .scaleTranslation(SwerveConstants.SCALE_TRANSLATION)
             .allianceRelativeControl(true);
 
     /**
@@ -62,7 +64,7 @@ public class RobotContainer {
             .withControllerRotationAxis(() -> m_driverController.getRawAxis(
                     2))
             .deadband(OperatorConstants.DEADBAND)
-            .scaleTranslation(0.8)
+            .scaleTranslation(SwerveConstants.SCALE_TRANSLATION)
             .allianceRelativeControl(true);
     // Derive the heading axis with math!
     SwerveInputStream driveDirectAngleKeyboard = driveAngularVelocityKeyboard.copy()
@@ -114,15 +116,18 @@ public class RobotContainer {
                             new Constraints(Units.degreesToRadians(360),
                                     Units.degreesToRadians(180))));
             m_driverController.start()
-                    .onTrue(Commands.runOnce(() -> drivebase.resetOdometry(new Pose2d(3, 3, new Rotation2d()))));
+                    .onTrue(Commands.runOnce(() -> drivebase
+                            .resetOdometry(new Pose2d(3, 3, new Rotation2d()))));
             m_driverController.button(1).whileTrue(drivebase.sysIdDriveMotorCommand());
             m_driverController.button(2)
-                    .whileTrue(Commands.runEnd(() -> driveDirectAngleKeyboard.driveToPoseEnabled(true),
+                    .whileTrue(Commands.runEnd(
+                            () -> driveDirectAngleKeyboard.driveToPoseEnabled(true),
                             () -> driveDirectAngleKeyboard.driveToPoseEnabled(false)));
 
         }
         if (DriverStation.isTest()) {
-            drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity); // Overrides drive command above!
+            drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity); // Overrides drive command
+                                                                             // above!
 
             m_driverController.x().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
             m_driverController.start().onTrue((Commands.runOnce(drivebase::zeroGyro)));
@@ -133,9 +138,18 @@ public class RobotContainer {
             m_driverController.a().onTrue((Commands.runOnce(drivebase::zeroGyro)));
             m_driverController.start().whileTrue(Commands.none());
             m_driverController.back().whileTrue(Commands.none());
-            m_driverController.leftBumper().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
+            m_driverController.leftBumper()
+                    .whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
             m_driverController.rightBumper().onTrue(Commands.none());
         }
+
+        // Limit driver speeds while shooting
+        m_driverController.rightBumper().onTrue(new InstantCommand(() -> {
+            driveAngularVelocity.scaleTranslation(0.1);
+        })).onFalse(
+                new InstantCommand(() -> {
+                    driveAngularVelocity.scaleTranslation(SwerveConstants.SCALE_TRANSLATION);
+                }));
     }
 
     public Command getAutonomousCommand() {
