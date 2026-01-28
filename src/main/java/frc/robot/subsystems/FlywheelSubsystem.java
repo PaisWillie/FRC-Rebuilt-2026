@@ -37,7 +37,7 @@ public class FlywheelSubsystem extends SubsystemBase {
     private final Distance flywheelDiameter = FlywheelConstants.DIAMETER_INCHES;
     private final TalonFX flywheelMotor = new TalonFX(FlywheelConstants.MOTOR_ID);
 
-    private final SmartMotorControllerConfig motorConfig = new SmartMotorControllerConfig(this)
+    private final SmartMotorControllerConfig smcConfig = new SmartMotorControllerConfig(this)
             .withClosedLoopController(
                     FlywheelConstants.PID_kP,
                     FlywheelConstants.PID_kI,
@@ -56,9 +56,9 @@ public class FlywheelSubsystem extends SubsystemBase {
             .withSimFeedforward(FlywheelConstants.SIM_FEEDFORWARD)
             .withControlMode(ControlMode.CLOSED_LOOP);
 
-    private final SmartMotorController motor = new TalonFXWrapper(flywheelMotor, DCMotor.getKrakenX60(1), motorConfig);
+    private final SmartMotorController smartMotorController = new TalonFXWrapper(flywheelMotor, DCMotor.getKrakenX60(1), smcConfig);
 
-    private final FlyWheelConfig flywheelConfig = new FlyWheelConfig(motor)
+    private final FlyWheelConfig flywheelConfig = new FlyWheelConfig(smartMotorController)
             .withDiameter(FlywheelConstants.DIAMETER_INCHES)
             .withMass(FlywheelConstants.MASS_POUNDS)
             .withTelemetry("FlywheelMech", TelemetryVerbosity.HIGH)
@@ -104,7 +104,7 @@ public class FlywheelSubsystem extends SubsystemBase {
     }
 
     public void setRPMDirect(LinearVelocity speed) {
-        motor.setVelocity(RotationsPerSecond.of(speed.in(MetersPerSecond) / flywheelDiameter.times(Math.PI).in(Meters)));
+        smartMotorController.setVelocity(RotationsPerSecond.of(speed.in(MetersPerSecond) / flywheelDiameter.times(Math.PI).in(Meters)));
     }
 
     @Override
