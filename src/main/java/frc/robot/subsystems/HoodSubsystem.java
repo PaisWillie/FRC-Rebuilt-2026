@@ -45,7 +45,7 @@ public class HoodSubsystem extends SubsystemBase {
             .withSimFeedforward(HoodConstants.SIM_FEEDFORWARD)
             .withControlMode(ControlMode.CLOSED_LOOP);
 
-    private final SmartMotorController smartMotorController = new TalonFXWrapper(motor, DCMotor.getNeo550(1), smcConfig);
+    private final SmartMotorController smartMotorController = new TalonFXWrapper(motor, DCMotor.getKrakenX60(1), smcConfig);
 
     private final ArmConfig hoodConfig = new ArmConfig(smartMotorController)
             .withTelemetry("HoodMech", TelemetryVerbosity.HIGH)
