@@ -76,7 +76,7 @@ public class SwerveSubsystem extends SubsystemBase {
                         Rotation2d.fromDegrees(180));
         // Configure the Telemetry before creating the SwerveDrive to avoid unnecessary
         // objects being created.
-        SwerveDriveTelemetry.verbosity = TelemetryVerbosity.POSE;
+        SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH;
         try {
             swerveDrive = new SwerveParser(directory).createSwerveDrive(SwerveConstants.MAX_SPEED, startingPose);
             // Alternative method if you don't want to supply the conversion factor via JSON
@@ -100,6 +100,8 @@ public class SwerveSubsystem extends SubsystemBase {
         // swerveDrive.pushOffsetsToEncoders(); // Set the absolute encoder to be used
         // over the internal encoder and push the offsets onto it. Throws warning if not
         // possible
+
+        setupLimeLight();
     }
 
     public void setupLimeLight() {
