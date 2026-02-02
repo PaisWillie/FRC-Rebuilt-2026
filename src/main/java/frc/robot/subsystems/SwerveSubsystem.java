@@ -124,6 +124,8 @@ public class SwerveSubsystem extends SubsystemBase {
         }
 
         m_choreoControllerHeading.enableContinuousInput(-Math.PI, Math.PI);
+
+        setupLimeLight();
     }
 
     public void setupLimeLight() {
