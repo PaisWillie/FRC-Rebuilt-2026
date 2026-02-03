@@ -24,7 +24,7 @@ import frc.robot.subsystems.SwerveSubsystem;
 import swervelib.SwerveInputStream;
 
 public class RobotContainer {
-    final CommandXboxController m_driverController = new CommandXboxController(Constants.DRIVER_CONTROLLER_PORT);
+    final CommandPS5Controller m_driverController = new CommandPS5Controller(Constants.DRIVER_CONTROLLER_PORT);
 
     private final SwerveSubsystem drivebase = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
             "swerve"));
@@ -121,7 +121,7 @@ public class RobotContainer {
 
         drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity);
 
-        m_driverController.rightBumper().whileTrue(driveFieldOrientedAutoAim);
+        m_driverController.R1().whileTrue(driveFieldOrientedAutoAim);
 
         if (Robot.isSimulation()) {
             Pose2d target = new Pose2d(new Translation2d(1, 4),
@@ -137,7 +137,7 @@ public class RobotContainer {
                             0,
                             new Constraints(Units.degreesToRadians(360),
                                     Units.degreesToRadians(180))));
-            m_driverController.start()
+            m_driverController.options()
                     .onTrue(Commands.runOnce(() -> drivebase
                             .resetOdometry(new Pose2d(3, 3, new Rotation2d()))));
             m_driverController.button(1).whileTrue(drivebase.sysIdDriveMotorCommand());
@@ -151,15 +151,15 @@ public class RobotContainer {
             drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity); // Overrides drive command
                                                                              // above!
 
-            m_driverController.x().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
-            m_driverController.start().onTrue((Commands.runOnce(drivebase::zeroGyro)));
-            m_driverController.back().whileTrue(drivebase.centerModulesCommand());
-            m_driverController.leftBumper().onTrue(Commands.none());
+            m_driverController.square().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
+            m_driverController.options().onTrue((Commands.runOnce(drivebase::zeroGyro)));
+            m_driverController.create().whileTrue(drivebase.centerModulesCommand());
+            m_driverController.L1().onTrue(Commands.none());
         } else {
-            m_driverController.a().onTrue((Commands.runOnce(drivebase::zeroGyro)));
-            m_driverController.start().whileTrue(Commands.none());
-            m_driverController.back().whileTrue(Commands.none());
-            m_driverController.leftBumper()
+            m_driverController.cross().onTrue((Commands.runOnce(drivebase::zeroGyro)));
+            m_driverController.options().whileTrue(Commands.none());
+            m_driverController.create().whileTrue(Commands.none());
+            m_driverController.L1()
                     .whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
         }
     }
