@@ -19,9 +19,11 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
+import frc.robot.FieldConstants;
 import frc.robot.Constants.SwerveConstants;
 import swervelib.SwerveController;
 import swervelib.SwerveDrive;
@@ -484,4 +486,47 @@ public class SwerveSubsystem extends SubsystemBase {
     public SwerveDrive getSwerveDrive() {
         return swerveDrive;
     }
+
+    // Left and right are from the perspective of the red/light driver station
+    public enum Zone {
+        BLUE_ALLIANCE_LEFT,
+        BLUE_ALLIANCE_RIGHT,
+        RED_ALLIANCE_LEFT,
+        RED_ALLIANCE_RIGHT,
+        NEUTRAL_ZONE_RED_LEFT,
+        NEUTRAL_ZONE_RED_RIGHT,
+        NEUTRAL_ZONE_BLUE_LEFT,
+        NEUTRAL_ZONE_BLUE_RIGHT
+    }
+
+    public Zone getCurrentZone() {
+        Translation2d position = getPose().getTranslation();
+
+        if (position.getX() < FieldConstants.BLUE_STARTING_LINE_X) {
+            if (position.getY() < FieldConstants.FIELD_WIDTH / 2) {
+                return Zone.BLUE_ALLIANCE_RIGHT;
+            } else {
+                return Zone.BLUE_ALLIANCE_LEFT;
+            }
+        } else if (position.getX() > FieldConstants.RED_STARTING_LINE_X) {
+            if (position.getY() < FieldConstants.FIELD_WIDTH / 2) {
+                return Zone.RED_ALLIANCE_LEFT;
+            } else {
+                return Zone.RED_ALLIANCE_RIGHT;
+            }
+        } else if (position.getX() < (FieldConstants.FIELD_LENGTH / 2)) {
+            if (position.getY() < FieldConstants.FIELD_WIDTH / 2) {
+                return Zone.NEUTRAL_ZONE_BLUE_RIGHT;
+            } else {
+                return Zone.NEUTRAL_ZONE_BLUE_LEFT;
+            }
+        } else {
+            if (position.getY() < FieldConstants.FIELD_WIDTH / 2) {
+                return Zone.NEUTRAL_ZONE_RED_LEFT;
+            } else {
+                return Zone.NEUTRAL_ZONE_RED_RIGHT;
+            }
+        }
+    }
+
 }
