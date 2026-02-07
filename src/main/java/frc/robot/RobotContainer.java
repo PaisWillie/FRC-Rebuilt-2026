@@ -86,12 +86,10 @@ public class RobotContainer {
             .translationHeadingOffset(Rotation2d.fromDegrees(
                     0));
 
-    Pose2d blueHub = new Pose2d(4.0218614 + Units.inchesToMeters(47.0) / 2.0, 8.069 / 2, null);
-
     private DoubleSupplier headingXSupplier() {
         return () -> {
-            Pose2d robotPose = drivebase.getSwerveDrive().getPose();
-            Translation2d delta = blueHub.getTranslation().minus(robotPose.getTranslation());
+            Translation2d robotTranslation = drivebase.getSwerveDrive().getPose().getTranslation();
+            Translation2d delta = FieldConstants.BLUE_HUB_CENTER.minus(robotTranslation);
             Rotation2d heading = delta.getAngle().minus(Rotation2d.fromDegrees(90));
             return heading.getCos();
         };
@@ -99,8 +97,8 @@ public class RobotContainer {
 
     private DoubleSupplier headingYSupplier() {
         return () -> {
-            Pose2d robotPose = drivebase.getSwerveDrive().getPose();
-            Translation2d delta = blueHub.getTranslation().minus(robotPose.getTranslation());
+            Translation2d robotTranslation = drivebase.getSwerveDrive().getPose().getTranslation();
+            Translation2d delta = FieldConstants.BLUE_HUB_CENTER.minus(robotTranslation);
             Rotation2d heading = delta.getAngle().minus(Rotation2d.fromDegrees(90));
             return -heading.getSin();
         };
