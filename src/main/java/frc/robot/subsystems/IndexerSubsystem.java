@@ -28,7 +28,7 @@ public class IndexerSubsystem extends SubsystemBase {
      * Constructs the indexer subsystem and applies motor configuration.
      */
     public IndexerSubsystem() {
-        m_motor = new TalonFX(IndexerConstants.MOTOR_ID);
+        m_motor = new TalonFX(IndexerConstants.MOTOR_CAN_ID);
         m_motorConfig = new TalonFXConfiguration();
         m_motorOutputConfig = new MotorOutputConfigs();
 

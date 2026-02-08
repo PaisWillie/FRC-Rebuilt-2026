@@ -20,9 +20,13 @@ public final class Constants {
     }
 
     public static class IndexerConstants {
-        public static final int MOTOR_ID = -1;
+        public static final int MOTOR_CAN_ID = -1;
 
         public static final int MOTOR_STATOR_CURRENT_LIMIT = -1;
         public static final int MOTOR_SUPPLY_CURRENT_LIMIT = -1;
+    }
+
+    public static class IntakeConstants {
+        public static final int MOTOR_PWM_ID = -1;
     }
 }
