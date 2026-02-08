@@ -18,4 +18,11 @@ public final class Constants {
         public static final double RIGHT_X_DEADBAND = 0.1;
         public static final double TURN_CONSTANT = 6;
     }
+
+    public static class IndexerConstants {
+        public static final int MOTOR_ID = -1;
+
+        public static final int MOTOR_STATOR_CURRENT_LIMIT = -1;
+        public static final int MOTOR_SUPPLY_CURRENT_LIMIT = -1;
+    }
 }
