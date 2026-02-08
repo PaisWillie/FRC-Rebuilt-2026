@@ -14,14 +14,14 @@ import frc.robot.Constants.IntakeConstants;
 public class IntakeSubsystem extends SubsystemBase {
 
     /** PWM motor controller for the intake. */
-    private final PWMTalonFX m_motor;
+    private final PWMTalonFX m_rollerMotor;
 
     /**
      * Constructs the intake subsystem and initializes the motor controller.
      */
     public IntakeSubsystem() {
         // Initialize motor controller using configured PWM ID.
-        m_motor = new PWMTalonFX(IntakeConstants.MOTOR_PWM_ID);
+        m_rollerMotor = new PWMTalonFX(IntakeConstants.MOTOR_PWM_ID);
     }
 
     /**
@@ -30,14 +30,14 @@ public class IntakeSubsystem extends SubsystemBase {
      * @param speed the desired motor output (-1.0 to 1.0)
      */
     public void setSpeed(double speed) {
-        m_motor.set(speed);
+        m_rollerMotor.set(speed);
     }
 
     /**
      * Stops the intake motor.
      */
     public void stop() {
-        m_motor.stopMotor();
+        m_rollerMotor.stopMotor();
     }
 
     @Override
