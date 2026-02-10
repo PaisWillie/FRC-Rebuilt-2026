@@ -110,11 +110,11 @@ public class IntakeSubsystem extends SubsystemBase {
     /**
      * Creates a command to set the linear intake height.
      *
-     * @param height the desired height
+     * @param position the desired position between the soft limits
      * @return the command that sets the height
      */
-    public Command setLinearPosition(Distance height) {
-        return m_linearIntake.setHeight(height);
+    public Command setLinearPosition(Distance position) {
+        return m_linearIntake.setHeight(position);
     }
 
     /**
