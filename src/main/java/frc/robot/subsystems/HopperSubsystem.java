@@ -5,6 +5,7 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj.Servo;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.HopperConstants;
 
@@ -21,12 +22,20 @@ public class HopperSubsystem extends SubsystemBase {
    *
    * @param degrees the target angle
    */
-  public void setPosition(double degrees) {
+  public void setAngle(double degrees) {
     m_motor.setAngle(degrees);
+  }
+
+  /**
+   * Gets the current angle of the hopper servo in degrees.
+   * 
+   * @return the current angle of the servo
+   */
+  public double getAngle() {
+    return m_motor.getAngle();
   }
 
   @Override
   public void periodic() {
-
   }
 }
