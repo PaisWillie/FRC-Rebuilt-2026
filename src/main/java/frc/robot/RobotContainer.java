@@ -18,7 +18,6 @@ import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.SwerveSubsystem;
 import swervelib.SwerveInputStream;
@@ -149,7 +148,8 @@ public class RobotContainer {
             drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity); // Overrides drive command
                                                                              // above!
 
-            m_driverController.square().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
+            m_driverController.square()
+                    .whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
             m_driverController.options().onTrue((Commands.runOnce(drivebase::zeroGyro)));
             m_driverController.create().whileTrue(drivebase.centerModulesCommand());
             m_driverController.L1().onTrue(Commands.none());
