@@ -49,23 +49,23 @@ public class IntakeSubsystem extends SubsystemBase {
         m_linearMotor = new TalonFX(IntakeConstants.LinearConstants.LINEAR_MOTOR_CAN_ID);
 
         m_linearMotorSMCConfig = new SmartMotorControllerConfig(this)
-                .withMechanismCircumference(IntakeConstants.LinearConstants.MOTOR_CIRCUMFERENCE)
+                .withMechanismCircumference(IntakeConstants.LinearConstants.MOTOR_CIRCUMFERENCE_METERS)
                 .withClosedLoopController(
                         IntakeConstants.LinearConstants.PID_kP,
                         IntakeConstants.LinearConstants.PID_kI,
                         IntakeConstants.LinearConstants.PID_kD,
-                        IntakeConstants.LinearConstants.MAX_VELOCITY,
-                        IntakeConstants.LinearConstants.MAX_ACCELERATION)
+                        IntakeConstants.LinearConstants.MAX_VELOCITY_MPS,
+                        IntakeConstants.LinearConstants.MAX_ACCELERATION_MPS2)
                 .withSoftLimit(
-                        IntakeConstants.LinearConstants.SOFT_LIMIT_MIN,
-                        IntakeConstants.LinearConstants.SOFT_LIMIT_MAX)
+                        IntakeConstants.LinearConstants.SOFT_LIMIT_MIN_METERS,
+                        IntakeConstants.LinearConstants.SOFT_LIMIT_MAX_METERS)
                 .withGearing(new MechanismGearing(IntakeConstants.LinearConstants.GEARBOX))
                 .withIdleMode(MotorMode.BRAKE)
                 .withTelemetry("ElevatorMotor", TelemetryVerbosity.HIGH)
-                .withStatorCurrentLimit(IntakeConstants.LinearConstants.STATOR_CURRENT_LIMIT)
+                .withStatorCurrentLimit(IntakeConstants.LinearConstants.STATOR_CURRENT_LIMIT_AMPS)
                 .withMotorInverted(false)
-                .withClosedLoopRampRate(IntakeConstants.LinearConstants.CLOSED_LOOP_RAMP_RATE)
-                .withOpenLoopRampRate(IntakeConstants.LinearConstants.OPEN_LOOP_RAMP_RATE)
+                .withClosedLoopRampRate(IntakeConstants.LinearConstants.CLOSED_LOOP_RAMP_RATE_SEC)
+                .withOpenLoopRampRate(IntakeConstants.LinearConstants.OPEN_LOOP_RAMP_RATE_SEC)
                 .withFeedforward(IntakeConstants.LinearConstants.FEEDFORWARD)
                 .withControlMode(ControlMode.CLOSED_LOOP);
 
@@ -75,18 +75,18 @@ public class IntakeSubsystem extends SubsystemBase {
                 m_linearMotorSMCConfig);
 
         m_robotToMechanism = new MechanismPositionConfig()
-                .withMaxRobotHeight(IntakeConstants.LinearConstants.ROBOT_MAX_HEIGHT)
-                .withMaxRobotLength(IntakeConstants.LinearConstants.ROBOT_MAX_LENGTH)
-                .withRelativePosition(IntakeConstants.LinearConstants.RELATIVE_POSITION);
+                .withMaxRobotHeight(IntakeConstants.LinearConstants.ROBOT_MAX_HEIGHT_METERS)
+                .withMaxRobotLength(IntakeConstants.LinearConstants.ROBOT_MAX_LENGTH_METERS)
+                .withRelativePosition(IntakeConstants.LinearConstants.RELATIVE_POSITION_METERS);
 
         m_linearConfig = new ElevatorConfig(m_linearMotorSMC)
-                .withStartingHeight(IntakeConstants.LinearConstants.STARTING_HEIGHT)
+                .withStartingHeight(IntakeConstants.LinearConstants.STARTING_HEIGHT_METERS)
                 .withHardLimits(
-                        IntakeConstants.LinearConstants.HARD_LIMIT_MIN,
-                        IntakeConstants.LinearConstants.HARD_LIMIT_MAX)
+                        IntakeConstants.LinearConstants.HARD_LIMIT_MIN_METERS,
+                        IntakeConstants.LinearConstants.HARD_LIMIT_MAX_METERS)
                 .withTelemetry("Elevator", TelemetryVerbosity.HIGH)
                 .withMechanismPositionConfig(m_robotToMechanism)
-                .withMass(IntakeConstants.LinearConstants.MECHANISM_MASS);
+                .withMass(IntakeConstants.LinearConstants.MECHANISM_MASS_POUNDS);
 
         m_linearIntake = new Elevator(m_linearConfig);
     }
