@@ -46,7 +46,7 @@ public class IntakeSubsystem extends SubsystemBase {
     public IntakeSubsystem() {
 
         m_rollerMotor = new PWMTalonFX(IntakeConstants.ROLLER_MOTOR_PWM_ID);
-        m_linearMotor = new TalonFX(IntakeConstants.LINEAR_MOTOR_CAN_ID);
+        m_linearMotor = new TalonFX(IntakeConstants.LinearConstants.LINEAR_MOTOR_CAN_ID);
 
         m_linearMotorSMCConfig = new SmartMotorControllerConfig(this)
                 .withMechanismCircumference(IntakeConstants.LinearConstants.MOTOR_CIRCUMFERENCE)
@@ -71,7 +71,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
         m_linearMotorSMC = new TalonFXWrapper(
                 m_linearMotor,
-                IntakeConstants.MOTOR,
+                IntakeConstants.LinearConstants.MOTOR,
                 m_linearMotorSMCConfig);
 
         m_robotToMechanism = new MechanismPositionConfig()

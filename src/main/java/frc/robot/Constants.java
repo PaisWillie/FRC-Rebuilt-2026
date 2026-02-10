@@ -59,13 +59,9 @@ public final class Constants {
         public static final int ROLLER_MOTOR_PWM_ID = -1;
         public static final double ROLLER_DEFAULT_SPEED = 0.0;
 
-        public static final int LINEAR_MOTOR_CAN_ID = -1;
-        public static final DCMotor MOTOR = DCMotor.getKrakenX60(1);
-
-        public static final int LINEAR_MOTOR_STATOR_CURRENT_LIMIT = -1;
-        public static final int LINEAR_MOTOR_SUPPLY_CURRENT_LIMIT = -1;
-
         public static class LinearConstants {
+            public static final int LINEAR_MOTOR_CAN_ID = -1;
+            public static final DCMotor MOTOR = DCMotor.getKrakenX60(1);
             public static final Distance MOTOR_CIRCUMFERENCE = Meters.of(Inches.of(0.25).in(Meters) * 22); // TODO
             public static final double PID_kP = 4.0; // TODO
             public static final double PID_kI = 0.0; // TODO
