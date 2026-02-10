@@ -28,6 +28,7 @@ import edu.wpi.first.units.measure.Mass;
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.units.measure.Velocity;
 import edu.wpi.first.units.measure.Voltage;
+import edu.wpi.first.math.system.plant.DCMotor;
 import yams.gearing.GearBox;
 
 public final class Constants {
@@ -59,6 +60,8 @@ public final class Constants {
         public static final double ROLLER_DEFAULT_SPEED = 0.0;
 
         public static final int LINEAR_MOTOR_CAN_ID = -1;
+        public static final DCMotor MOTOR = DCMotor.getKrakenX60(1);
+
         public static final int LINEAR_MOTOR_STATOR_CURRENT_LIMIT = -1;
         public static final int LINEAR_MOTOR_SUPPLY_CURRENT_LIMIT = -1;
 
@@ -89,6 +92,7 @@ public final class Constants {
 
     public static final class FlywheelConstants {
         public static final int MOTOR_ID = -1; // TODO
+        public static final DCMotor MOTOR = DCMotor.getKrakenX60(1);
 
         public static final Distance DIAMETER_INCHES = Inches.of(4.0); // TODO
         public static final Mass MASS_POUNDS = Pounds.of(1); // TODO
@@ -119,6 +123,7 @@ public final class Constants {
 
     public static final class HoodConstants {
         public static final int MOTOR_ID = -1; // TODO
+        public static final DCMotor MOTOR = DCMotor.getKrakenX60(1);
 
         public static final GearBox GEARBOX = GearBox.fromReductionStages(3, 4); // TODO
 

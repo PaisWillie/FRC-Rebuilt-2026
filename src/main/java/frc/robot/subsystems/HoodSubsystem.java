@@ -8,7 +8,6 @@ import java.util.function.Supplier;
 
 import com.ctre.phoenix6.hardware.TalonFX;
 
-import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -32,8 +31,7 @@ public class HoodSubsystem extends SubsystemBase {
                     HoodConstants.PID_kI,
                     HoodConstants.PID_kD,
                     HoodConstants.MAX_VELOCITY_RPM,
-                    HoodConstants.MAX_ACCELERATION_RPS2
-            )
+                    HoodConstants.MAX_ACCELERATION_RPS2)
             .withGearing(new MechanismGearing(HoodConstants.GEARBOX))
             .withIdleMode(MotorMode.COAST)
             .withTelemetry("HoodMotor", TelemetryVerbosity.HIGH)
@@ -45,12 +43,16 @@ public class HoodSubsystem extends SubsystemBase {
             .withSimFeedforward(HoodConstants.SIM_FEEDFORWARD)
             .withControlMode(ControlMode.CLOSED_LOOP);
 
-    private final SmartMotorController smartMotorController = new TalonFXWrapper(motor, DCMotor.getKrakenX60(1), smcConfig);
+    private final SmartMotorController smartMotorController = new TalonFXWrapper(
+            motor,
+            HoodConstants.MOTOR,
+            smcConfig);
 
     private final ArmConfig hoodConfig = new ArmConfig(smartMotorController)
             .withTelemetry("HoodMech", TelemetryVerbosity.HIGH)
             .withSoftLimits(HoodConstants.SOFT_LIMIT_MIN, HoodConstants.SOFT_LIMIT_MAX)
-            .withHardLimit(HoodConstants.HARD_LIMIT_MIN, HoodConstants.HARD_LIMIT_MAX); // The Hood can be modeled as an arm since it has a
+            .withHardLimit(HoodConstants.HARD_LIMIT_MIN, HoodConstants.HARD_LIMIT_MAX); // The Hood can be modeled as an
+                                                                                        // arm since it has a
     // gravitational force acted upon based on the angle its in
 
     private final Arm hood = new Arm(hoodConfig);
@@ -63,8 +65,7 @@ public class HoodSubsystem extends SubsystemBase {
         return hood.setAngle(angle);
     }
 
-    public void setAngleDirect(Angle angle)
-    {
+    public void setAngleDirect(Angle angle) {
         smartMotorController.setPosition(angle);
     }
 
@@ -80,8 +81,7 @@ public class HoodSubsystem extends SubsystemBase {
         return hood.sysId(
                 HoodConstants.SYSID_MAX_VOLTAGE,
                 HoodConstants.SYSID_STEP,
-                HoodConstants.SYSID_DURATION
-        );
+                HoodConstants.SYSID_DURATION);
     }
 
     public Command setDutyCycle(Supplier<Double> dutyCycleSupplier) {

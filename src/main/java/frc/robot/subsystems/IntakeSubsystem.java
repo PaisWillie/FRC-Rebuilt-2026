@@ -11,13 +11,6 @@ import edu.wpi.first.wpilibj.motorcontrol.PWMTalonFX;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.IntakeConstants;
-
-import static edu.wpi.first.units.Units.*;
-
-import edu.wpi.first.math.controller.ElevatorFeedforward;
-import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.math.system.plant.DCMotor;
-import yams.gearing.GearBox;
 import yams.gearing.MechanismGearing;
 import yams.mechanisms.config.ElevatorConfig;
 import yams.mechanisms.config.MechanismPositionConfig;
@@ -76,7 +69,10 @@ public class IntakeSubsystem extends SubsystemBase {
                 .withFeedforward(IntakeConstants.LinearConstants.FEEDFORWARD)
                 .withControlMode(ControlMode.CLOSED_LOOP);
 
-        m_linearMotorSMC = new TalonFXWrapper(m_linearMotor, DCMotor.getKrakenX60(1), m_linearMotorSMCConfig);
+        m_linearMotorSMC = new TalonFXWrapper(
+                m_linearMotor,
+                IntakeConstants.MOTOR,
+                m_linearMotorSMCConfig);
 
         m_robotToMechanism = new MechanismPositionConfig()
                 .withMaxRobotHeight(IntakeConstants.LinearConstants.ROBOT_MAX_HEIGHT)
