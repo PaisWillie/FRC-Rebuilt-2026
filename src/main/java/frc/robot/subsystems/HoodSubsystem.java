@@ -113,22 +113,23 @@ public class HoodSubsystem extends SubsystemBase {
     }
 
     /**
-     * Creates a command to set the hood duty cycle from a supplier.
+     * Moves the hood up and down.
      *
-     * @param dutyCycleSupplier the supplier of duty cycle (-1.0 to 1.0)
+     * @param dutyCycleSupplier the supplier of [-1, 1] speed to set the hood to.
      * @return the command that sets duty cycle
      */
-    public Command setDutyCycle(Supplier<Double> dutyCycleSupplier) {
+    public Command set(Supplier<Double> dutyCycleSupplier) {
         return hood.set(dutyCycleSupplier);
     }
 
     /**
-     * Creates a command to set the hood duty cycle.
-     *
-     * @param dutyCycle the duty cycle (-1.0 to 1.0)
-     * @return the command that sets duty cycle
+     * Move the hood up and down.
+     * 
+     * @param dutyCycle [-1, 1] speed to set the hood to.
+     * @return the command that sets the duty cycle
      */
-    public Command setDutyCycle(double dutyCycle) {
+
+    public Command set(double dutyCycle) {
         return hood.set(dutyCycle);
     }
 
