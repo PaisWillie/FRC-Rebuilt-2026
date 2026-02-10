@@ -149,4 +149,8 @@ public final class Constants {
         public static final Velocity<VoltageUnit> SYSID_STEP = Volts.per(Second).of(0.5); // TODO
         public static final Time SYSID_DURATION = Seconds.of(8.0); // TODO
     }
+
+    public static final class HopperConstants {
+        public static final int MOTOR_ID = -1; // TODO
+    }
 }
