@@ -1,12 +1,34 @@
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Amps;
+import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
+import static edu.wpi.first.units.Units.Pounds;
+import static edu.wpi.first.units.Units.RPM;
+import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
+import static edu.wpi.first.units.Units.Second;
+import static edu.wpi.first.units.Units.Seconds;
+import static edu.wpi.first.units.Units.Volts;
+
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.VoltageUnit;
-import edu.wpi.first.units.measure.*;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularAcceleration;
+import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Current;
+import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.LinearAcceleration;
+import edu.wpi.first.units.measure.LinearVelocity;
+import edu.wpi.first.units.measure.Mass;
+import edu.wpi.first.units.measure.Time;
+import edu.wpi.first.units.measure.Velocity;
+import edu.wpi.first.units.measure.Voltage;
 import yams.gearing.GearBox;
-
-import static edu.wpi.first.units.Units.*;
 
 public final class Constants {
 
@@ -33,7 +55,36 @@ public final class Constants {
     }
 
     public static class IntakeConstants {
-        public static final int MOTOR_PWM_ID = -1;
+        public static final int ROLLER_MOTOR_PWM_ID = -1;
+        public static final double ROLLER_DEFAULT_SPEED = 0.0;
+
+        public static final int LINEAR_MOTOR_CAN_ID = -1;
+        public static final int LINEAR_MOTOR_STATOR_CURRENT_LIMIT = -1;
+        public static final int LINEAR_MOTOR_SUPPLY_CURRENT_LIMIT = -1;
+
+        public static class LinearConstants {
+            public static final Distance MOTOR_CIRCUMFERENCE = Meters.of(Inches.of(0.25).in(Meters) * 22); // TODO
+            public static final double PID_kP = 4.0; // TODO
+            public static final double PID_kI = 0.0; // TODO
+            public static final double PID_kD = 0.0; // TODO
+            public static final LinearVelocity MAX_VELOCITY = MetersPerSecond.of(0.5); // TODO
+            public static final LinearAcceleration MAX_ACCELERATION = MetersPerSecondPerSecond.of(0.5); // TODO
+            public static final Distance SOFT_LIMIT_MIN = Meters.of(0); // TODO
+            public static final Distance SOFT_LIMIT_MAX = Meters.of(2); // TODO
+            public static final GearBox GEARBOX = GearBox.fromReductionStages(3, 4); // TODO
+            public static final Current STATOR_CURRENT_LIMIT = Amps.of(40); // TODO
+            public static final Time CLOSED_LOOP_RAMP_RATE = Seconds.of(0.25); // TODO
+            public static final Time OPEN_LOOP_RAMP_RATE = Seconds.of(0.25); // TODO
+            public static final SimpleMotorFeedforward FEEDFORWARD = new SimpleMotorFeedforward(0, 0, 0, 0); // TODO
+            public static final Distance STARTING_HEIGHT = Meters.of(0.5); // TODO
+            public static final Distance HARD_LIMIT_MIN = Meters.of(0); // TODO
+            public static final Distance HARD_LIMIT_MAX = Meters.of(3); // TODO
+            public static final Mass MECHANISM_MASS = Pounds.of(16); // TODO
+            public static final Distance ROBOT_MAX_HEIGHT = Meters.of(1.5); // TODO
+            public static final Distance ROBOT_MAX_LENGTH = Meters.of(0.75); // TODO
+            public static final Translation3d RELATIVE_POSITION = new Translation3d(Meters.of(-0.25), Meters.of(0),
+                    Meters.of(0.5)); // TODO
+        }
     }
 
     public static final class FlywheelConstants {
@@ -82,8 +133,10 @@ public final class Constants {
 
         public static final Time CLOSED_LOOP_RAMP_RATE_SEC = Seconds.of(0.25); // TODO
         public static final Time OPEN_LOOP_RAMP_RATE_SEC = Seconds.of(0.25); // TODO
-        public static final SimpleMotorFeedforward FEEDFORWARD = new SimpleMotorFeedforward(0.27937, 0.089836, 0.014557); // TODO
-        public static final SimpleMotorFeedforward SIM_FEEDFORWARD = new SimpleMotorFeedforward(0.27937, 0.089836, 0.014557); // TODO
+        public static final SimpleMotorFeedforward FEEDFORWARD = new SimpleMotorFeedforward(0.27937, 0.089836,
+                0.014557); // TODO
+        public static final SimpleMotorFeedforward SIM_FEEDFORWARD = new SimpleMotorFeedforward(0.27937, 0.089836,
+                0.014557); // TODO
 
         public static final Angle SOFT_LIMIT_MIN = Degrees.of(5); // TODO
         public static final Angle SOFT_LIMIT_MAX = Degrees.of(100); // TODO

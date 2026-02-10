@@ -34,17 +34,16 @@ import yams.motorcontrollers.remote.TalonFXWrapper;
 
 public class FlywheelSubsystem extends SubsystemBase {
 
-    private final Distance diameter = FlywheelConstants.DIAMETER_INCHES;
-    private final TalonFX motor = new TalonFX(FlywheelConstants.MOTOR_ID);
+    private final Distance m_diameter = FlywheelConstants.DIAMETER_INCHES;
+    private final TalonFX m_motor = new TalonFX(FlywheelConstants.MOTOR_ID);
 
-    private final SmartMotorControllerConfig smcConfig = new SmartMotorControllerConfig(this)
+    private final SmartMotorControllerConfig m_smcConfig = new SmartMotorControllerConfig(this)
             .withClosedLoopController(
                     FlywheelConstants.PID_kP,
                     FlywheelConstants.PID_kI,
                     FlywheelConstants.PID_kD,
                     FlywheelConstants.MAX_VELOCITY_RPM,
-                    FlywheelConstants.MAX_ACCELERATION_RPS2
-            )
+                    FlywheelConstants.MAX_ACCELERATION_RPS2)
             .withGearing(new MechanismGearing(FlywheelConstants.GEARBOX))
             .withIdleMode(MotorMode.COAST) // Keep spinning even if not powered
             .withTelemetry("FlywheelMotor", TelemetryVerbosity.HIGH)
@@ -56,59 +55,62 @@ public class FlywheelSubsystem extends SubsystemBase {
             .withSimFeedforward(FlywheelConstants.SIM_FEEDFORWARD)
             .withControlMode(ControlMode.CLOSED_LOOP);
 
-    private final SmartMotorController smartMotorController = new TalonFXWrapper(motor, DCMotor.getKrakenX60(1), smcConfig);
+    private final SmartMotorController m_smartMotorController = new TalonFXWrapper(m_motor, DCMotor.getKrakenX60(1),
+            m_smcConfig);
 
-    private final FlyWheelConfig flywheelConfig = new FlyWheelConfig(smartMotorController)
+    private final FlyWheelConfig m_flywheelConfig = new FlyWheelConfig(m_smartMotorController)
             .withDiameter(FlywheelConstants.DIAMETER_INCHES)
             .withMass(FlywheelConstants.MASS_POUNDS)
             .withTelemetry("FlywheelMech", TelemetryVerbosity.HIGH)
             .withSoftLimit(RPM.of(-FlywheelConstants.SOFT_LIMIT_RPM), RPM.of(FlywheelConstants.SOFT_LIMIT_RPM))
             .withSpeedometerSimulation(FlywheelConstants.SIM_MAX_VELOCITY_RPM);
 
-    private final FlyWheel flywheel = new FlyWheel(flywheelConfig);
+    private final FlyWheel m_flywheel = new FlyWheel(m_flywheelConfig);
 
     public FlywheelSubsystem() {
     }
 
     public AngularVelocity getVelocity() {
-        return flywheel.getSpeed();
+        return m_flywheel.getSpeed();
     }
 
     public Command setVelocity(AngularVelocity speed) {
-        return flywheel.setSpeed(speed);
+        return m_flywheel.setSpeed(speed);
     }
 
     public Command setDutyCycle(double dutyCycle) {
-        return flywheel.set(dutyCycle);
+        return m_flywheel.set(dutyCycle);
     }
 
     public Command setVelocity(Supplier<AngularVelocity> speed) {
-        return flywheel.setSpeed(speed);
+        return m_flywheel.setSpeed(speed);
     }
 
     public Command setDutyCycle(Supplier<Double> dutyCycle) {
-        return flywheel.set(dutyCycle);
+        return m_flywheel.set(dutyCycle);
     }
 
     public Command sysId() {
-        return flywheel.sysId(Volts.of(10), Volts.of(1).per(Second), Seconds.of(5)); // TODO
+        return m_flywheel.sysId(Volts.of(10), Volts.of(1).per(Second), Seconds.of(5)); // TODO
     }
 
     @Override
     public void simulationPeriodic() {
-        flywheel.simIterate();
+        m_flywheel.simIterate();
     }
 
     public Command setRPM(LinearVelocity speed) {
-        return flywheel.setSpeed(RotationsPerSecond.of(speed.in(MetersPerSecond) / diameter.times(Math.PI).in(Meters)));
+        return m_flywheel
+                .setSpeed(RotationsPerSecond.of(speed.in(MetersPerSecond) / m_diameter.times(Math.PI).in(Meters)));
     }
 
     public void setRPMDirect(LinearVelocity speed) {
-        smartMotorController.setVelocity(RotationsPerSecond.of(speed.in(MetersPerSecond) / diameter.times(Math.PI).in(Meters)));
+        m_smartMotorController
+                .setVelocity(RotationsPerSecond.of(speed.in(MetersPerSecond) / m_diameter.times(Math.PI).in(Meters)));
     }
 
     @Override
     public void periodic() {
-        flywheel.updateTelemetry();
+        m_flywheel.updateTelemetry();
     }
 }
