@@ -53,8 +53,9 @@ public class HoodSubsystem extends SubsystemBase {
             .withSoftLimits(HoodConstants.SOFT_LIMIT_MIN, HoodConstants.SOFT_LIMIT_MAX)
             .withHardLimit(HoodConstants.HARD_LIMIT_MIN, HoodConstants.HARD_LIMIT_MAX); // The Hood can be modeled as an
                                                                                         // arm since it has a
-    // gravitational force acted upon based on the angle its in
 
+    // We use Arm, since a hood has gravitational force acted upon based on the
+    // angle its in
     private final Arm hood = new Arm(hoodConfig);
 
     public HoodSubsystem() {
