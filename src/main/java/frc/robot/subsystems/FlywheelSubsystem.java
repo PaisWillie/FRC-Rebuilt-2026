@@ -33,83 +33,144 @@ import yams.motorcontrollers.remote.TalonFXWrapper;
 
 public class FlywheelSubsystem extends SubsystemBase {
 
-    private final Distance m_diameter = FlywheelConstants.DIAMETER_INCHES;
-    private final TalonFX m_motor = new TalonFX(FlywheelConstants.MOTOR_ID);
+    private final TalonFX m_motor;
 
-    private final SmartMotorControllerConfig m_smcConfig = new SmartMotorControllerConfig(this)
-            .withClosedLoopController(
-                    FlywheelConstants.PID_kP,
-                    FlywheelConstants.PID_kI,
-                    FlywheelConstants.PID_kD,
-                    FlywheelConstants.MAX_VELOCITY_RPM,
-                    FlywheelConstants.MAX_ACCELERATION_RPS2)
-            .withGearing(new MechanismGearing(FlywheelConstants.GEARBOX))
-            .withIdleMode(MotorMode.COAST) // Keep spinning even if not powered
-            .withTelemetry("FlywheelMotor", TelemetryVerbosity.HIGH)
-            .withStatorCurrentLimit(FlywheelConstants.STATOR_CURRENT_LIMIT_AMPS)
-            .withMotorInverted(false)
-            .withClosedLoopRampRate(FlywheelConstants.CLOSED_LOOP_RAMP_RATE_SEC)
-            .withOpenLoopRampRate(FlywheelConstants.OPEN_LOOP_RAMP_RATE_SEC)
-            .withFeedforward(FlywheelConstants.FEEDFORWARD)
-            .withSimFeedforward(FlywheelConstants.SIM_FEEDFORWARD)
-            .withControlMode(ControlMode.CLOSED_LOOP);
+    private final SmartMotorControllerConfig m_smcConfig;
 
-    private final SmartMotorController m_smartMotorController = new TalonFXWrapper(
-            m_motor,
-            FlywheelConstants.MOTOR,
-            m_smcConfig);
+    private final SmartMotorController m_smartMotorController;
 
-    private final FlyWheelConfig m_flywheelConfig = new FlyWheelConfig(m_smartMotorController)
-            .withDiameter(FlywheelConstants.DIAMETER_INCHES)
-            .withMass(FlywheelConstants.MASS_POUNDS)
-            .withTelemetry("FlywheelMech", TelemetryVerbosity.HIGH)
-            .withSoftLimit(RPM.of(-FlywheelConstants.SOFT_LIMIT_RPM), RPM.of(FlywheelConstants.SOFT_LIMIT_RPM))
-            .withSpeedometerSimulation(FlywheelConstants.SIM_MAX_VELOCITY_RPM);
+    private final FlyWheelConfig m_flywheelConfig;
 
-    private final FlyWheel m_flywheel = new FlyWheel(m_flywheelConfig);
+    private final FlyWheel m_flywheel;
 
     public FlywheelSubsystem() {
+        m_motor = new TalonFX(FlywheelConstants.MOTOR_ID);
+
+        m_smcConfig = new SmartMotorControllerConfig(this)
+                .withClosedLoopController(
+                        FlywheelConstants.PID_kP,
+                        FlywheelConstants.PID_kI,
+                        FlywheelConstants.PID_kD,
+                        FlywheelConstants.MAX_VELOCITY_RPM,
+                        FlywheelConstants.MAX_ACCELERATION_RPS2)
+                .withGearing(new MechanismGearing(FlywheelConstants.GEARBOX))
+                .withIdleMode(MotorMode.COAST) // Keep spinning even if not powered
+                .withTelemetry("FlywheelMotor", TelemetryVerbosity.HIGH)
+                .withStatorCurrentLimit(FlywheelConstants.STATOR_CURRENT_LIMIT_AMPS)
+                .withMotorInverted(false)
+                .withClosedLoopRampRate(FlywheelConstants.CLOSED_LOOP_RAMP_RATE_SEC)
+                .withOpenLoopRampRate(FlywheelConstants.OPEN_LOOP_RAMP_RATE_SEC)
+                .withFeedforward(FlywheelConstants.FEEDFORWARD)
+                .withSimFeedforward(FlywheelConstants.SIM_FEEDFORWARD)
+                .withControlMode(ControlMode.CLOSED_LOOP);
+
+        m_smartMotorController = new TalonFXWrapper(
+                m_motor,
+                FlywheelConstants.MOTOR,
+                m_smcConfig);
+
+        m_flywheelConfig = new FlyWheelConfig(m_smartMotorController)
+                .withDiameter(FlywheelConstants.DIAMETER_INCHES)
+                .withMass(FlywheelConstants.MASS_POUNDS)
+                .withTelemetry("FlywheelMech", TelemetryVerbosity.HIGH)
+                .withSoftLimit(RPM.of(-FlywheelConstants.SOFT_LIMIT_RPM), RPM.of(FlywheelConstants.SOFT_LIMIT_RPM))
+                .withSpeedometerSimulation(FlywheelConstants.SIM_MAX_VELOCITY_RPM);
+
+        m_flywheel = new FlyWheel(m_flywheelConfig);
     }
 
+    /**
+     * Gets the current flywheel velocity.
+     *
+     * @return the current angular velocity
+     */
     public AngularVelocity getVelocity() {
         return m_flywheel.getSpeed();
     }
 
+    /**
+     * Creates a command to set the flywheel velocity.
+     *
+     * @param speed the target angular velocity
+     * @return the command that sets flywheel speed
+     */
     public Command setVelocity(AngularVelocity speed) {
         return m_flywheel.setSpeed(speed);
     }
 
+    /**
+     * Creates a command to set the flywheel duty cycle.
+     *
+     * @param dutyCycle the duty cycle (-1.0 to 1.0)
+     * @return the command that sets duty cycle
+     */
     public Command setDutyCycle(double dutyCycle) {
         return m_flywheel.set(dutyCycle);
     }
 
+    /**
+     * Creates a command to set the flywheel velocity from a supplier.
+     *
+     * @param speed the supplier of target angular velocity
+     * @return the command that sets flywheel speed
+     */
     public Command setVelocity(Supplier<AngularVelocity> speed) {
         return m_flywheel.setSpeed(speed);
     }
 
+    /**
+     * Creates a command to set the flywheel duty cycle from a supplier.
+     *
+     * @param dutyCycle the supplier of duty cycle (-1.0 to 1.0)
+     * @return the command that sets duty cycle
+     */
     public Command setDutyCycle(Supplier<Double> dutyCycle) {
         return m_flywheel.set(dutyCycle);
     }
 
+    /**
+     * Creates a SysId characterization command for the flywheel.
+     *
+     * @return the SysId command
+     */
     public Command sysId() {
         return m_flywheel.sysId(Volts.of(10), Volts.of(1).per(Second), Seconds.of(5)); // TODO
     }
 
+    /**
+     * Runs the flywheel simulation step.
+     */
     @Override
     public void simulationPeriodic() {
         m_flywheel.simIterate();
     }
 
+    /**
+     * Creates a command to set the flywheel speed based on linear velocity.
+     *
+     * @param speed the desired linear velocity
+     * @return the command that sets flywheel speed
+     */
     public Command setRPM(LinearVelocity speed) {
         return m_flywheel
-                .setSpeed(RotationsPerSecond.of(speed.in(MetersPerSecond) / m_diameter.times(Math.PI).in(Meters)));
+                .setSpeed(RotationsPerSecond
+                        .of(speed.in(MetersPerSecond) / FlywheelConstants.DIAMETER_INCHES.times(Math.PI).in(Meters)));
     }
 
+    /**
+     * Directly sets flywheel speed based on linear velocity.
+     *
+     * @param speed the desired linear velocity
+     */
     public void setRPMDirect(LinearVelocity speed) {
         m_smartMotorController
-                .setVelocity(RotationsPerSecond.of(speed.in(MetersPerSecond) / m_diameter.times(Math.PI).in(Meters)));
+                .setVelocity(RotationsPerSecond
+                        .of(speed.in(MetersPerSecond) / FlywheelConstants.DIAMETER_INCHES.times(Math.PI).in(Meters)));
     }
 
+    /**
+     * Updates flywheel telemetry.
+     */
     @Override
     public void periodic() {
         m_flywheel.updateTelemetry();

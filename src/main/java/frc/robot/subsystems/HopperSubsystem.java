@@ -16,6 +16,11 @@ public class HopperSubsystem extends SubsystemBase {
     m_motor = new Servo(HopperConstants.MOTOR_ID);
   }
 
+  /**
+   * Sets the hopper servo position in degrees.
+   *
+   * @param degrees the target angle
+   */
   public void setPosition(double degrees) {
     m_motor.setAngle(degrees);
   }

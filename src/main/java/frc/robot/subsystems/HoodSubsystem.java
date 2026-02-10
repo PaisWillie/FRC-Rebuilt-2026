@@ -62,22 +62,49 @@ public class HoodSubsystem extends SubsystemBase {
 
     }
 
+    /**
+     * Creates a command to set the hood angle.
+     *
+     * @param angle the target angle
+     * @return the command that sets the angle
+     */
     public Command setAngle(Angle angle) {
         return hood.setAngle(angle);
     }
 
+    /**
+     * Directly sets the hood angle.
+     *
+     * @param angle the target angle
+     */
     public void setAngleDirect(Angle angle) {
         smartMotorController.setPosition(angle);
     }
 
+    /**
+     * Creates a command to set the hood angle from a supplier.
+     *
+     * @param angleSupplier the supplier of target angle
+     * @return the command that sets the angle
+     */
     public Command setAngle(Supplier<Angle> angleSupplier) {
         return hood.setAngle(angleSupplier);
     }
 
+    /**
+     * Gets the current hood angle.
+     *
+     * @return the current angle
+     */
     public Angle getAngle() {
         return hood.getAngle();
     }
 
+    /**
+     * Creates a SysId characterization command for the hood.
+     *
+     * @return the SysId command
+     */
     public Command sysId() {
         return hood.sysId(
                 HoodConstants.SYSID_MAX_VOLTAGE,
@@ -85,19 +112,37 @@ public class HoodSubsystem extends SubsystemBase {
                 HoodConstants.SYSID_DURATION);
     }
 
+    /**
+     * Creates a command to set the hood duty cycle from a supplier.
+     *
+     * @param dutyCycleSupplier the supplier of duty cycle (-1.0 to 1.0)
+     * @return the command that sets duty cycle
+     */
     public Command setDutyCycle(Supplier<Double> dutyCycleSupplier) {
         return hood.set(dutyCycleSupplier);
     }
 
+    /**
+     * Creates a command to set the hood duty cycle.
+     *
+     * @param dutyCycle the duty cycle (-1.0 to 1.0)
+     * @return the command that sets duty cycle
+     */
     public Command setDutyCycle(double dutyCycle) {
         return hood.set(dutyCycle);
     }
 
+    /**
+     * Updates hood telemetry.
+     */
     @Override
     public void periodic() {
         hood.updateTelemetry();
     }
 
+    /**
+     * Runs the hood simulation step.
+     */
     @Override
     public void simulationPeriodic() {
         hood.simIterate();

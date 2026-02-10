@@ -107,15 +107,27 @@ public class IntakeSubsystem extends SubsystemBase {
         m_rollerMotor.stopMotor();
     }
 
+    /**
+     * Creates a command to set the linear intake height.
+     *
+     * @param height the desired height
+     * @return the command that sets the height
+     */
     public Command setLinearPosition(Distance height) {
         return m_linearIntake.setHeight(height);
     }
 
+    /**
+     * Updates intake telemetry.
+     */
     @Override
     public void periodic() {
         m_linearIntake.updateTelemetry();
     }
 
+    /**
+     * Runs the intake simulation step.
+     */
     @Override
     public void simulationPeriodic() {
         m_linearIntake.simIterate();
