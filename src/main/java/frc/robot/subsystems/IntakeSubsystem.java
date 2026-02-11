@@ -10,6 +10,7 @@ import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.motorcontrol.PWMTalonFX;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 import frc.robot.Constants.IntakeConstants;
 import yams.gearing.MechanismGearing;
 import yams.mechanisms.config.ElevatorConfig;
@@ -61,7 +62,7 @@ public class IntakeSubsystem extends SubsystemBase {
                         IntakeConstants.LinearConstants.SOFT_LIMIT_MAX_METERS)
                 .withGearing(new MechanismGearing(IntakeConstants.LinearConstants.GEARBOX))
                 .withIdleMode(MotorMode.BRAKE)
-                .withTelemetry("ElevatorMotor", TelemetryVerbosity.HIGH)
+                .withTelemetry("ElevatorMotor", Constants.TELEMETRY_VERBOSITY)
                 .withStatorCurrentLimit(IntakeConstants.LinearConstants.STATOR_CURRENT_LIMIT_AMPS)
                 .withMotorInverted(false)
                 .withClosedLoopRampRate(IntakeConstants.LinearConstants.CLOSED_LOOP_RAMP_RATE_SEC)
@@ -84,7 +85,7 @@ public class IntakeSubsystem extends SubsystemBase {
                 .withHardLimits(
                         IntakeConstants.LinearConstants.HARD_LIMIT_MIN_METERS,
                         IntakeConstants.LinearConstants.HARD_LIMIT_MAX_METERS)
-                .withTelemetry("Elevator", TelemetryVerbosity.HIGH)
+                .withTelemetry("Elevator", Constants.TELEMETRY_VERBOSITY)
                 .withMechanismPositionConfig(m_robotToMechanism)
                 .withMass(IntakeConstants.LinearConstants.MECHANISM_MASS_POUNDS);
 

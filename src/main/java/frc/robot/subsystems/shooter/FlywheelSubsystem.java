@@ -1,7 +1,7 @@
 // Copyright (c) FIRST and other WPILib contributors.
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
-package frc.robot.subsystems;
+package frc.robot.subsystems.shooter;
 
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
@@ -19,6 +19,7 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 import frc.robot.Constants.FlywheelConstants;
 import yams.gearing.MechanismGearing;
 import yams.mechanisms.config.FlyWheelConfig;
@@ -54,7 +55,7 @@ public class FlywheelSubsystem extends SubsystemBase {
                         FlywheelConstants.MAX_ACCELERATION_RPS2)
                 .withGearing(new MechanismGearing(FlywheelConstants.GEARBOX))
                 .withIdleMode(MotorMode.COAST) // Keep spinning even if not powered
-                .withTelemetry("FlywheelMotor", TelemetryVerbosity.HIGH)
+                .withTelemetry("FlywheelMotor", Constants.TELEMETRY_VERBOSITY)
                 .withStatorCurrentLimit(FlywheelConstants.STATOR_CURRENT_LIMIT_AMPS)
                 .withMotorInverted(false)
                 .withClosedLoopRampRate(FlywheelConstants.CLOSED_LOOP_RAMP_RATE_SEC)
@@ -71,7 +72,7 @@ public class FlywheelSubsystem extends SubsystemBase {
         m_flywheelConfig = new FlyWheelConfig(m_smartMotorController)
                 .withDiameter(FlywheelConstants.DIAMETER_INCHES)
                 .withMass(FlywheelConstants.MASS_POUNDS)
-                .withTelemetry("FlywheelMech", TelemetryVerbosity.HIGH)
+                .withTelemetry("FlywheelMech", Constants.TELEMETRY_VERBOSITY)
                 .withSoftLimit(RPM.of(-FlywheelConstants.SOFT_LIMIT_RPM), RPM.of(FlywheelConstants.SOFT_LIMIT_RPM))
                 .withSpeedometerSimulation(FlywheelConstants.SIM_MAX_VELOCITY_RPM);
 
