@@ -160,6 +160,11 @@ public class RobotContainer {
             m_driverController.L1()
                     .whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
         }
+
+        m_driverController.povUp().whileTrue(drivebase.driveForward());
+        m_driverController.povDown().whileTrue(drivebase.driveBackward());
+        m_driverController.povLeft().whileTrue(drivebase.driveLeft());
+        m_driverController.povRight().whileTrue(drivebase.driveRight());
     }
 
     public Command getAutonomousCommand() {
