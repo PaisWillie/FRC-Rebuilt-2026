@@ -28,7 +28,6 @@ import yams.motorcontrollers.SmartMotorController;
 import yams.motorcontrollers.SmartMotorControllerConfig;
 import yams.motorcontrollers.SmartMotorControllerConfig.ControlMode;
 import yams.motorcontrollers.SmartMotorControllerConfig.MotorMode;
-import yams.motorcontrollers.SmartMotorControllerConfig.TelemetryVerbosity;
 import yams.motorcontrollers.remote.TalonFXWrapper;
 
 public class FlywheelSubsystem extends SubsystemBase {
@@ -42,6 +41,8 @@ public class FlywheelSubsystem extends SubsystemBase {
     private final FlyWheelConfig m_flywheelConfig;
 
     private final FlyWheel m_flywheel;
+
+    private AngularVelocity m_targetVelocity = RPM.of(0);
 
     public FlywheelSubsystem() {
         m_motor = new TalonFX(FlywheelConstants.MOTOR_ID);
@@ -95,17 +96,8 @@ public class FlywheelSubsystem extends SubsystemBase {
      * @return the command that sets flywheel speed
      */
     public Command setVelocity(AngularVelocity speed) {
+        m_targetVelocity = speed;
         return m_flywheel.setSpeed(speed);
-    }
-
-    /**
-     * Creates a command to set the flywheel duty cycle.
-     *
-     * @param dutyCycle the duty cycle (-1.0 to 1.0)
-     * @return the command that sets duty cycle
-     */
-    public Command setDutyCycle(double dutyCycle) {
-        return m_flywheel.set(dutyCycle);
     }
 
     /**
@@ -115,17 +107,8 @@ public class FlywheelSubsystem extends SubsystemBase {
      * @return the command that sets flywheel speed
      */
     public Command setVelocity(Supplier<AngularVelocity> speed) {
+        m_targetVelocity = speed.get();
         return m_flywheel.setSpeed(speed);
-    }
-
-    /**
-     * Creates a command to set the flywheel duty cycle from a supplier.
-     *
-     * @param dutyCycle the supplier of duty cycle (-1.0 to 1.0)
-     * @return the command that sets duty cycle
-     */
-    public Command setDutyCycle(Supplier<Double> dutyCycle) {
-        return m_flywheel.set(dutyCycle);
     }
 
     /**
@@ -152,9 +135,9 @@ public class FlywheelSubsystem extends SubsystemBase {
      * @return the command that sets flywheel speed
      */
     public Command setRPM(LinearVelocity speed) {
-        return m_flywheel
-                .setSpeed(RotationsPerSecond
-                        .of(speed.in(MetersPerSecond) / FlywheelConstants.DIAMETER_INCHES.times(Math.PI).in(Meters)));
+        m_targetVelocity = RotationsPerSecond
+                .of(speed.in(MetersPerSecond) / FlywheelConstants.DIAMETER_INCHES.times(Math.PI).in(Meters));
+        return m_flywheel.setSpeed(m_targetVelocity);
     }
 
     /**
@@ -163,9 +146,26 @@ public class FlywheelSubsystem extends SubsystemBase {
      * @param speed the desired linear velocity
      */
     public void setRPMDirect(LinearVelocity speed) {
-        m_smartMotorController
-                .setVelocity(RotationsPerSecond
-                        .of(speed.in(MetersPerSecond) / FlywheelConstants.DIAMETER_INCHES.times(Math.PI).in(Meters)));
+        m_targetVelocity = RotationsPerSecond
+                .of(speed.in(MetersPerSecond) / FlywheelConstants.DIAMETER_INCHES.times(Math.PI).in(Meters));
+        m_smartMotorController.setVelocity(m_targetVelocity);
+    }
+
+    public Command shoot() {
+        return setVelocity(FlywheelConstants.SHOOTING_VELOCITY_RPM);
+    }
+
+    public Command setDefaultRPM() {
+        return setVelocity(FlywheelConstants.DEFAULT_VELOCITY_RPM);
+    }
+
+    public boolean isAtTargetRPM() {
+        double deltaRPM = getVelocity().in(RPM) - m_targetVelocity.in(RPM);
+        return Math.abs(deltaRPM) <= FlywheelConstants.RPM_TOLERANCE.in(RPM);
+    }
+
+    public Command stop() {
+        return setVelocity(RPM.of(0));
     }
 
     /**

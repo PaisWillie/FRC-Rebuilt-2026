@@ -32,8 +32,8 @@ public class RobotContainer {
 
     private final ClimbSubsystem m_climbSubsystem = new ClimbSubsystem();
     private final HopperSubsystem m_hopperSubsystem = new HopperSubsystem();
-    private final IndexerSubsystem m_indexerSubsystem = new IndexerSubsystem();
-    private final IntakeSubsystem m_intakeSubsystem = new IntakeSubsystem();
+    // private final IndexerSubsystem m_indexerSubsystem = new IndexerSubsystem();
+    // private final IntakeSubsystem m_intakeSubsystem = new IntakeSubsystem();
     private final ShooterSubsystem m_shooterSubsystem = new ShooterSubsystem();
     private final SwerveSubsystem m_swerveSubsystem = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
             "swerve"));

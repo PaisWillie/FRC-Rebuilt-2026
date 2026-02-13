@@ -5,6 +5,7 @@
 package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.Meter;
+import static edu.wpi.first.units.Units.Meters;
 
 import java.io.File;
 import java.util.Arrays;
@@ -18,6 +19,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -561,6 +563,17 @@ public class SwerveSubsystem extends SubsystemBase {
                 return Zone.NEUTRAL_ZONE_RED_RIGHT;
             }
         }
+    }
+
+    /**
+     * Gets the distance from the hub.
+     *
+     * @return the distance from the hub to the center of the robot in meters
+     */
+    public Distance getDistanceFromHub() {
+        Translation2d position = getPose().getTranslation();
+        // TODO: Change to adapt to current alliance colour
+        return Meters.of(position.getDistance(FieldConstants.BLUE_HUB_CENTER));
     }
 
 }

@@ -14,6 +14,8 @@ import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 
+import java.util.Map;
+
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
@@ -118,6 +120,11 @@ public final class Constants {
         public static final AngularVelocity SIM_MAX_VELOCITY_RPM = RPM.of(7500); // TODO
 
         public static final AngularAcceleration MAX_ACCELERATION_RPS2 = RotationsPerSecondPerSecond.of(2500); // TODO
+
+        public static final AngularVelocity DEFAULT_VELOCITY_RPM = RPM.of(2000); // TODO
+        public static final AngularVelocity SHOOTING_VELOCITY_RPM = RPM.of(4000); // TODO
+
+        public static final AngularVelocity RPM_TOLERANCE = RPM.of(100); // TODO
     }
 
     public static final class HoodConstants {
@@ -145,10 +152,14 @@ public final class Constants {
                 0.014557); // TODO
 
         public static final Angle SOFT_LIMIT_MIN = Degrees.of(5); // TODO
-        public static final Angle SOFT_LIMIT_MAX = Degrees.of(100); // TODO
+        public static final Angle SOFT_LIMIT_MAX = Degrees.of(85); // TODO
 
         public static final Angle HARD_LIMIT_MIN = Degrees.of(0); // TODO
-        public static final Angle HARD_LIMIT_MAX = Degrees.of(120); // TODO
+        public static final Angle HARD_LIMIT_MAX = Degrees.of(90); // TODO
+
+        public static final Distance LENGTH = Inches.of(12); // TODO
+        public static final Mass MASS = Pounds.of(5); // TODO
+        public static final Angle STARTING_ANGLE = Degrees.of(0); // TODO
 
         public static final Voltage SYSID_MAX_VOLTAGE = Volts.of(4.0); // TODO
         public static final Velocity<VoltageUnit> SYSID_STEP = Volts.per(Second).of(0.5); // TODO
@@ -156,6 +167,8 @@ public final class Constants {
         public static final boolean EXTERNAL_ENCODER_INVERTED = false; // TODO
         public static final double EXTERNAL_ENCODER_GEARING = 17;
         public static final Angle EXTERNAL_ENCODER_ZERO_OFFSET = Degrees.of(0); // TODO
+
+        public static final Angle ANGLE_TOLERANCE = Degrees.of(2); // TODO
     }
 
     public static final class FeederConstants {
@@ -163,6 +176,20 @@ public final class Constants {
 
         public static final int MOTOR_STATOR_CURRENT_LIMIT = -1; // TODO
         public static final int MOTOR_SUPPLY_CURRENT_LIMIT = -1; // TODO
+
+        public static final double FEEDER_SPEED = 0.5; // TODO
+    }
+
+    public static final class ShooterConstants {
+        public static final Map<Double, Double> SHOOTER_DISTANCE_TO_HOOD_ANGLE = Map.ofEntries(
+                Map.entry(1.0, 80.0),
+                Map.entry(2.0, 70.0),
+                Map.entry(3.0, 60.0),
+                Map.entry(4.0, 50.0),
+                Map.entry(5.0, 40.0),
+                Map.entry(6.0, 30.0),
+                Map.entry(7.0, 20.0),
+                Map.entry(8.0, 10.0));
     }
 
     public static final class HopperConstants {

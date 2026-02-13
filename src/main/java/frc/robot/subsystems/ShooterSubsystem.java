@@ -4,32 +4,79 @@
 
 package frc.robot.subsystems;
 
+import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Meters;
+
+import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
+import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.ShooterConstants;
 import frc.robot.subsystems.shooter.FeederSubsystem;
 import frc.robot.subsystems.shooter.FlywheelSubsystem;
 import frc.robot.subsystems.shooter.HoodSubsystem;
 
 public class ShooterSubsystem extends SubsystemBase {
 
-    FeederSubsystem m_feederSubsystem;
-    FlywheelSubsystem m_flywheelSubsystem;
-    HoodSubsystem m_hoodSubsystem;
+    private FeederSubsystem m_feederSubsystem;
+    private FlywheelSubsystem m_flywheelSubsystem;
+    private HoodSubsystem m_hoodSubsystem;
+
+    private InterpolatingDoubleTreeMap m_distanceToHoodAngleMap;
 
     public ShooterSubsystem() {
         m_feederSubsystem = new FeederSubsystem();
         m_flywheelSubsystem = new FlywheelSubsystem();
         m_hoodSubsystem = new HoodSubsystem();
 
-        // TODO: Hood to constantly correct itself to the target angle using vision
-        // feedback
+        m_distanceToHoodAngleMap = new InterpolatingDoubleTreeMap();
+        ShooterConstants.SHOOTER_DISTANCE_TO_HOOD_ANGLE.forEach(m_distanceToHoodAngleMap::put);
 
-        // TODO: Set flywheel velocity to default speed when not shooting, and only
-        // increase to target speed when shooting command is active
+        // Set default command for flywheel to maintain a default RPM when not shooting
+        m_flywheelSubsystem.setDefaultCommand(m_flywheelSubsystem.setDefaultRPM());
     }
 
-    // public Command shoot() {
-    // return new SequentialCommandGroup();
-    // }
+    /**
+     * Checks if the shooter is ready to shoot by verifying that the hood is at the
+     * correct angle and the flywheel is at the target RPM.
+     * 
+     * @return true if the shooter is ready to shoot, false otherwise
+     */
+    public boolean isShooterReady() {
+        return m_hoodSubsystem.isAtAngle() && m_flywheelSubsystem.isAtTargetRPM();
+    }
+
+    /**
+     * Aims the shooter by adjusting the hood angle based on the distance to the
+     * target,
+     * and then shoots by spinning up the flywheel and feeding balls into it.
+     *
+     * @param distanceToTarget the distance from the robot to the target, used to
+     *                         determine the appropriate hood angle
+     * @return a Command that performs the aiming and shooting sequence when
+     *         executed
+     */
+    public Command aimAndShoot(Distance distanceToTarget) {
+        return Commands.parallel(
+
+                // Spin up flywheel and adjust hood angle in parallel, then feed balls when
+                // ready
+                m_flywheelSubsystem.shoot(),
+                m_hoodSubsystem.setAngle(Degrees.of(m_distanceToHoodAngleMap.get(distanceToTarget.in(Meters))))
+                        .repeatedly(),
+                new ConditionalCommand(m_feederSubsystem.feed(), m_feederSubsystem.stop(), this::isShooterReady)
+                        .repeatedly()
+
+        // Slow flywheel, lower hood, and stop feeder when we stop shooting
+        ).finallyDo((interrupted) -> {
+            m_flywheelSubsystem.setDefaultRPM();
+            m_hoodSubsystem.lowerHood();
+            m_feederSubsystem.stop();
+        }); // TODO: Check if this requires .schedule(), or a Commands.parallel(), or if it
+            // will run automatically after the parallel command finishes
+    }
 
     @Override
     public void periodic() {

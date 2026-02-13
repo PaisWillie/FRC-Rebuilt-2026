@@ -8,6 +8,8 @@ import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.FeederConstants;
 
@@ -46,8 +48,12 @@ public class FeederSubsystem extends SubsystemBase {
     /**
      * Stops the intake motor.
      */
-    public void stop() {
-        m_motor.stopMotor();
+    public Command stop() {
+        return this.run(() -> m_motor.stopMotor());
+    }
+
+    public Command feed() {
+        return this.run(() -> setSpeed(FeederConstants.FEEDER_SPEED));
     }
 
     @Override
