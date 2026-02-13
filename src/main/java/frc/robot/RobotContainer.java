@@ -19,20 +19,30 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 import frc.robot.Constants.OperatorConstants;
+import frc.robot.subsystems.ClimbSubsystem;
+import frc.robot.subsystems.HopperSubsystem;
+import frc.robot.subsystems.IndexerSubsystem;
+import frc.robot.subsystems.IntakeSubsystem;
+import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
 import swervelib.SwerveInputStream;
 
 public class RobotContainer {
     final CommandPS5Controller m_driverController = new CommandPS5Controller(Constants.DRIVER_CONTROLLER_PORT);
 
-    private final SwerveSubsystem drivebase = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
+    private final ClimbSubsystem m_climbSubsystem = new ClimbSubsystem();
+    private final HopperSubsystem m_hopperSubsystem = new HopperSubsystem();
+    private final IndexerSubsystem m_indexerSubsystem = new IndexerSubsystem();
+    private final IntakeSubsystem m_intakeSubsystem = new IntakeSubsystem();
+    private final ShooterSubsystem m_shooterSubsystem = new ShooterSubsystem();
+    private final SwerveSubsystem m_swerveSubsystem = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
             "swerve"));
 
     /**
      * Converts driver input into a field-relative ChassisSpeeds that is controlled
      * by angular velocity.
      */
-    SwerveInputStream driveAngularVelocity = SwerveInputStream.of(drivebase.getSwerveDrive(),
+    SwerveInputStream driveAngularVelocity = SwerveInputStream.of(m_swerveSubsystem.getSwerveDrive(),
             () -> m_driverController.getLeftY() * -1,
             () -> m_driverController.getLeftX() * -1)
             .withControllerRotationAxis(m_driverController::getRightX)
@@ -56,7 +66,7 @@ public class RobotContainer {
     SwerveInputStream driveRobotOriented = driveAngularVelocity.copy().robotRelative(true)
             .allianceRelativeControl(false);
 
-    SwerveInputStream driveAngularVelocityKeyboard = SwerveInputStream.of(drivebase.getSwerveDrive(),
+    SwerveInputStream driveAngularVelocityKeyboard = SwerveInputStream.of(m_swerveSubsystem.getSwerveDrive(),
             () -> -m_driverController.getLeftY(),
             () -> -m_driverController.getLeftX())
             .withControllerRotationAxis(() -> m_driverController.getRawAxis(
@@ -87,7 +97,7 @@ public class RobotContainer {
 
     private DoubleSupplier headingXSupplier() {
         return () -> {
-            Translation2d robotTranslation = drivebase.getSwerveDrive().getPose().getTranslation();
+            Translation2d robotTranslation = m_swerveSubsystem.getSwerveDrive().getPose().getTranslation();
             Translation2d delta = FieldConstants.BLUE_HUB_CENTER.minus(robotTranslation);
             Rotation2d heading = delta.getAngle().minus(Rotation2d.fromDegrees(90));
             return heading.getCos();
@@ -96,7 +106,7 @@ public class RobotContainer {
 
     private DoubleSupplier headingYSupplier() {
         return () -> {
-            Translation2d robotTranslation = drivebase.getSwerveDrive().getPose().getTranslation();
+            Translation2d robotTranslation = m_swerveSubsystem.getSwerveDrive().getPose().getTranslation();
             Translation2d delta = FieldConstants.BLUE_HUB_CENTER.minus(robotTranslation);
             Rotation2d heading = delta.getAngle().minus(Rotation2d.fromDegrees(90));
             return -heading.getSin();
@@ -108,15 +118,16 @@ public class RobotContainer {
             .headingWhile(true);
 
     public RobotContainer() {
+        DriverStation.silenceJoystickConnectionWarning(true);
         configureBindings();
     }
 
     private void configureBindings() {
-        Command driveFieldOrientedAnglularVelocity = drivebase.driveFieldOriented(driveAngularVelocity);
-        Command driveFieldOrientedDirectAngleKeyboard = drivebase.driveFieldOriented(driveDirectAngleKeyboard);
-        Command driveFieldOrientedAutoAim = drivebase.driveFieldOriented(driveAutoAim);
+        Command driveFieldOrientedAnglularVelocity = m_swerveSubsystem.driveFieldOriented(driveAngularVelocity);
+        Command driveFieldOrientedDirectAngleKeyboard = m_swerveSubsystem.driveFieldOriented(driveDirectAngleKeyboard);
+        Command driveFieldOrientedAutoAim = m_swerveSubsystem.driveFieldOriented(driveAutoAim);
 
-        drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity);
+        m_swerveSubsystem.setDefaultCommand(driveFieldOrientedAnglularVelocity);
 
         m_driverController.R1().whileTrue(driveFieldOrientedAutoAim);
 
@@ -135,9 +146,9 @@ public class RobotContainer {
                             new Constraints(Units.degreesToRadians(360),
                                     Units.degreesToRadians(180))));
             m_driverController.options()
-                    .onTrue(Commands.runOnce(() -> drivebase
+                    .onTrue(Commands.runOnce(() -> m_swerveSubsystem
                             .resetOdometry(new Pose2d(3, 3, new Rotation2d()))));
-            m_driverController.button(1).whileTrue(drivebase.sysIdDriveMotorCommand());
+            m_driverController.button(1).whileTrue(m_swerveSubsystem.sysIdDriveMotorCommand());
             m_driverController.button(2)
                     .whileTrue(Commands.runEnd(
                             () -> driveDirectAngleKeyboard.driveToPoseEnabled(true),
@@ -145,26 +156,26 @@ public class RobotContainer {
 
         }
         if (DriverStation.isTest()) {
-            drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity); // Overrides drive command
-                                                                             // above!
+            m_swerveSubsystem.setDefaultCommand(driveFieldOrientedAnglularVelocity); // Overrides drive command
+            // above!
 
             m_driverController.square()
-                    .whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
-            m_driverController.options().onTrue((Commands.runOnce(drivebase::zeroGyro)));
-            m_driverController.create().whileTrue(drivebase.centerModulesCommand());
+                    .whileTrue(Commands.runOnce(m_swerveSubsystem::lock, m_swerveSubsystem).repeatedly());
+            m_driverController.options().onTrue((Commands.runOnce(m_swerveSubsystem::zeroGyro)));
+            m_driverController.create().whileTrue(m_swerveSubsystem.centerModulesCommand());
             m_driverController.L1().onTrue(Commands.none());
         } else {
-            m_driverController.cross().onTrue((Commands.runOnce(drivebase::zeroGyro)));
+            m_driverController.cross().onTrue((Commands.runOnce(m_swerveSubsystem::zeroGyro)));
             m_driverController.options().whileTrue(Commands.none());
             m_driverController.create().whileTrue(Commands.none());
             m_driverController.L1()
-                    .whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
+                    .whileTrue(Commands.runOnce(m_swerveSubsystem::lock, m_swerveSubsystem).repeatedly());
         }
 
-        m_driverController.povUp().whileTrue(drivebase.driveForward());
-        m_driverController.povDown().whileTrue(drivebase.driveBackward());
-        m_driverController.povLeft().whileTrue(drivebase.driveLeft());
-        m_driverController.povRight().whileTrue(drivebase.driveRight());
+        m_driverController.povUp().whileTrue(m_swerveSubsystem.driveForward());
+        m_driverController.povDown().whileTrue(m_swerveSubsystem.driveBackward());
+        m_driverController.povLeft().whileTrue(m_swerveSubsystem.driveLeft());
+        m_driverController.povRight().whileTrue(m_swerveSubsystem.driveRight());
     }
 
     public Command getAutonomousCommand() {

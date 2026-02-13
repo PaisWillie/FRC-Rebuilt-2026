@@ -58,7 +58,7 @@ public final class Constants {
     }
 
     public static class IntakeConstants {
-        public static final int ROLLER_MOTOR_PWM_ID = -1; // TODO
+        public static final int ROLLER_MOTOR_PWM_ID = 1; // TODO
         public static final double ROLLER_DEFAULT_SPEED_DUTY_CYCLE = 0.0; // TODO
 
         public static class LinearConstants {
@@ -76,7 +76,7 @@ public final class Constants {
             public static final Current STATOR_CURRENT_LIMIT_AMPS = Amps.of(40); // TODO
             public static final Time CLOSED_LOOP_RAMP_RATE_SEC = Seconds.of(0.25); // TODO
             public static final Time OPEN_LOOP_RAMP_RATE_SEC = Seconds.of(0.25); // TODO
-            public static final SimpleMotorFeedforward FEEDFORWARD = new SimpleMotorFeedforward(0, 0, 0, 0); // TODO
+            public static final SimpleMotorFeedforward FEEDFORWARD = new SimpleMotorFeedforward(0, 0, 0, 0.1); // TODO
             public static final Distance STARTING_HEIGHT_METERS = Meters.of(0.5); // TODO
             public static final Distance HARD_LIMIT_MIN_METERS = Meters.of(0); // TODO
             public static final Distance HARD_LIMIT_MAX_METERS = Meters.of(3); // TODO
@@ -166,7 +166,7 @@ public final class Constants {
     }
 
     public static final class HopperConstants {
-        public static final int MOTOR_ID = -1; // TODO
+        public static final int MOTOR_PWM_ID = 0; // TODO
     }
 
     public static final class ClimbConstants {

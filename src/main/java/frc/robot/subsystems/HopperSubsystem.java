@@ -13,7 +13,7 @@ public class HopperSubsystem extends SubsystemBase {
   private final Servo m_motor;
 
   public HopperSubsystem() {
-    m_motor = new Servo(HopperConstants.MOTOR_ID);
+    m_motor = new Servo(HopperConstants.MOTOR_PWM_ID);
   }
 
   /**
