@@ -29,7 +29,6 @@ import yams.motorcontrollers.SmartMotorController;
 import yams.motorcontrollers.SmartMotorControllerConfig;
 import yams.motorcontrollers.SmartMotorControllerConfig.ControlMode;
 import yams.motorcontrollers.SmartMotorControllerConfig.MotorMode;
-import yams.motorcontrollers.SmartMotorControllerConfig.TelemetryVerbosity;
 import yams.motorcontrollers.local.SparkWrapper;
 
 public class ClimbSubsystem extends SubsystemBase {
@@ -146,6 +145,10 @@ public class ClimbSubsystem extends SubsystemBase {
 
   public Command sysId() {
     return m_elevator.sysId(ClimbConstants.SYSID_MAX_VOLTAGE, ClimbConstants.SYSID_STEP, ClimbConstants.SYSID_DURATION);
+  }
+
+  public Command test() {
+    return runOnce(() -> System.out.println("Running!"));
   }
 
   @Override

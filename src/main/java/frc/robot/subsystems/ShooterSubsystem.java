@@ -7,8 +7,11 @@ package frc.robot.subsystems;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Meters;
 
+import java.util.function.Supplier;
+
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
@@ -58,13 +61,13 @@ public class ShooterSubsystem extends SubsystemBase {
      * @return a Command that performs the aiming and shooting sequence when
      *         executed
      */
-    public Command aimAndShoot(Distance distanceToTarget) {
+    public Command aimAndShoot(Supplier<Distance> getDistanceToTarget) {
         return Commands.parallel(
 
                 // Spin up flywheel and adjust hood angle in parallel, then feed balls when
                 // ready
                 m_flywheelSubsystem.shoot(),
-                m_hoodSubsystem.setAngle(Degrees.of(m_distanceToHoodAngleMap.get(distanceToTarget.in(Meters))))
+                m_hoodSubsystem.setAngle(Degrees.of(m_distanceToHoodAngleMap.get(getDistanceToTarget.get().in(Meters))))
                         .repeatedly(),
                 new ConditionalCommand(m_feederSubsystem.feed(), m_feederSubsystem.stop(), this::isShooterReady)
                         .repeatedly()
@@ -74,11 +77,22 @@ public class ShooterSubsystem extends SubsystemBase {
             m_flywheelSubsystem.setDefaultRPM();
             m_hoodSubsystem.lowerHood();
             m_feederSubsystem.stop();
-        }); // TODO: Check if this requires .schedule(), or a Commands.parallel(), or if it
-            // will run automatically after the parallel command finishes
+        }) // TODO: Check if this requires .schedule(), or a Commands.parallel(), or
+           // if it will run automatically after the parallel command finishes
+                .withName("Aim and Shoot");
+
+    }
+
+    public Command test() {
+        return m_flywheelSubsystem.test();
     }
 
     @Override
     public void periodic() {
+    }
+
+    @Override
+    public void simulationPeriodic() {
+        SmartDashboard.putNumber("m_distanceToHoodAngleMap", m_distanceToHoodAngleMap.get(4.0));
     }
 }

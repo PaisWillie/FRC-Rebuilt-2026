@@ -20,7 +20,6 @@ import yams.motorcontrollers.SmartMotorController;
 import yams.motorcontrollers.SmartMotorControllerConfig;
 import yams.motorcontrollers.SmartMotorControllerConfig.ControlMode;
 import yams.motorcontrollers.SmartMotorControllerConfig.MotorMode;
-import yams.motorcontrollers.SmartMotorControllerConfig.TelemetryVerbosity;
 import yams.motorcontrollers.remote.TalonFXWrapper;
 
 /**
@@ -62,7 +61,7 @@ public class IntakeSubsystem extends SubsystemBase {
                         IntakeConstants.LinearConstants.SOFT_LIMIT_MAX_METERS)
                 .withGearing(new MechanismGearing(IntakeConstants.LinearConstants.GEARBOX))
                 .withIdleMode(MotorMode.BRAKE)
-                .withTelemetry("ElevatorMotor", Constants.TELEMETRY_VERBOSITY)
+                .withTelemetry("ClimbMotor", Constants.TELEMETRY_VERBOSITY)
                 .withStatorCurrentLimit(IntakeConstants.LinearConstants.STATOR_CURRENT_LIMIT_AMPS)
                 .withMotorInverted(false)
                 .withClosedLoopRampRate(IntakeConstants.LinearConstants.CLOSED_LOOP_RAMP_RATE_SEC)
@@ -85,7 +84,7 @@ public class IntakeSubsystem extends SubsystemBase {
                 .withHardLimits(
                         IntakeConstants.LinearConstants.HARD_LIMIT_MIN_METERS,
                         IntakeConstants.LinearConstants.HARD_LIMIT_MAX_METERS)
-                .withTelemetry("Elevator", Constants.TELEMETRY_VERBOSITY)
+                .withTelemetry("Climb", Constants.TELEMETRY_VERBOSITY)
                 .withMechanismPositionConfig(m_robotToMechanism)
                 .withMass(IntakeConstants.LinearConstants.MECHANISM_MASS_POUNDS);
 

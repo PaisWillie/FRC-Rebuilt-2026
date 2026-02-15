@@ -53,7 +53,7 @@ public final class Constants {
     }
 
     public static class IndexerConstants {
-        public static final int MOTOR_CAN_ID = -1; // TODO
+        public static final int MOTOR_CAN_ID = 1; // TODO
 
         public static final int MOTOR_STATOR_CURRENT_LIMIT = -1; // TODO
         public static final int MOTOR_SUPPLY_CURRENT_LIMIT = -1; // TODO
@@ -64,7 +64,7 @@ public final class Constants {
         public static final double ROLLER_DEFAULT_SPEED_DUTY_CYCLE = 0.0; // TODO
 
         public static class LinearConstants {
-            public static final int LINEAR_MOTOR_CAN_ID = -1;
+            public static final int LINEAR_MOTOR_CAN_ID = 2;
             public static final DCMotor MOTOR = DCMotor.getKrakenX60(1);
             public static final Distance MOTOR_CIRCUMFERENCE_METERS = Meters.of(Inches.of(0.25).in(Meters) * 22); // TODO
             public static final double PID_kP = 4.0; // TODO
@@ -92,7 +92,7 @@ public final class Constants {
     }
 
     public static final class FlywheelConstants {
-        public static final int MOTOR_ID = -1; // TODO
+        public static final int MOTOR_CAN_ID = 3; // TODO
         public static final DCMotor MOTOR = DCMotor.getKrakenX60(1);
 
         public static final Distance DIAMETER_INCHES = Inches.of(4.0); // TODO
@@ -128,10 +128,10 @@ public final class Constants {
     }
 
     public static final class HoodConstants {
-        public static final int MOTOR_CAN_ID = -1; // TODO
+        public static final int MOTOR_CAN_ID = 4; // TODO
         public static final DCMotor MOTOR = DCMotor.getKrakenX60(1);
 
-        public static final int ENCODER_CAN_ID = -1; // TODO
+        public static final int ENCODER_CAN_ID = 8; // TODO
 
         public static final GearBox GEARBOX = GearBox.fromReductionStages(3, 4); // TODO
 
@@ -172,7 +172,7 @@ public final class Constants {
     }
 
     public static final class FeederConstants {
-        public static final int MOTOR_CAN_ID = -1; // TODO
+        public static final int MOTOR_CAN_ID = 6; // TODO
 
         public static final int MOTOR_STATOR_CURRENT_LIMIT = -1; // TODO
         public static final int MOTOR_SUPPLY_CURRENT_LIMIT = -1; // TODO
@@ -193,11 +193,11 @@ public final class Constants {
     }
 
     public static final class HopperConstants {
-        public static final int MOTOR_PWM_ID = 0; // TODO
+        public static final int MOTOR_PWM_ID = 2; // TODO
     }
 
     public static final class ClimbConstants {
-        public static final int MOTOR_CAN_ID = 2; // TODO
+        public static final int MOTOR_CAN_ID = 7; // TODO
         public static final DCMotor MOTOR = DCMotor.getNEO(1); // TODO
         public static final Distance CHAIN_PITCH = Inches.of(0.25); // TODO
         public static final int TOOTH_COUNT = 22; // TODO

@@ -11,6 +11,7 @@ import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 
+import java.util.Optional;
 import java.util.function.Supplier;
 
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -42,10 +43,8 @@ public class FlywheelSubsystem extends SubsystemBase {
 
     private final FlyWheel m_flywheel;
 
-    private AngularVelocity m_targetVelocity = RPM.of(0);
-
     public FlywheelSubsystem() {
-        m_motor = new TalonFX(FlywheelConstants.MOTOR_ID);
+        m_motor = new TalonFX(FlywheelConstants.MOTOR_CAN_ID);
 
         m_smcConfig = new SmartMotorControllerConfig(this)
                 .withClosedLoopController(
@@ -96,7 +95,6 @@ public class FlywheelSubsystem extends SubsystemBase {
      * @return the command that sets flywheel speed
      */
     public Command setVelocity(AngularVelocity speed) {
-        m_targetVelocity = speed;
         return m_flywheel.setSpeed(speed);
     }
 
@@ -107,7 +105,6 @@ public class FlywheelSubsystem extends SubsystemBase {
      * @return the command that sets flywheel speed
      */
     public Command setVelocity(Supplier<AngularVelocity> speed) {
-        m_targetVelocity = speed.get();
         return m_flywheel.setSpeed(speed);
     }
 
@@ -135,9 +132,8 @@ public class FlywheelSubsystem extends SubsystemBase {
      * @return the command that sets flywheel speed
      */
     public Command setRPM(LinearVelocity speed) {
-        m_targetVelocity = RotationsPerSecond
-                .of(speed.in(MetersPerSecond) / FlywheelConstants.DIAMETER_INCHES.times(Math.PI).in(Meters));
-        return m_flywheel.setSpeed(m_targetVelocity);
+        return m_flywheel.setSpeed(RotationsPerSecond
+                .of(speed.in(MetersPerSecond) / FlywheelConstants.DIAMETER_INCHES.times(Math.PI).in(Meters)));
     }
 
     /**
@@ -146,9 +142,8 @@ public class FlywheelSubsystem extends SubsystemBase {
      * @param speed the desired linear velocity
      */
     public void setRPMDirect(LinearVelocity speed) {
-        m_targetVelocity = RotationsPerSecond
-                .of(speed.in(MetersPerSecond) / FlywheelConstants.DIAMETER_INCHES.times(Math.PI).in(Meters));
-        m_smartMotorController.setVelocity(m_targetVelocity);
+        m_smartMotorController.setVelocity(RotationsPerSecond
+                .of(speed.in(MetersPerSecond) / FlywheelConstants.DIAMETER_INCHES.times(Math.PI).in(Meters)));
     }
 
     public Command shoot() {
@@ -160,8 +155,18 @@ public class FlywheelSubsystem extends SubsystemBase {
     }
 
     public boolean isAtTargetRPM() {
-        double deltaRPM = getVelocity().in(RPM) - m_targetVelocity.in(RPM);
+        Optional<AngularVelocity> setpoint = m_smartMotorController.getMechanismSetpointVelocity();
+
+        if (!setpoint.isPresent())
+            return false;
+
+        double deltaRPM = setpoint.get().in(RPM) - getVelocity().in(RPM);
         return Math.abs(deltaRPM) <= FlywheelConstants.RPM_TOLERANCE.in(RPM);
+    }
+
+    // TODO: Delete this
+    public Command test() {
+        return runOnce(() -> System.out.println("Running!"));
     }
 
     public Command stop() {

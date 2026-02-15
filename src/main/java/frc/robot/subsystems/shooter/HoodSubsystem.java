@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems.shooter;
 
+import java.util.Optional;
 import java.util.function.Supplier;
 
 import com.ctre.phoenix6.hardware.CANcoder;
@@ -37,8 +38,6 @@ public class HoodSubsystem extends SubsystemBase {
     private final ArmConfig m_hoodConfig;
 
     private final Arm m_hood;
-
-    private Angle m_targetAngle = HoodConstants.STARTING_ANGLE;
 
     public HoodSubsystem() {
         m_motor = new TalonFX(HoodConstants.MOTOR_CAN_ID);
@@ -90,7 +89,6 @@ public class HoodSubsystem extends SubsystemBase {
      * @return the command that sets the angle
      */
     public Command setAngle(Angle angle) {
-        m_targetAngle = angle;
         return m_hood.setAngle(angle);
     }
 
@@ -100,7 +98,6 @@ public class HoodSubsystem extends SubsystemBase {
      * @param angle the target angle
      */
     public void setAngleDirect(Angle angle) {
-        m_targetAngle = angle;
         m_smartMotorController.setPosition(angle);
     }
 
@@ -111,7 +108,6 @@ public class HoodSubsystem extends SubsystemBase {
      * @return the command that sets the angle
      */
     public Command setAngle(Supplier<Angle> angleSupplier) {
-        m_targetAngle = angleSupplier.get();
         return m_hood.setAngle(angleSupplier);
     }
 
@@ -125,7 +121,12 @@ public class HoodSubsystem extends SubsystemBase {
     }
 
     public boolean isAtAngle() {
-        double deltaDeg = m_targetAngle.minus(m_hood.getAngle()).in(Units.Degrees);
+        Optional<Angle> setpoint = m_hood.getMechanismSetpoint();
+
+        if (!setpoint.isPresent())
+            return false;
+
+        double deltaDeg = setpoint.get().minus(m_hood.getAngle()).in(Units.Degrees);
         return Math.abs(deltaDeg) <= HoodConstants.ANGLE_TOLERANCE.in(Units.Degrees);
     }
 
