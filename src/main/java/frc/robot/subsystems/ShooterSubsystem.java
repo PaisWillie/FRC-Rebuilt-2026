@@ -14,7 +14,6 @@ import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.subsystems.shooter.FeederSubsystem;
@@ -87,11 +86,16 @@ public class ShooterSubsystem extends SubsystemBase {
                     return Degrees.of(m_distanceToHoodAngleMap
                             .get(getDistanceToTarget.get().in(Meters)));
                 });
-
     }
 
-    public Command test() {
-        return m_flywheelSubsystem.test();
+    public Command stopShooting() {
+        return Commands.parallel(
+                m_hoodSubsystem.lowerHood());
+    }
+
+    // TOOD: Delete this
+    public Command runFlywheel() {
+        return m_flywheelSubsystem.shoot();
     }
 
     @Override

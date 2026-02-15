@@ -70,6 +70,9 @@ public final class Constants {
             public static final double PID_kP = 4.0; // TODO
             public static final double PID_kI = 0.0; // TODO
             public static final double PID_kD = 0.0; // TODO
+            public static final double SIM_PID_kP = 4.0; // TODO
+            public static final double SIM_PID_kI = 0.0; // TODO
+            public static final double SIM_PID_kD = 0.0; // TODO
             public static final LinearVelocity MAX_VELOCITY_MPS = MetersPerSecond.of(0.5); // TODO
             public static final LinearAcceleration MAX_ACCELERATION_MPS2 = MetersPerSecondPerSecond.of(0.5); // TODO
             public static final Distance SOFT_LIMIT_MIN_METERS = Meters.of(0); // TODO
@@ -105,6 +108,9 @@ public final class Constants {
         public static final double PID_kP = 0.00016541; // TODO
         public static final double PID_kI = 0.0; // TODO
         public static final double PID_kD = 0.0; // TODO
+        public static final double SIM_PID_kP = 0.00016541; // TODO
+        public static final double SIM_PID_kI = 0.0; // TODO
+        public static final double SIM_PID_kD = 0.0; // TODO
 
         public static final Time CLOSED_LOOP_RAMP_RATE_SEC = Seconds.of(0.25); // TODO
         public static final Time OPEN_LOOP_RAMP_RATE_SEC = Seconds.of(0.25); // TODO
@@ -215,6 +221,9 @@ public final class Constants {
         public static final double PID_kP = 1; // TODO
         public static final double PID_kI = 0; // TODO
         public static final double PID_kD = 0; // TODO
+        public static final double SIM_PID_kP = 1; // TODO
+        public static final double SIM_PID_kI = 0; // TODO
+        public static final double SIM_PID_kD = 0; // TODO
         public static final double FEEDFORWARD_kS = 0; // TODO
         public static final double FEEDFORWARD_kG = 0; // TODO
         public static final double FEEDFORWARD_kV = 0; // TODO

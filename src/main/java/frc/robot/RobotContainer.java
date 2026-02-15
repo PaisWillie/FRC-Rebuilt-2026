@@ -193,20 +193,10 @@ public class RobotContainer {
         // .get(m_swerveSubsystem.getDistanceFromHub().in(Meters)));
         // }));
 
-        m_driverController.R1().whileTrue(m_shooterSubsystem.aimAndShoot(m_swerveSubsystem::getDistanceFromHub));
+        m_driverController.R1().whileTrue(m_shooterSubsystem.aimAndShoot(m_swerveSubsystem::getDistanceToHub))
+                .onFalse(m_shooterSubsystem.stopShooting());
 
-        // }
-        // m_driverController.cross().whileTrue(m_flywheelSubsystem.setVelocity(RPM.of(2000)));
-
-        // m_driverController.circle().whileTrue(m_shooterSubsystem.test());
-        m_driverController.cross()
-                .whileTrue(m_shooterSubsystem.m_hoodSubsystem.setAngle(Degrees.of(20)));
-        m_driverController.square()
-                .whileTrue(m_shooterSubsystem.m_hoodSubsystem.setAngle(Degrees.of(30)));
-        m_driverController.triangle()
-                .whileTrue(m_shooterSubsystem.m_hoodSubsystem.setAngle(Degrees.of(40)));
-        m_driverController.circle()
-                .whileTrue(m_shooterSubsystem.m_hoodSubsystem.setAngle(Degrees.of(50)));
+        m_driverController.cross().whileTrue(m_shooterSubsystem.runFlywheel());
     }
 
     public Command getAutonomousCommand() {

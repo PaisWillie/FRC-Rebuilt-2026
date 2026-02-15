@@ -56,6 +56,12 @@ public class IntakeSubsystem extends SubsystemBase {
                         IntakeConstants.LinearConstants.PID_kD,
                         IntakeConstants.LinearConstants.MAX_VELOCITY_MPS,
                         IntakeConstants.LinearConstants.MAX_ACCELERATION_MPS2)
+                .withSimClosedLoopController(
+                        IntakeConstants.LinearConstants.SIM_PID_kP,
+                        IntakeConstants.LinearConstants.SIM_PID_kI,
+                        IntakeConstants.LinearConstants.SIM_PID_kD,
+                        IntakeConstants.LinearConstants.MAX_VELOCITY_MPS,
+                        IntakeConstants.LinearConstants.MAX_ACCELERATION_MPS2)
                 .withSoftLimit(
                         IntakeConstants.LinearConstants.SOFT_LIMIT_MIN_METERS,
                         IntakeConstants.LinearConstants.SOFT_LIMIT_MAX_METERS)

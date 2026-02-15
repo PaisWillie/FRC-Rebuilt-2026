@@ -53,6 +53,12 @@ public class FlywheelSubsystem extends SubsystemBase {
                         FlywheelConstants.PID_kD,
                         FlywheelConstants.MAX_VELOCITY_RPM,
                         FlywheelConstants.MAX_ACCELERATION_RPS2)
+                .withSimClosedLoopController(
+                        FlywheelConstants.SIM_PID_kP,
+                        FlywheelConstants.SIM_PID_kI,
+                        FlywheelConstants.SIM_PID_kD,
+                        FlywheelConstants.MAX_VELOCITY_RPM,
+                        FlywheelConstants.MAX_ACCELERATION_RPS2)
                 .withGearing(new MechanismGearing(FlywheelConstants.GEARBOX))
                 .withIdleMode(MotorMode.COAST) // Keep spinning even if not powered
                 .withTelemetry("FlywheelMotor", Constants.TELEMETRY_VERBOSITY)

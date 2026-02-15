@@ -567,11 +567,11 @@ public class SwerveSubsystem extends SubsystemBase {
     }
 
     /**
-     * Gets the distance from the hub.
+     * Gets the distance to the hub.
      *
-     * @return the distance from the hub to the center of the robot in meters
+     * @return the distance to the hub to the center of the robot in meters
      */
-    public Distance getDistanceFromHub() {
+    public Distance getDistanceToHub() {
         Translation2d position = getPose().getTranslation();
         // TODO: Change to adapt to current alliance colour
         return Meters.of(position.getDistance(FieldConstants.BLUE_HUB_CENTER));
