@@ -164,11 +164,6 @@ public class FlywheelSubsystem extends SubsystemBase {
         return Math.abs(deltaRPM) <= FlywheelConstants.RPM_TOLERANCE.in(RPM);
     }
 
-    // TODO: Delete this
-    public Command test() {
-        return runOnce(() -> System.out.println("Running!"));
-    }
-
     public Command stop() {
         return setVelocity(RPM.of(0));
     }

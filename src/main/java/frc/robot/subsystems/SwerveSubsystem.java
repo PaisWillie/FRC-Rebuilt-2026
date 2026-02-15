@@ -104,7 +104,6 @@ public class SwerveSubsystem extends SubsystemBase {
 
     @Override
     public void simulationPeriodic() {
-        SmartDashboard.putNumber("Distance to Blue Hub", getDistanceFromHub().in(Meters));
     }
 
     /**

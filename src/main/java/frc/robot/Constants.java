@@ -141,6 +141,10 @@ public final class Constants {
         public static final double PID_kI = 0.0; // TODO
         public static final double PID_kD = 0.0; // TODO
 
+        public static final double SIM_PID_kP = 25; // TODO
+        public static final double SIM_PID_kI = 0.0; // TODO
+        public static final double SIM_PID_kD = 0.0; // TODO
+
         public static final AngularVelocity MAX_VELOCITY_RPM = RPM.of(5000); // TODO
         public static final AngularAcceleration MAX_ACCELERATION_RPS2 = RotationsPerSecondPerSecond.of(2500); // TODO
 

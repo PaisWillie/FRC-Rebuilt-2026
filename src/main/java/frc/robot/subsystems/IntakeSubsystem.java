@@ -117,6 +117,10 @@ public class IntakeSubsystem extends SubsystemBase {
         return m_linearIntake.setHeight(position);
     }
 
+    public Command elevCmd(double dutycycle) {
+        return m_linearIntake.set(dutycycle);
+    }
+
     /**
      * Updates intake telemetry.
      */

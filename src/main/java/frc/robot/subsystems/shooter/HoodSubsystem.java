@@ -50,6 +50,12 @@ public class HoodSubsystem extends SubsystemBase {
                         HoodConstants.PID_kD,
                         HoodConstants.MAX_VELOCITY_RPM,
                         HoodConstants.MAX_ACCELERATION_RPS2)
+                .withSimClosedLoopController(
+                        HoodConstants.SIM_PID_kP,
+                        HoodConstants.SIM_PID_kI,
+                        HoodConstants.SIM_PID_kD,
+                        HoodConstants.MAX_VELOCITY_RPM,
+                        HoodConstants.MAX_ACCELERATION_RPS2)
                 .withGearing(new MechanismGearing(HoodConstants.GEARBOX))
                 .withIdleMode(MotorMode.COAST)
                 .withTelemetry("HoodMotor", Constants.TELEMETRY_VERBOSITY)

@@ -62,24 +62,31 @@ public class ShooterSubsystem extends SubsystemBase {
      *         executed
      */
     public Command aimAndShoot(Supplier<Distance> getDistanceToTarget) {
-        return Commands.parallel(
+        // return Commands.parallel(
 
-                // Spin up flywheel and adjust hood angle in parallel, then feed balls when
-                // ready
-                m_flywheelSubsystem.shoot(),
-                m_hoodSubsystem.setAngle(Degrees.of(m_distanceToHoodAngleMap.get(getDistanceToTarget.get().in(Meters))))
-                        .repeatedly(),
-                new ConditionalCommand(m_feederSubsystem.feed(), m_feederSubsystem.stop(), this::isShooterReady)
-                        .repeatedly()
+        // // Spin up flywheel and adjust hood angle in parallel, then feed balls when
+        // // ready
+        // m_flywheelSubsystem.shoot(),
+        // m_hoodSubsystem.setAngle(Degrees.of(m_distanceToHoodAngleMap.get(getDistanceToTarget.get().in(Meters))))
+        // .repeatedly(),
+        // new ConditionalCommand(m_feederSubsystem.feed(), m_feederSubsystem.stop(),
+        // this::isShooterReady)
+        // .repeatedly()
 
-        // Slow flywheel, lower hood, and stop feeder when we stop shooting
-        ).finallyDo((interrupted) -> {
-            m_flywheelSubsystem.setDefaultRPM();
-            m_hoodSubsystem.lowerHood();
-            m_feederSubsystem.stop();
-        }) // TODO: Check if this requires .schedule(), or a Commands.parallel(), or
-           // if it will run automatically after the parallel command finishes
-                .withName("Aim and Shoot");
+        // // Slow flywheel, lower hood, and stop feeder when we stop shooting
+        // ).finallyDo((interrupted) -> {
+        // m_flywheelSubsystem.setDefaultRPM();
+        // m_hoodSubsystem.lowerHood();
+        // m_feederSubsystem.stop();
+        // }) // TODO: Check if this requires .schedule(), or a Commands.parallel(), or
+        // // if it will run automatically after the parallel command finishes
+        // .withName("Aim and Shoot");
+
+        return m_hoodSubsystem.setAngle(
+                () -> {
+                    return Degrees.of(m_distanceToHoodAngleMap
+                            .get(getDistanceToTarget.get().in(Meters)));
+                });
 
     }
 
