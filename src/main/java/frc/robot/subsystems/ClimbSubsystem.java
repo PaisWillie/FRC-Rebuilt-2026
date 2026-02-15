@@ -130,17 +130,17 @@ public class ClimbSubsystem extends SubsystemBase {
      * for 0.4 seconds, and the motor moves
      * less than 2 degrees per second.
      *
-     * @param threshhold The current threshhold held when the Elevator is at it's
-     *                   hard limit.
+     * @param threshold The current threshhold held when the Elevator is at it's
+     *                  hard limit.
      * @return
      */
-    public Command homing(Current threshhold) {
+    public Command homing(Current threshold) {
         Debouncer currentDebouncer = new Debouncer(ClimbConstants.HOMING_DEBOUNCE_TIME.in(Seconds));
         Voltage runVolts = ClimbConstants.HOMING_RUN_VOLTS;
         Distance limitHit = ClimbConstants.HARD_UPPER_LIMIT;
         AngularVelocity velocityThreshold = ClimbConstants.HOMING_VELOCITY_THRESHOLD;
         return Commands.startRun(motor::stopClosedLoopController, () -> motor.setVoltage(runVolts))
-                .until(() -> currentDebouncer.calculate(motor.getStatorCurrent().gte(threshhold) &&
+                .until(() -> currentDebouncer.calculate(motor.getStatorCurrent().gte(threshold) &&
                         motor.getMechanismVelocity().abs(DegreesPerSecond) <= velocityThreshold.in(DegreesPerSecond)))
                 .finallyDo(() -> {
                     motor.setEncoderPosition(limitHit);
