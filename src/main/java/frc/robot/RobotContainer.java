@@ -24,160 +24,161 @@ import frc.robot.subsystems.SwerveSubsystem;
 import swervelib.SwerveInputStream;
 
 public class RobotContainer {
-        final CommandPS5Controller m_driverController = new CommandPS5Controller(Constants.DRIVER_CONTROLLER_PORT);
+    final CommandPS5Controller m_driverController = new CommandPS5Controller(Constants.DRIVER_CONTROLLER_PORT);
 
-        private final ClimbSubsystem m_climbSubsystem = new ClimbSubsystem();
-        private final HopperSubsystem m_hopperSubsystem = new HopperSubsystem();
-        private final IndexerSubsystem m_indexerSubsystem = new IndexerSubsystem();
-        private final IntakeSubsystem m_intakeSubsystem = new IntakeSubsystem();
-        private final ShooterSubsystem m_shooterSubsystem = new ShooterSubsystem();
-        private final SwerveSubsystem m_swerveSubsystem = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
-                        "swerve"));
+    private final ClimbSubsystem m_climbSubsystem = new ClimbSubsystem();
+    private final HopperSubsystem m_hopperSubsystem = new HopperSubsystem();
+    private final IndexerSubsystem m_indexerSubsystem = new IndexerSubsystem();
+    private final IntakeSubsystem m_intakeSubsystem = new IntakeSubsystem();
+    private final ShooterSubsystem m_shooterSubsystem = new ShooterSubsystem();
+    private final SwerveSubsystem m_swerveSubsystem = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
+            "swerve"));
 
-        /**
-         * Converts driver input into a field-relative ChassisSpeeds that is controlled
-         * by angular velocity.
-         */
-        SwerveInputStream driveAngularVelocity = SwerveInputStream.of(m_swerveSubsystem.getSwerveDrive(),
-                        () -> m_driverController.getLeftY() * -1,
-                        () -> m_driverController.getLeftX() * -1)
-                        .withControllerRotationAxis(m_driverController::getRightX)
-                        .deadband(OperatorConstants.DEADBAND)
-                        .scaleTranslation(0.8)
-                        .allianceRelativeControl(true);
+    /**
+     * Converts driver input into a field-relative ChassisSpeeds that is controlled
+     * by angular velocity.
+     */
+    SwerveInputStream driveAngularVelocity = SwerveInputStream.of(m_swerveSubsystem.getSwerveDrive(),
+            () -> m_driverController.getLeftY() * -1,
+            () -> m_driverController.getLeftX() * -1)
+            .withControllerRotationAxis(m_driverController::getRightX)
+            .deadband(OperatorConstants.DEADBAND)
+            .scaleTranslation(0.8)
+            .allianceRelativeControl(true);
 
-        /**
-         * Clone's the angular velocity input stream and converts it to a fieldRelative
-         * input stream.
-         */
-        SwerveInputStream driveDirectAngle = driveAngularVelocity.copy()
-                        .withControllerHeadingAxis(m_driverController::getRightX,
-                                        m_driverController::getRightY)
-                        .headingWhile(true);
+    /**
+     * Clone's the angular velocity input stream and converts it to a fieldRelative
+     * input stream.
+     */
+    SwerveInputStream driveDirectAngle = driveAngularVelocity.copy()
+            .withControllerHeadingAxis(m_driverController::getRightX,
+                    m_driverController::getRightY)
+            .headingWhile(true);
 
-        /**
-         * Clone's the angular velocity input stream and converts it to a robotRelative
-         * input stream.
-         */
-        SwerveInputStream driveRobotOriented = driveAngularVelocity.copy().robotRelative(true)
-                        .allianceRelativeControl(false);
+    /**
+     * Clone's the angular velocity input stream and converts it to a robotRelative
+     * input stream.
+     */
+    SwerveInputStream driveRobotOriented = driveAngularVelocity.copy().robotRelative(true)
+            .allianceRelativeControl(false);
 
-        SwerveInputStream driveAngularVelocityKeyboard = SwerveInputStream.of(m_swerveSubsystem.getSwerveDrive(),
-                        () -> -m_driverController.getLeftY(),
-                        () -> -m_driverController.getLeftX())
-                        .withControllerRotationAxis(() -> m_driverController.getRawAxis(
-                                        2))
-                        .deadband(OperatorConstants.DEADBAND)
-                        .scaleTranslation(0.8)
-                        .allianceRelativeControl(true);
-        // Derive the heading axis with math!
-        SwerveInputStream driveDirectAngleKeyboard = driveAngularVelocityKeyboard.copy()
-                        .withControllerHeadingAxis(() -> Math.sin(
-                                        m_driverController.getRawAxis(
-                                                        2) *
-                                                        Math.PI)
-                                        *
-                                        (Math.PI *
-                                                        2),
-                                        () -> Math.cos(
-                                                        m_driverController.getRawAxis(
-                                                                        2) *
-                                                                        Math.PI)
-                                                        *
-                                                        (Math.PI *
-                                                                        2))
-                        .headingWhile(true)
-                        .translationHeadingOffset(true)
-                        .translationHeadingOffset(Rotation2d.fromDegrees(
-                                        0));
+    SwerveInputStream driveAngularVelocityKeyboard = SwerveInputStream.of(m_swerveSubsystem.getSwerveDrive(),
+            () -> -m_driverController.getLeftY(),
+            () -> -m_driverController.getLeftX())
+            .withControllerRotationAxis(() -> m_driverController.getRawAxis(
+                    2))
+            .deadband(OperatorConstants.DEADBAND)
+            .scaleTranslation(0.8)
+            .allianceRelativeControl(true);
+    // Derive the heading axis with math!
+    SwerveInputStream driveDirectAngleKeyboard = driveAngularVelocityKeyboard.copy()
+            .withControllerHeadingAxis(() -> Math.sin(
+                    m_driverController.getRawAxis(
+                            2) *
+                            Math.PI)
+                    *
+                    (Math.PI *
+                            2),
+                    () -> Math.cos(
+                            m_driverController.getRawAxis(
+                                    2) *
+                                    Math.PI)
+                            *
+                            (Math.PI *
+                                    2))
+            .headingWhile(true)
+            .translationHeadingOffset(true)
+            .translationHeadingOffset(Rotation2d.fromDegrees(
+                    0));
 
-        private DoubleSupplier headingXSupplier() {
-                return () -> m_swerveSubsystem.getAutoAimHeading().getCos();
+    private DoubleSupplier headingXSupplier() {
+        return () -> m_swerveSubsystem.getAutoAimHeading().getCos();
+    }
+
+    private DoubleSupplier headingYSupplier() {
+        return () -> -m_swerveSubsystem.getAutoAimHeading().getSin();
+    }
+
+    SwerveInputStream driveAutoAim = driveAngularVelocity.copy()
+            .withControllerHeadingAxis(headingXSupplier(), headingYSupplier())
+            .headingWhile(true)
+            .scaleTranslation(SwerveConstants.AUTO_AIM_SCALE_TRANSLATION);
+
+    public RobotContainer() {
+        if (Robot.isSimulation()) {
+            DriverStation.silenceJoystickConnectionWarning(true);
         }
 
-        private DoubleSupplier headingYSupplier() {
-                return () -> -m_swerveSubsystem.getAutoAimHeading().getSin();
-        }
+        configureBindings();
+    }
 
-        SwerveInputStream driveAutoAim = driveAngularVelocity.copy()
-                        .withControllerHeadingAxis(headingXSupplier(), headingYSupplier())
-                        .headingWhile(true)
-                        .scaleTranslation(SwerveConstants.AUTO_AIM_SCALE_TRANSLATION);
+    private void configureBindings() {
+        Command driveFieldOrientedAnglularVelocity = m_swerveSubsystem.driveFieldOriented(driveAngularVelocity);
+        Command driveFieldOrientedDirectAngleKeyboard = m_swerveSubsystem
+                .driveFieldOriented(driveDirectAngleKeyboard);
+        Command driveFieldOrientedAutoAim = m_swerveSubsystem.driveFieldOriented(driveAutoAim);
 
-        public RobotContainer() {
-                if (Robot.isSimulation()) {
-                        DriverStation.silenceJoystickConnectionWarning(true);
-                }
+        m_swerveSubsystem.setDefaultCommand(driveFieldOrientedAnglularVelocity);
 
-                configureBindings();
-        }
+        // if (Robot.isSimulation()) {
+        // Pose2d target = new Pose2d(new Translation2d(1, 4),
+        // Rotation2d.fromDegrees(90));
+        // // drivebase.getSwerveDrive().field.getObject("targetPose").setPose(target);
+        // driveDirectAngleKeyboard.driveToPose(() -> target,
+        // new ProfiledPIDController(5,
+        // 0,
+        // 0,
+        // new Constraints(5, 2)),
+        // new ProfiledPIDController(5,
+        // 0,
+        // 0,
+        // new Constraints(Units.degreesToRadians(360),
+        // Units.degreesToRadians(180))));
+        // m_driverController.start()
+        // .onTrue(Commands.runOnce(() -> m_swerveSubsystem
+        // .resetOdometry(new Pose2d(3, 3, new Rotation2d()))));
+        // m_driverController.button(1).whileTrue(m_swerveSubsystem.sysIdDriveMotorCommand());
+        // m_driverController.button(2)
+        // .whileTrue(Commands.runEnd(
+        // () -> driveDirectAngleKeyboard.driveToPoseEnabled(true),
+        // () -> driveDirectAngleKeyboard.driveToPoseEnabled(false)));
 
-        private void configureBindings() {
-                Command driveFieldOrientedAnglularVelocity = m_swerveSubsystem.driveFieldOriented(driveAngularVelocity);
-                Command driveFieldOrientedDirectAngleKeyboard = m_swerveSubsystem
-                                .driveFieldOriented(driveDirectAngleKeyboard);
-                Command driveFieldOrientedAutoAim = m_swerveSubsystem.driveFieldOriented(driveAutoAim);
+        // }
+        // if (DriverStation.isTest()) {
+        // m_swerveSubsystem.setDefaultCommand(driveFieldOrientedAnglularVelocity); //
+        // Overrides drive
+        // // command
+        // // above!
 
-                m_swerveSubsystem.setDefaultCommand(driveFieldOrientedAnglularVelocity);
+        // m_driverController.square()
+        // .whileTrue(Commands.runOnce(m_swerveSubsystem::lock, m_swerveSubsystem)
+        // .repeatedly());
+        // m_driverController.options().onTrue((Commands.runOnce(m_swerveSubsystem::zeroGyro)));
+        // m_driverController.create().whileTrue(m_swerveSubsystem.centerModulesCommand());
+        // m_driverController.L1().onTrue(Commands.none());
+        // } else {
 
-                // if (Robot.isSimulation()) {
-                // Pose2d target = new Pose2d(new Translation2d(1, 4),
-                // Rotation2d.fromDegrees(90));
-                // // drivebase.getSwerveDrive().field.getObject("targetPose").setPose(target);
-                // driveDirectAngleKeyboard.driveToPose(() -> target,
-                // new ProfiledPIDController(5,
-                // 0,
-                // 0,
-                // new Constraints(5, 2)),
-                // new ProfiledPIDController(5,
-                // 0,
-                // 0,
-                // new Constraints(Units.degreesToRadians(360),
-                // Units.degreesToRadians(180))));
-                // m_driverController.start()
-                // .onTrue(Commands.runOnce(() -> m_swerveSubsystem
-                // .resetOdometry(new Pose2d(3, 3, new Rotation2d()))));
-                // m_driverController.button(1).whileTrue(m_swerveSubsystem.sysIdDriveMotorCommand());
-                // m_driverController.button(2)
-                // .whileTrue(Commands.runEnd(
-                // () -> driveDirectAngleKeyboard.driveToPoseEnabled(true),
-                // () -> driveDirectAngleKeyboard.driveToPoseEnabled(false)));
+        // m_driverController.L1()
+        // .whileTrue(Commands.runOnce(m_swerveSubsystem::lock, m_swerveSubsystem)
+        // .repeatedly());
 
-                // }
-                // if (DriverStation.isTest()) {
-                // m_swerveSubsystem.setDefaultCommand(driveFieldOrientedAnglularVelocity); //
-                // Overrides drive
-                // // command
-                // // above!
+        m_driverController.povUp().whileTrue(m_swerveSubsystem.driveForward());
+        m_driverController.povDown().whileTrue(m_swerveSubsystem.driveBackward());
+        m_driverController.povLeft().whileTrue(m_swerveSubsystem.driveLeft());
+        m_driverController.povRight().whileTrue(m_swerveSubsystem.driveRight());
 
-                // m_driverController.square()
-                // .whileTrue(Commands.runOnce(m_swerveSubsystem::lock, m_swerveSubsystem)
-                // .repeatedly());
-                // m_driverController.options().onTrue((Commands.runOnce(m_swerveSubsystem::zeroGyro)));
-                // m_driverController.create().whileTrue(m_swerveSubsystem.centerModulesCommand());
-                // m_driverController.L1().onTrue(Commands.none());
-                // } else {
+        m_driverController.options().onTrue((Commands.runOnce(m_swerveSubsystem::zeroGyro)));
 
-                // m_driverController.L1()
-                // .whileTrue(Commands.runOnce(m_swerveSubsystem::lock, m_swerveSubsystem)
-                // .repeatedly());
+        m_driverController.R2()
+                .whileTrue(Commands.parallel(
+                        m_shooterSubsystem.aimAndShoot(m_swerveSubsystem::getDistanceToTarget,
+                                m_swerveSubsystem::isAutoAimOnTarget),
+                        driveFieldOrientedAutoAim))
+                .onFalse(m_shooterSubsystem.stopShooting());
 
-                m_driverController.povUp().whileTrue(m_swerveSubsystem.driveForward());
-                m_driverController.povDown().whileTrue(m_swerveSubsystem.driveBackward());
-                m_driverController.povLeft().whileTrue(m_swerveSubsystem.driveLeft());
-                m_driverController.povRight().whileTrue(m_swerveSubsystem.driveRight());
+    }
 
-                m_driverController.options().onTrue((Commands.runOnce(m_swerveSubsystem::zeroGyro)));
-
-                m_driverController.R2()
-                                .whileTrue(Commands.parallel(
-                                                m_shooterSubsystem.aimAndShoot(m_swerveSubsystem::getDistanceToTarget,
-                                                                m_swerveSubsystem::isAutoAimOnTarget),
-                                                driveFieldOrientedAutoAim))
-                                .onFalse(m_shooterSubsystem.stopShooting());
-        }
-
-        public Command getAutonomousCommand() {
-                return Commands.print("No autonomous command configured");
-        }
+    public Command getAutonomousCommand() {
+        return Commands.print("No autonomous command configured");
+    }
 }
