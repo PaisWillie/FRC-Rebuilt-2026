@@ -7,16 +7,20 @@ package frc.robot;
 import java.io.File;
 import java.util.function.DoubleSupplier;
 
+import choreo.auto.AutoChooser;
+import choreo.auto.AutoFactory;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
+import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.Constants.SwerveConstants;
 import frc.robot.subsystems.ClimbSubsystem;
@@ -37,6 +41,10 @@ public class RobotContainer {
     private final ShooterSubsystem m_shooterSubsystem = new ShooterSubsystem();
     private final SwerveSubsystem m_swerveSubsystem = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
             "swerve"));
+
+    // Choreo
+    private final AutoFactory autoFactory;
+    private final AutoChooser autoChooser;
 
     /**
      * Converts driver input into a field-relative ChassisSpeeds that is controlled
@@ -112,6 +120,21 @@ public class RobotContainer {
         if (Robot.isSimulation()) {
             DriverStation.silenceJoystickConnectionWarning(true);
         }
+
+        autoFactory = new AutoFactory(
+                m_swerveSubsystem::getPose, // A function that returns the current robot pose
+                m_swerveSubsystem::resetOdometry, // A function that resets the current robot pose to the provided
+                                                  // Pose2d
+                m_swerveSubsystem::followTrajectory, // The drive subsystem trajectory follower
+
+                true, // If alliance flipping should be enabled
+
+                m_swerveSubsystem // The drive subsystem
+        );
+        autoChooser = new AutoChooser();
+        // autoChooser.addRoutine("routine1", this::routine1);
+        SmartDashboard.putData("Auto Chooser", autoChooser);
+        RobotModeTriggers.autonomous().whileTrue(autoChooser.selectedCommandScheduler());
 
         configureBindings();
     }
@@ -234,9 +257,5 @@ public class RobotContainer {
                         Commands.runEnd(
                                 () -> driveAngularVelocity.driveToPoseEnabled(true),
                                 () -> driveAngularVelocity.driveToPoseEnabled(false))));
-    }
-
-    public Command getAutonomousCommand() {
-        return Commands.print("No autonomous command configured");
     }
 }

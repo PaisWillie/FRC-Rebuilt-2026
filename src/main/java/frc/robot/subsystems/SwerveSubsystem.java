@@ -12,8 +12,9 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
-import java.util.logging.Logger;
 
+import choreo.trajectory.SwerveSample;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -23,10 +24,10 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import frc.robot.Constants.SwerveConstants;
 import frc.robot.FieldConstants;
@@ -49,6 +50,10 @@ public class SwerveSubsystem extends SubsystemBase {
     private Rotation2d autoAimTargetRotation = new Rotation2d();
 
     private Pose2d m_selectedClimbPose;
+
+    private final PIDController m_choreoControllerX = new PIDController(10.0, 0.0, 0.0);
+    private final PIDController m_choreoControllerY = new PIDController(10.0, 0.0, 0.0);
+    private final PIDController m_choreoControllerHeading = new PIDController(7.5, 0.0, 0.0);
 
     /**
      * Initialize {@link SwerveDrive} with the directory provided.
@@ -95,6 +100,8 @@ public class SwerveSubsystem extends SubsystemBase {
         } else {
             m_selectedClimbPose = SwerveConstants.BLUE_LEFT_TOWER_CLIMB_POS;
         }
+
+        m_choreoControllerHeading.enableContinuousInput(-Math.PI, Math.PI);
     }
 
     /**
@@ -527,6 +534,28 @@ public class SwerveSubsystem extends SubsystemBase {
      */
     public SwerveDrive getSwerveDrive() {
         return swerveDrive;
+    }
+
+    /**
+     * Follows the given swerve sample by calculating the necessary chassis speeds
+     * and
+     * commanding them to the drive.
+     * 
+     * @param sample The swerve sample containing the desired velocities and
+     *               heading.
+     */
+    public void followTrajectory(SwerveSample sample) {
+        // Get the current pose of the robot
+        Pose2d pose = getPose();
+
+        // Generate the next speeds for the robot
+        ChassisSpeeds speeds = new ChassisSpeeds(
+                sample.vx + m_choreoControllerX.calculate(pose.getX(), sample.x),
+                sample.vy + m_choreoControllerY.calculate(pose.getY(), sample.y),
+                sample.omega + m_choreoControllerHeading.calculate(pose.getRotation().getRadians(), sample.heading));
+
+        // Apply the generated speeds
+        driveFieldOriented(speeds);
     }
 
     // Left and right are from the perspective of the red/light driver station
