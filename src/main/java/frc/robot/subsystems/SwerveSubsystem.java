@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems;
 
+import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Meter;
 import static edu.wpi.first.units.Units.Meters;
 
@@ -44,6 +45,8 @@ public class SwerveSubsystem extends SubsystemBase {
      * Swerve drive object.
      */
     private final SwerveDrive swerveDrive;
+
+    private Rotation2d autoAimTargetRotation = new Rotation2d();
 
     /**
      * Initialize {@link SwerveDrive} with the directory provided.
@@ -575,7 +578,7 @@ public class SwerveSubsystem extends SubsystemBase {
 
     Translation2d futureTranslation = new Translation2d();
 
-    public Rotation2d getAutoAimHeading() {
+    public void calculateAutoAimHeading() {
         Translation2d robotTranslation = getPose().getTranslation();
 
         ChassisSpeeds fieldRelativeChassisSpeeds = getFieldVelocity();
@@ -584,15 +587,28 @@ public class SwerveSubsystem extends SubsystemBase {
                 fieldRelativeChassisSpeeds.vyMetersPerSecond);
 
         futureTranslation = robotTranslation
-                .plus(deltaPos.times(SwerveConstants.AUTOM_AIM_VELOCITY_COMPENSATION_FACTOR)); // Look ahead 0.5
-                                                                                               // seconds
+                .plus(deltaPos.times(SwerveConstants.AUTO_AIM_VELOCITY_COMPENSATION_FACTOR)); // Look ahead 0.5
+                                                                                              // seconds
 
         Translation2d hubCenter = isRedAlliance()
                 ? FieldConstants.RED_HUB_CENTER
                 : FieldConstants.BLUE_HUB_CENTER;
 
         Translation2d delta = hubCenter.minus(futureTranslation);
-        return delta.getAngle().minus(Rotation2d.fromDegrees(90));
+        autoAimTargetRotation = delta.getAngle().minus(Rotation2d.fromDegrees(90));
+    }
+
+    public boolean isAutoAimOnTarget() {
+        Rotation2d currentHeading = getHeading();
+        double angleError = Math
+                .abs(currentHeading.minus(autoAimTargetRotation.plus(Rotation2d.fromDegrees(90))).getDegrees());
+        SmartDashboard.putNumber("angleError", angleError);
+        return angleError < SwerveConstants.AUTO_AIM_ANGLE_TOLERANCE.in(Degrees);
+    }
+
+    public Rotation2d getAutoAimHeading() {
+        calculateAutoAimHeading();
+        return autoAimTargetRotation;
     }
 
     @Override
@@ -601,5 +617,6 @@ public class SwerveSubsystem extends SubsystemBase {
 
     @Override
     public void simulationPeriodic() {
+        SmartDashboard.putBoolean("isAutoAimReady", isAutoAimOnTarget());
     }
 }

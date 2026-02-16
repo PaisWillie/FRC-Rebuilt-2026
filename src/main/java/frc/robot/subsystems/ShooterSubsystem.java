@@ -64,7 +64,7 @@ public class ShooterSubsystem extends SubsystemBase {
      * @return a Command that performs the aiming and shooting sequence when
      *         executed
      */
-    public Command aimAndShoot(Supplier<Distance> getDistanceToTarget) {
+    public Command aimAndShoot(Supplier<Distance> getDistanceToTarget, Supplier<Boolean> isAutoAimReady) {
         return Commands.parallel(
                 m_hoodSubsystem.setAngle(
                         () -> {
@@ -72,7 +72,13 @@ public class ShooterSubsystem extends SubsystemBase {
                                     .get(getDistanceToTarget.get().in(Meters)));
                         }),
                 m_flywheelSubsystem.shoot(),
-                new ConditionalCommand(m_feederSubsystem.feed(), m_feederSubsystem.stop(), this::isShooterReady))
+                new ConditionalCommand(m_feederSubsystem.feed(), m_feederSubsystem.stop(),
+                        () -> isAutoAimReady.get() && isShooterReady()).repeatedly()) // TODO: Find a way to remove the
+                                                                                      // repeatedly(), and instead only
+                                                                                      // switch between feed and stop
+                                                                                      // once the shooter is ready/not
+                                                                                      // ready, instead of constantly
+                                                                                      // running feed/stop commands
                 .withName("SHTR - Aim and Shoot");
     }
 

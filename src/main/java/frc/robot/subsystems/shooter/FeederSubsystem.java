@@ -47,13 +47,26 @@ public class FeederSubsystem extends SubsystemBase {
 
     /**
      * Stops the intake motor.
+     * 
+     * @return a Command that stops the feeder when executed
      */
     public Command stop() {
-        return this.run(() -> m_motor.stopMotor());
+        return this.runOnce(() -> {
+            System.out.println("Stopping feeder!");
+            m_motor.stopMotor();
+        });
     }
 
+    /**
+     * Runs the feeder at the predefined speed.
+     *
+     * @return a Command that runs the feeder when executed
+     */
     public Command feed() {
-        return this.run(() -> setSpeed(FeederConstants.FEEDER_SPEED));
+        return this.runOnce(() -> {
+            System.out.println("Feeding!");
+            setSpeed(FeederConstants.FEEDER_SPEED);
+        });
     }
 
     @Override

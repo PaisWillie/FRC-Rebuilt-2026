@@ -186,7 +186,9 @@ public class RobotContainer {
         // .get(m_swerveSubsystem.getDistanceFromHub().in(Meters)));
         // }));
 
-        m_driverController.R1().whileTrue(m_shooterSubsystem.aimAndShoot(m_swerveSubsystem::getDistanceToHub))
+        m_driverController.R1()
+                .whileTrue(m_shooterSubsystem.aimAndShoot(m_swerveSubsystem::getDistanceToHub,
+                        m_swerveSubsystem::isAutoAimOnTarget))
                 .onFalse(m_shooterSubsystem.stopShooting());
     }
 

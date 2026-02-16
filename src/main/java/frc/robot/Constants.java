@@ -43,7 +43,8 @@ public final class Constants {
     public static final class SwerveConstants {
         public static final double MAX_SPEED = Units.feetToMeters(14.5); // TODO
 
-        public static final double AUTOM_AIM_VELOCITY_COMPENSATION_FACTOR = 0.5; // TODO
+        public static final double AUTO_AIM_VELOCITY_COMPENSATION_FACTOR = 0.5; // TODO
+        public static final Angle AUTO_AIM_ANGLE_TOLERANCE = Degrees.of(10); // TODO
     }
 
     public static final class OperatorConstants {
