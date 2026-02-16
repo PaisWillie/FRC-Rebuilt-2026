@@ -128,6 +128,7 @@ public class HoodSubsystem extends SubsystemBase {
     }
 
     public boolean isAtTargetAngle() {
+        // TODO: Maybe change this to get setpoint from SMC instead of hood
         Optional<Angle> setpoint = m_hood.getMechanismSetpoint();
 
         if (!setpoint.isPresent())

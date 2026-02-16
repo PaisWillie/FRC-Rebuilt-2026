@@ -4,7 +4,10 @@
 
 package frc.robot.subsystems;
 
+import static edu.wpi.first.units.Units.Degrees;
+
 import edu.wpi.first.wpilibj.Servo;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.HopperConstants;
 
@@ -35,6 +38,18 @@ public class HopperSubsystem extends SubsystemBase {
    */
   public double getAngle() {
     return m_leftMotor.getAngle();
+  }
+
+  public Command expand() {
+    return this.runOnce(() -> {
+      setAngle(HopperConstants.EXPANDED_ANGLE.in(Degrees));
+    });
+  }
+
+  public Command retract() {
+    return this.runOnce(() -> {
+      setAngle(HopperConstants.RETRACT_ANGLE.in(Degrees));
+    });
   }
 
   @Override

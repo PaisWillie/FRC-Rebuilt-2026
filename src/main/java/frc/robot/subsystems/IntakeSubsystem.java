@@ -4,14 +4,22 @@
 
 package frc.robot.subsystems;
 
+import static edu.wpi.first.units.Units.Meters;
+
+import java.util.Optional;
+
 import com.ctre.phoenix6.hardware.TalonFX;
 
+import edu.wpi.first.units.Units;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.motorcontrol.PWMTalonFX;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.Constants.HoodConstants;
 import frc.robot.Constants.IntakeConstants;
+import frc.robot.Constants.IntakeConstants.LinearConstants;
 import yams.gearing.MechanismGearing;
 import yams.mechanisms.config.ElevatorConfig;
 import yams.mechanisms.config.MechanismPositionConfig;
@@ -31,11 +39,14 @@ public class IntakeSubsystem extends SubsystemBase {
      * PWM motor controller for the intake.
      */
     private final PWMTalonFX m_rollerMotor;
-
     private final TalonFX m_linearMotor;
+
     private final SmartMotorController m_linearMotorSMC;
+    private final SmartMotorControllerConfig m_linearMotorSMCConfig;
 
     private final Elevator m_linearIntake;
+
+    private Distance m_linearSetpoint = IntakeConstants.LinearConstants.STARTING_HEIGHT_METERS;
 
     /**
      * Constructs the intake subsystem and initializes the motor controller.
@@ -45,7 +56,7 @@ public class IntakeSubsystem extends SubsystemBase {
         m_rollerMotor = new PWMTalonFX(IntakeConstants.ROLLER_MOTOR_PWM_ID);
         m_linearMotor = new TalonFX(IntakeConstants.LinearConstants.LINEAR_MOTOR_CAN_ID);
 
-        SmartMotorControllerConfig m_linearMotorSMCConfig = new SmartMotorControllerConfig(this)
+        m_linearMotorSMCConfig = new SmartMotorControllerConfig(this)
                 .withMechanismCircumference(IntakeConstants.LinearConstants.MOTOR_CIRCUMFERENCE_METERS)
                 .withClosedLoopController(
                         IntakeConstants.LinearConstants.PID_kP,
@@ -106,8 +117,8 @@ public class IntakeSubsystem extends SubsystemBase {
     /**
      * Stops the intake motor.
      */
-    public void stopRollers() {
-        m_rollerMotor.stopMotor();
+    public Command stopRollers() {
+        return runOnce(() -> m_rollerMotor.stopMotor());
     }
 
     /**
@@ -117,11 +128,45 @@ public class IntakeSubsystem extends SubsystemBase {
      * @return the command that sets the height
      */
     public Command setLinearPosition(Distance position) {
+        m_linearSetpoint = position;
         return m_linearIntake.setHeight(position);
+    }
+
+    public boolean isLinearAtTargetPosition() {
+        Optional<Angle> setpoint = m_linearIntake.getMechanismSetpoint();
+
+        if (!setpoint.isPresent())
+            return false;
+
+        m_linearMotorSMCConfig.convertFromMechanism(setpoint.get());
+        double deltaMeters = m_linearSetpoint.minus(m_linearIntake.getHeight()).in(Meters);
+        return Math.abs(deltaMeters) <= IntakeConstants.LinearConstants.POSITION_TOLERANCE.in(Meters); // TODO: Do we
+                                                                                                       // need a
+                                                                                                       // debouncer?
     }
 
     public Command elevCmd(double dutycycle) {
         return m_linearIntake.set(dutycycle);
+    }
+
+    public Command intake() {
+        return this.runOnce(() -> {
+            setRollerSpeed(IntakeConstants.ROLLER_SPEED);
+        });
+    }
+
+    public Command outtake() {
+        return this.runOnce(() -> {
+            setRollerSpeed(-IntakeConstants.ROLLER_SPEED);
+        });
+    }
+
+    public Command extend() {
+        return setLinearPosition(IntakeConstants.LinearConstants.EXTENDED_POSITION);
+    }
+
+    public Command retract() {
+        return setLinearPosition(IntakeConstants.LinearConstants.RETRACTED_POSITION);
     }
 
     /**

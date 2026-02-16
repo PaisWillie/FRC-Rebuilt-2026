@@ -45,7 +45,7 @@ public class RobotContainer {
     SwerveInputStream driveAngularVelocity = SwerveInputStream.of(m_swerveSubsystem.getSwerveDrive(),
             () -> m_driverController.getLeftY() * -1,
             () -> m_driverController.getLeftX() * -1)
-            .withControllerRotationAxis(m_driverController::getRightX)
+            .withControllerRotationAxis(() -> m_driverController.getRightX() * -1) // TODO: Check if * -1 is needed IRL
             .deadband(OperatorConstants.DEADBAND)
             .scaleTranslation(0.8)
             .allianceRelativeControl(true);
@@ -174,12 +174,38 @@ public class RobotContainer {
 
         m_driverController.options().onTrue((Commands.runOnce(m_swerveSubsystem::zeroGyro)));
 
+        // TODO: Maybe run indexer while intaking?
+        m_driverController.L2().whileTrue(
+                Commands.sequence(
+                        m_intakeSubsystem.extend().until(m_intakeSubsystem::isLinearAtTargetPosition),
+                        Commands.parallel(
+                                m_hopperSubsystem.expand(),
+                                m_intakeSubsystem.intake())))
+                .onFalse(
+                        Commands.sequence(
+                                m_intakeSubsystem.retract().until(m_intakeSubsystem::isLinearAtTargetPosition),
+                                m_intakeSubsystem.stopRollers()));
+
         m_driverController.R2()
                 .whileTrue(Commands.parallel(
                         m_shooterSubsystem.aimAndShoot(m_swerveSubsystem::getDistanceToTarget,
                                 m_swerveSubsystem::isAutoAimOnTarget),
                         driveFieldOrientedAutoAim))
                 .onFalse(m_shooterSubsystem.stopShooting());
+
+        // TODO: Expand intake DLI then retract
+        m_driverController.R1().whileTrue(
+                Commands.sequence(
+                        m_intakeSubsystem.extend().until(m_intakeSubsystem::isLinearAtTargetPosition),
+                        Commands.parallel(
+                                m_indexerSubsystem.reverse(),
+                                m_intakeSubsystem.outtake())))
+                .onFalse(
+                        Commands.sequence(
+                                m_intakeSubsystem.retract().until(m_intakeSubsystem::isLinearAtTargetPosition),
+                                Commands.parallel(
+                                        m_indexerSubsystem.stop(),
+                                        m_intakeSubsystem.stopRollers())));
 
         // TODO: Move constants to Constants.java
         driveAngularVelocity.driveToPose(m_swerveSubsystem::getSelectedClimbPose,

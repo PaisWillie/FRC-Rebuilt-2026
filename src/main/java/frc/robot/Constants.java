@@ -78,11 +78,15 @@ public final class Constants {
 
         public static final int MOTOR_STATOR_CURRENT_LIMIT = -1; // TODO
         public static final int MOTOR_SUPPLY_CURRENT_LIMIT = -1; // TODO
+
+        public static final double INDEXER_SPEED = 0.5; // TODO
     }
 
     public static class IntakeConstants {
         public static final int ROLLER_MOTOR_PWM_ID = 1; // TODO
         public static final double ROLLER_DEFAULT_SPEED_DUTY_CYCLE = 0.0; // TODO
+
+        public static final double ROLLER_SPEED = 0.5; // TODO
 
         public static class LinearConstants {
             public static final int LINEAR_MOTOR_CAN_ID = 2;
@@ -112,6 +116,11 @@ public final class Constants {
             public static final Translation3d RELATIVE_POSITION_METERS = new Translation3d(Meters.of(-0.25),
                     Meters.of(0),
                     Meters.of(0.5)); // TODO
+
+            public static final Distance EXTENDED_POSITION = Meters.of(1.5); // TODO
+            public static final Distance RETRACTED_POSITION = Meters.of(0.5); // TODO
+
+            public static final Distance POSITION_TOLERANCE = Meters.of(0.1); // TODO
         }
     }
 
@@ -230,6 +239,9 @@ public final class Constants {
     public static final class HopperConstants {
         public static final int MOTOR_PWM_ID_LEFT = 2; // TODO
         public static final int MOTOR_PWM_ID_RIGHT = 3; // TODO
+
+        public static final Angle EXPANDED_ANGLE = Degrees.of(90); // TODO
+        public static final Angle RETRACT_ANGLE = Degrees.of(0); // TODO
     }
 
     public static final class ClimbConstants {
