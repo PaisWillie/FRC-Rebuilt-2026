@@ -46,6 +46,7 @@ public final class Constants {
 
         public static final double AUTO_AIM_VELOCITY_COMPENSATION_FACTOR = 0.5; // TODO
         public static final Angle AUTO_AIM_ANGLE_TOLERANCE = Degrees.of(10); // TODO
+        public static final double AUTO_AIM_SCALE_TRANSLATION = 0.3; // TODO
 
         public static final Translation2d BLUE_LEFT_FEEDING_TARGET = new Translation2d(2.067625, 6.05175);
         public static final Translation2d BLUE_RIGHT_FEEDING_TARGET = new Translation2d(2.067625, 2.01725);

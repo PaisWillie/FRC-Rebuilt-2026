@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 import frc.robot.Constants.OperatorConstants;
+import frc.robot.Constants.SwerveConstants;
 import frc.robot.subsystems.ClimbSubsystem;
 import frc.robot.subsystems.HopperSubsystem;
 import frc.robot.subsystems.IndexerSubsystem;
@@ -103,7 +104,8 @@ public class RobotContainer {
 
         SwerveInputStream driveAutoAim = driveAngularVelocity.copy()
                         .withControllerHeadingAxis(headingXSupplier(), headingYSupplier())
-                        .headingWhile(true);
+                        .headingWhile(true)
+                        .scaleTranslation(SwerveConstants.AUTO_AIM_SCALE_TRANSLATION);
 
         public RobotContainer() {
                 if (Robot.isSimulation()) {
@@ -169,8 +171,6 @@ public class RobotContainer {
                 m_driverController.povRight().whileTrue(m_swerveSubsystem.driveRight());
 
                 m_driverController.options().onTrue((Commands.runOnce(m_swerveSubsystem::zeroGyro)));
-
-                m_driverController.L1().whileTrue(driveFieldOrientedAutoAim);
                 // m_driverController.R1().whileTrue(
                 // m_shooterSubsystem.aimAndShoot(m_swerveSubsystem::getDistanceFromHub));
 
@@ -187,8 +187,10 @@ public class RobotContainer {
                 // }));
 
                 m_driverController.R1()
-                                .whileTrue(m_shooterSubsystem.aimAndShoot(m_swerveSubsystem::getDistanceToTarget,
-                                                m_swerveSubsystem::isAutoAimOnTarget))
+                                .whileTrue(Commands.parallel(
+                                                m_shooterSubsystem.aimAndShoot(m_swerveSubsystem::getDistanceToTarget,
+                                                                m_swerveSubsystem::isAutoAimOnTarget),
+                                                driveFieldOrientedAutoAim))
                                 .onFalse(m_shooterSubsystem.stopShooting());
         }
 

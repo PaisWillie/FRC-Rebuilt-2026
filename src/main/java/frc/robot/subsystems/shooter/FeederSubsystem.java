@@ -52,7 +52,6 @@ public class FeederSubsystem extends SubsystemBase {
      */
     public Command stop() {
         return this.runOnce(() -> {
-            System.out.println("Stopping feeder!");
             m_motor.stopMotor();
         });
     }
@@ -64,7 +63,6 @@ public class FeederSubsystem extends SubsystemBase {
      */
     public Command feed() {
         return this.runOnce(() -> {
-            System.out.println("Feeding!");
             setSpeed(FeederConstants.FEEDER_SPEED);
         });
     }
