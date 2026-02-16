@@ -573,8 +573,6 @@ public class SwerveSubsystem extends SubsystemBase {
         return Meters.of(position.getDistance(getAutoAimTarget()));
     }
 
-    Translation2d futureTranslation = new Translation2d();
-
     /**
      * Gets the target translation for auto-aiming based on the current zone and
      * alliance.
@@ -626,7 +624,7 @@ public class SwerveSubsystem extends SubsystemBase {
         Translation2d deltaPos = new Translation2d(fieldRelativeChassisSpeeds.vxMetersPerSecond,
                 fieldRelativeChassisSpeeds.vyMetersPerSecond);
 
-        futureTranslation = robotTranslation
+        Translation2d futureTranslation = robotTranslation
                 .plus(deltaPos.times(SwerveConstants.AUTO_AIM_VELOCITY_COMPENSATION_FACTOR)); // Look ahead 0.5
                                                                                               // seconds
 
