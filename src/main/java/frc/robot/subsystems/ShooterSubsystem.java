@@ -61,6 +61,10 @@ public class ShooterSubsystem extends SubsystemBase {
      *
      * @param distanceToTarget the distance from the robot to the target, used to
      *                         determine the appropriate hood angle
+     * @param isAutoAimReady   a supplier that indicates whether the chassis'
+     *                         auto-aiming
+     *                         is ready
+     * 
      * @return a Command that performs the aiming and shooting sequence when
      *         executed
      */
