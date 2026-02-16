@@ -18,18 +18,18 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.Constants.SwerveConstants;
-import frc.robot.subsystems.ClimbSubsystem;
 import frc.robot.subsystems.HopperSubsystem;
 import frc.robot.subsystems.IndexerSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
+import frc.robot.subsystems.climb.ElevatorSubsystem;
 import swervelib.SwerveInputStream;
 
 public class RobotContainer {
         final CommandPS5Controller m_driverController = new CommandPS5Controller(Constants.DRIVER_CONTROLLER_PORT);
 
-        private final ClimbSubsystem m_climbSubsystem = new ClimbSubsystem();
+        private final ElevatorSubsystem m_climbSubsystem = new ElevatorSubsystem();
         private final HopperSubsystem m_hopperSubsystem = new HopperSubsystem();
         private final IndexerSubsystem m_indexerSubsystem = new IndexerSubsystem();
         private final IntakeSubsystem m_intakeSubsystem = new IntakeSubsystem();
@@ -186,7 +186,7 @@ public class RobotContainer {
                 // .get(m_swerveSubsystem.getDistanceFromHub().in(Meters)));
                 // }));
 
-                m_driverController.R1()
+                m_driverController.R2()
                                 .whileTrue(Commands.parallel(
                                                 m_shooterSubsystem.aimAndShoot(m_swerveSubsystem::getDistanceToTarget,
                                                                 m_swerveSubsystem::isAutoAimOnTarget),
