@@ -39,7 +39,9 @@ public class ShooterSubsystem extends SubsystemBase {
         ShooterConstants.SHOOTER_DISTANCE_TO_HOOD_ANGLE.forEach(m_distanceToHoodAngleMap::put);
 
         // Set default command for flywheel to maintain a default RPM when not shooting
-        m_flywheelSubsystem.setDefaultCommand(m_flywheelSubsystem.setDefaultRPM());
+        m_flywheelSubsystem.setDefaultCommand(m_flywheelSubsystem.setDefaultRPM()); // TODO: Check if this is still
+                                                                                    // active after running
+                                                                                    // flywheel.stop()
     }
 
     /**
@@ -49,7 +51,7 @@ public class ShooterSubsystem extends SubsystemBase {
      * @return true if the shooter is ready to shoot, false otherwise
      */
     public boolean isShooterReady() {
-        return m_hoodSubsystem.isAtAngle() && m_flywheelSubsystem.isAtTargetRPM();
+        return m_hoodSubsystem.isAtTargetAngle() && m_flywheelSubsystem.isAtTargetRPM();
     }
 
     /**
@@ -104,7 +106,7 @@ public class ShooterSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("hood angle", m_hoodSubsystem.getAngle().in(Degrees));
         SmartDashboard.putNumber("flywheel RPM", m_flywheelSubsystem.getVelocity().in(RPM));
 
-        SmartDashboard.putBoolean("isHoodReady", m_hoodSubsystem.isAtAngle());
+        SmartDashboard.putBoolean("isHoodReady", m_hoodSubsystem.isAtTargetAngle());
         SmartDashboard.putBoolean("isFlywheelReady", m_flywheelSubsystem.isAtTargetRPM());
     }
 }

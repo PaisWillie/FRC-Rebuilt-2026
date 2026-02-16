@@ -202,6 +202,8 @@ public final class Constants {
 
         public static final Angle ANGLE_TOLERANCE = Degrees.of(7); // TODO
         public static final double AT_ANGLE_DEBOUNCE_TIME = 0.2; // TODO
+
+        public static final Angle DEFAULT_ANGLE = Degrees.of(20); // TODO
     }
 
     public static final class FeederConstants {

@@ -127,7 +127,7 @@ public class HoodSubsystem extends SubsystemBase {
         return m_hood.getAngle();
     }
 
-    public boolean isAtAngle() {
+    public boolean isAtTargetAngle() {
         Optional<Angle> setpoint = m_hood.getMechanismSetpoint();
 
         if (!setpoint.isPresent())
@@ -171,7 +171,7 @@ public class HoodSubsystem extends SubsystemBase {
     }
 
     public Command lowerHood() {
-        return m_hood.setAngle(HoodConstants.SOFT_LIMIT_MIN);
+        return m_hood.setAngle(HoodConstants.DEFAULT_ANGLE);
     }
 
     /**
