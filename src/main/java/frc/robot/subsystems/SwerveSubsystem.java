@@ -48,6 +48,8 @@ public class SwerveSubsystem extends SubsystemBase {
 
     private Rotation2d autoAimTargetRotation = new Rotation2d();
 
+    private Pose2d m_selectedClimbPose;
+
     /**
      * Initialize {@link SwerveDrive} with the directory provided.
      *
@@ -87,6 +89,12 @@ public class SwerveSubsystem extends SubsystemBase {
         // swerveDrive.pushOffsetsToEncoders(); // Set the absolute encoder to be used
         // over the internal encoder and push the offsets onto it. Throws warning if not
         // possible
+
+        if (isRedAlliance()) {
+            m_selectedClimbPose = SwerveConstants.RED_LEFT_TOWER_CLIMB_POS;
+        } else {
+            m_selectedClimbPose = SwerveConstants.BLUE_LEFT_TOWER_CLIMB_POS;
+        }
     }
 
     /**
@@ -667,6 +675,20 @@ public class SwerveSubsystem extends SubsystemBase {
     public Rotation2d getAutoAimHeading() {
         calculateAutoAimHeading();
         return autoAimTargetRotation;
+    }
+
+    public void setSelectedClimbPose(boolean isLeft) {
+        if (isRedAlliance()) {
+            m_selectedClimbPose = isLeft ? SwerveConstants.RED_LEFT_TOWER_CLIMB_POS
+                    : SwerveConstants.RED_RIGHT_TOWER_CLIMB_POS;
+        } else {
+            m_selectedClimbPose = isLeft ? SwerveConstants.BLUE_LEFT_TOWER_CLIMB_POS
+                    : SwerveConstants.BLUE_RIGHT_TOWER_CLIMB_POS;
+        }
+    }
+
+    public Pose2d getSelectedClimbPose() {
+        return m_selectedClimbPose;
     }
 
     @Override

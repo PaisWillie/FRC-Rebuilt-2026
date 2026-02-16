@@ -7,11 +7,15 @@ package frc.robot;
 import java.io.File;
 import java.util.function.DoubleSupplier;
 
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.Constants.SwerveConstants;
@@ -162,10 +166,11 @@ public class RobotContainer {
         // .whileTrue(Commands.runOnce(m_swerveSubsystem::lock, m_swerveSubsystem)
         // .repeatedly());
 
-        m_driverController.povUp().whileTrue(m_swerveSubsystem.driveForward());
-        m_driverController.povDown().whileTrue(m_swerveSubsystem.driveBackward());
-        m_driverController.povLeft().whileTrue(m_swerveSubsystem.driveLeft());
-        m_driverController.povRight().whileTrue(m_swerveSubsystem.driveRight());
+        // Cardinal directions for PID tuning
+        // m_driverController.povUp().whileTrue(m_swerveSubsystem.driveForward());
+        // m_driverController.povDown().whileTrue(m_swerveSubsystem.driveBackward());
+        // m_driverController.povLeft().whileTrue(m_swerveSubsystem.driveLeft());
+        // m_driverController.povRight().whileTrue(m_swerveSubsystem.driveRight());
 
         m_driverController.options().onTrue((Commands.runOnce(m_swerveSubsystem::zeroGyro)));
 
@@ -176,6 +181,33 @@ public class RobotContainer {
                         driveFieldOrientedAutoAim))
                 .onFalse(m_shooterSubsystem.stopShooting());
 
+        // TODO: Move constants to Constants.java
+        driveAngularVelocity.driveToPose(m_swerveSubsystem::getSelectedClimbPose,
+                new ProfiledPIDController(5,
+                        0,
+                        0,
+                        new TrapezoidProfile.Constraints(1, 0.5)),
+                new ProfiledPIDController(5,
+                        0,
+                        0,
+                        new TrapezoidProfile.Constraints(Units.degreesToRadians(360),
+                                Units.degreesToRadians(180))));
+
+        m_driverController.povLeft().whileTrue(
+                Commands.sequence(
+                        new InstantCommand(
+                                () -> m_swerveSubsystem.setSelectedClimbPose(true)),
+                        Commands.runEnd(
+                                () -> driveAngularVelocity.driveToPoseEnabled(true),
+                                () -> driveAngularVelocity.driveToPoseEnabled(false))));
+
+        m_driverController.povRight().whileTrue(
+                Commands.sequence(
+                        new InstantCommand(
+                                () -> m_swerveSubsystem.setSelectedClimbPose(false)),
+                        Commands.runEnd(
+                                () -> driveAngularVelocity.driveToPoseEnabled(true),
+                                () -> driveAngularVelocity.driveToPoseEnabled(false))));
     }
 
     public Command getAutonomousCommand() {
