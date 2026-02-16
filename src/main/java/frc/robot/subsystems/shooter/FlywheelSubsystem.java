@@ -8,12 +8,12 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Second;
-import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 
 import java.util.Optional;
 import java.util.function.Supplier;
 
+import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.hardware.TalonFX;
 
 import edu.wpi.first.math.filter.Debouncer;
@@ -87,6 +87,19 @@ public class FlywheelSubsystem extends SubsystemBase {
     }
 
     /**
+     * Creates a SysId characterization command for the flywheel.
+     *
+     * @return the SysId command
+     */
+    public Command sysId() {
+        return m_flywheel.sysId(
+                Volts.of(10), Volts.of(1).per(Second), Second.of(5))
+                .beforeStarting(
+                        () -> SignalLogger.start())
+                .finallyDo(() -> SignalLogger.stop());
+    }
+
+    /**
      * Gets the current flywheel velocity.
      *
      * @return the current angular velocity
@@ -113,15 +126,6 @@ public class FlywheelSubsystem extends SubsystemBase {
      */
     public Command setVelocity(Supplier<AngularVelocity> speed) {
         return m_flywheel.setSpeed(speed);
-    }
-
-    /**
-     * Creates a SysId characterization command for the flywheel.
-     *
-     * @return the SysId command
-     */
-    public Command sysId() {
-        return m_flywheel.sysId(Volts.of(10), Volts.of(1).per(Second), Seconds.of(5)); // TODO
     }
 
     /**

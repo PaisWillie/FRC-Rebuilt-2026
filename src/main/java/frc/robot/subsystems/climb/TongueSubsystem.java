@@ -4,6 +4,10 @@
 
 package frc.robot.subsystems.climb;
 
+import static edu.wpi.first.units.Units.Second;
+import static edu.wpi.first.units.Units.Volts;
+
+import com.ctre.phoenix6.SignalLogger;
 import com.revrobotics.spark.SparkLowLevel;
 import com.revrobotics.spark.SparkMax;
 
@@ -66,6 +70,19 @@ public class TongueSubsystem extends SubsystemBase {
                 .withMass(TongueConstants.MECHANISM_MASS);
 
         m_elevator = new Elevator(config);
+    }
+
+    /**
+     * Creates a SysId characterization command for the tongue.
+     *
+     * @return the SysId command
+     */
+    public Command sysId() {
+        return m_elevator.sysId(
+                Volts.of(12), Volts.of(12).per(Second), Second.of(30))
+                .beforeStarting(
+                        () -> SignalLogger.start())
+                .finallyDo(() -> SignalLogger.stop());
     }
 
     public Command elevCmd(double dutycycle) {

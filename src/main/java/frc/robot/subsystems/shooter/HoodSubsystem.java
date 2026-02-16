@@ -4,9 +4,13 @@
 
 package frc.robot.subsystems.shooter;
 
+import static edu.wpi.first.units.Units.Second;
+import static edu.wpi.first.units.Units.Volts;
+
 import java.util.Optional;
 import java.util.function.Supplier;
 
+import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 
@@ -90,6 +94,19 @@ public class HoodSubsystem extends SubsystemBase {
     }
 
     /**
+     * Creates a SysId characterization command for the hood.
+     *
+     * @return the SysId command
+     */
+    public Command sysId() {
+        return m_hood.sysId(
+                Volts.of(4), Volts.of(0.5).per(Second), Second.of(8))
+                .beforeStarting(
+                        () -> SignalLogger.start())
+                .finallyDo(() -> SignalLogger.stop());
+    }
+
+    /**
      * Creates a command to set the hood angle.
      *
      * @param angle the target angle
@@ -136,18 +153,6 @@ public class HoodSubsystem extends SubsystemBase {
 
         double deltaDeg = setpoint.get().minus(m_hood.getAngle()).in(Units.Degrees);
         return m_atAngleDebouncer.calculate(Math.abs(deltaDeg) <= HoodConstants.ANGLE_TOLERANCE.in(Units.Degrees));
-    }
-
-    /**
-     * Creates a SysId characterization command for the hood.
-     *
-     * @return the SysId command
-     */
-    public Command sysId() {
-        return m_hood.sysId(
-                HoodConstants.SYSID_MAX_VOLTAGE,
-                HoodConstants.SYSID_STEP,
-                HoodConstants.SYSID_DURATION);
     }
 
     /**

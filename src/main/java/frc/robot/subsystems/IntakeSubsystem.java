@@ -5,9 +5,12 @@
 package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.Second;
+import static edu.wpi.first.units.Units.Volts;
 
 import java.util.Optional;
 
+import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.hardware.TalonFX;
 
 import edu.wpi.first.units.Units;
@@ -19,6 +22,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.HoodConstants;
 import frc.robot.Constants.IntakeConstants;
+import frc.robot.Constants.ClimbConstants.ElevatorConstants;
 import frc.robot.Constants.IntakeConstants.LinearConstants;
 import yams.gearing.MechanismGearing;
 import yams.mechanisms.config.ElevatorConfig;
@@ -75,7 +79,7 @@ public class IntakeSubsystem extends SubsystemBase {
                         IntakeConstants.LinearConstants.SOFT_LIMIT_MAX_METERS)
                 .withGearing(new MechanismGearing(IntakeConstants.LinearConstants.GEARBOX))
                 .withIdleMode(MotorMode.BRAKE)
-                .withTelemetry("ClimbMotor", Constants.TELEMETRY_VERBOSITY)
+                .withTelemetry("LinearIntakeMotor", Constants.TELEMETRY_VERBOSITY)
                 .withStatorCurrentLimit(IntakeConstants.LinearConstants.STATOR_CURRENT_LIMIT_AMPS)
                 .withMotorInverted(false)
                 .withClosedLoopRampRate(IntakeConstants.LinearConstants.CLOSED_LOOP_RAMP_RATE_SEC)
@@ -98,11 +102,24 @@ public class IntakeSubsystem extends SubsystemBase {
                 .withHardLimits(
                         IntakeConstants.LinearConstants.HARD_LIMIT_MIN_METERS,
                         IntakeConstants.LinearConstants.HARD_LIMIT_MAX_METERS)
-                .withTelemetry("Climb", Constants.TELEMETRY_VERBOSITY)
+                .withTelemetry("LinearIntake", Constants.TELEMETRY_VERBOSITY)
                 .withMechanismPositionConfig(m_robotToMechanism)
                 .withMass(IntakeConstants.LinearConstants.MECHANISM_MASS_POUNDS);
 
         m_linearIntake = new Elevator(m_linearConfig);
+    }
+
+    /**
+     * Creates a SysId characterization command for the linear intake.
+     *
+     * @return the SysId command
+     */
+    public Command sysId() {
+        return m_linearIntake.sysId(
+                Volts.of(12), Volts.of(12).per(Second), Second.of(30))
+                .beforeStarting(
+                        () -> SignalLogger.start())
+                .finallyDo(() -> SignalLogger.stop());
     }
 
     /**
@@ -167,6 +184,15 @@ public class IntakeSubsystem extends SubsystemBase {
 
     public Command retract() {
         return setLinearPosition(IntakeConstants.LinearConstants.RETRACTED_POSITION);
+    }
+
+    /**
+     * Move the elevator up and down.
+     * 
+     * @param dutycycle [-1, 1] speed to set the elevator too.
+     */
+    public Command set(double dutycycle) {
+        return m_linearIntake.set(dutycycle);
     }
 
     /**

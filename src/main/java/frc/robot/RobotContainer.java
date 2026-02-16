@@ -257,5 +257,12 @@ public class RobotContainer {
                         Commands.runEnd(
                                 () -> driveAngularVelocity.driveToPoseEnabled(true),
                                 () -> driveAngularVelocity.driveToPoseEnabled(false))));
+
+        m_intakeSubsystem.setDefaultCommand(m_intakeSubsystem.set(0));
+
+        m_driverController.cross().whileTrue(m_intakeSubsystem.sysId());
+        m_driverController.circle().whileTrue(m_intakeSubsystem.set(0));
+        m_driverController.triangle().whileTrue(m_intakeSubsystem.set(-0.3));
+        m_driverController.square().whileTrue(m_intakeSubsystem.set(0.3));
     }
 }

@@ -11,7 +11,6 @@ import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Pounds;
 import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
-import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 
@@ -25,7 +24,6 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.units.VoltageUnit;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularAcceleration;
 import edu.wpi.first.units.measure.AngularVelocity;
@@ -35,7 +33,6 @@ import edu.wpi.first.units.measure.LinearAcceleration;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.Mass;
 import edu.wpi.first.units.measure.Time;
-import edu.wpi.first.units.measure.Velocity;
 import edu.wpi.first.units.measure.Voltage;
 import yams.gearing.GearBox;
 import yams.gearing.MechanismGearing;
@@ -187,6 +184,7 @@ public final class Constants {
 
         public static final Time CLOSED_LOOP_RAMP_RATE_SEC = Seconds.of(0.25); // TODO
         public static final Time OPEN_LOOP_RAMP_RATE_SEC = Seconds.of(0.25); // TODO
+
         public static final SimpleMotorFeedforward FEEDFORWARD = new SimpleMotorFeedforward(0.27937, 0.089836,
                 0.014557); // TODO
         public static final SimpleMotorFeedforward SIM_FEEDFORWARD = new SimpleMotorFeedforward(0.27937, 0.089836,
@@ -202,9 +200,6 @@ public final class Constants {
         public static final Mass MASS = Pounds.of(5); // TODO
         public static final Angle STARTING_ANGLE = Degrees.of(0); // TODO
 
-        public static final Voltage SYSID_MAX_VOLTAGE = Volts.of(4.0); // TODO
-        public static final Velocity<VoltageUnit> SYSID_STEP = Volts.per(Second).of(0.5); // TODO
-        public static final Time SYSID_DURATION = Seconds.of(8.0); // TODO
         public static final boolean EXTERNAL_ENCODER_INVERTED = false; // TODO
         public static final double EXTERNAL_ENCODER_GEARING = 17;
         public static final Angle EXTERNAL_ENCODER_ZERO_OFFSET = Degrees.of(0); // TODO
@@ -271,9 +266,6 @@ public final class Constants {
             public static final Current STATOR_CURRENT_LIMIT = Amps.of(40); // TODO
             public static final Time CLOSED_LOOP_RAMP_RATE = Seconds.of(0.25); // TODO
             public static final Time OPEN_LOOP_RAMP_RATE = Seconds.of(0.25); // TODO
-            public static final Voltage SYSID_MAX_VOLTAGE = Volts.of(12); // TODO
-            public static final Velocity<VoltageUnit> SYSID_STEP = Volts.of(12).per(Second); // TODO
-            public static final Time SYSID_DURATION = Second.of(30); // TODO
             public static final Time HOMING_DEBOUNCE_TIME = Seconds.of(0.4); // TODO
             public static final Voltage HOMING_RUN_VOLTS = Volts.of(-2); // TODO
             public static final AngularVelocity HOMING_VELOCITY_THRESHOLD = DegreesPerSecond.of(2); // TODO
