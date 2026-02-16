@@ -168,20 +168,6 @@ public class RobotContainer {
                 m_driverController.povRight().whileTrue(m_swerveSubsystem.driveRight());
 
                 m_driverController.options().onTrue((Commands.runOnce(m_swerveSubsystem::zeroGyro)));
-                // m_driverController.R1().whileTrue(
-                // m_shooterSubsystem.aimAndShoot(m_swerveSubsystem::getDistanceFromHub));
-
-                // m_driverController.R1().whileTrue(
-                // m_shooterSubsystem.m_hoodSubsystem.setAngle(
-                // Degrees.of(m_shooterSubsystem.m_distanceToHoodAngleMap
-                // .get(m_swerveSubsystem::getDistanceFromHub.get().in(Meters)))));
-
-                // m_driverController.R1().whileTrue(
-                // m_shooterSubsystem.m_hoodSubsystem.setAngle(
-                // () -> {
-                // return Degrees.of(m_shooterSubsystem.m_distanceToHoodAngleMap
-                // .get(m_swerveSubsystem.getDistanceFromHub().in(Meters)));
-                // }));
 
                 m_driverController.R2()
                                 .whileTrue(Commands.parallel(
