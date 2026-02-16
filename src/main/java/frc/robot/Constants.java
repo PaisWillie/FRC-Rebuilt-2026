@@ -179,7 +179,7 @@ public final class Constants {
         public static final double EXTERNAL_ENCODER_GEARING = 17;
         public static final Angle EXTERNAL_ENCODER_ZERO_OFFSET = Degrees.of(0); // TODO
 
-        public static final Angle ANGLE_TOLERANCE = Degrees.of(2); // TODO
+        public static final Angle ANGLE_TOLERANCE = Degrees.of(7); // TODO
         public static final double AT_ANGLE_DEBOUNCE_TIME = 0.2; // TODO
     }
 

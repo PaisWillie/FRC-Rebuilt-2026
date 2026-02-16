@@ -94,21 +94,11 @@ public class RobotContainer {
                     0));
 
     private DoubleSupplier headingXSupplier() {
-        return () -> {
-            Translation2d robotTranslation = m_swerveSubsystem.getSwerveDrive().getPose().getTranslation();
-            Translation2d delta = FieldConstants.BLUE_HUB_CENTER.minus(robotTranslation);
-            Rotation2d heading = delta.getAngle().minus(Rotation2d.fromDegrees(90));
-            return heading.getCos();
-        };
+        return () -> m_swerveSubsystem.getAutoAimHeading().getCos();
     }
 
     private DoubleSupplier headingYSupplier() {
-        return () -> {
-            Translation2d robotTranslation = m_swerveSubsystem.getSwerveDrive().getPose().getTranslation();
-            Translation2d delta = FieldConstants.BLUE_HUB_CENTER.minus(robotTranslation);
-            Rotation2d heading = delta.getAngle().minus(Rotation2d.fromDegrees(90));
-            return -heading.getSin();
-        };
+        return () -> -m_swerveSubsystem.getAutoAimHeading().getSin();
     }
 
     SwerveInputStream driveAutoAim = driveAngularVelocity.copy()

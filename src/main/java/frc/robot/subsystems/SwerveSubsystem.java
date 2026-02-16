@@ -380,7 +380,7 @@ public class SwerveSubsystem extends SubsystemBase {
      * @return true if the red alliance, false if blue. Defaults to false if none is
      *         available.
      */
-    private boolean isRedAlliance() {
+    public boolean isRedAlliance() {
         var alliance = DriverStation.getAlliance();
         return alliance.isPresent() ? alliance.get() == DriverStation.Alliance.Red : false;
     }
@@ -573,8 +573,20 @@ public class SwerveSubsystem extends SubsystemBase {
      */
     public Distance getDistanceToHub() {
         Translation2d position = getPose().getTranslation();
-        // TODO: Change to adapt to current alliance colour
+        if (isRedAlliance())
+            return Meters.of(position.getDistance(FieldConstants.RED_HUB_CENTER));
+
         return Meters.of(position.getDistance(FieldConstants.BLUE_HUB_CENTER));
+    }
+
+    public Rotation2d getAutoAimHeading() {
+        Translation2d robotTranslation = getPose().getTranslation();
+        Translation2d hubCenter = isRedAlliance()
+                ? FieldConstants.RED_HUB_CENTER
+                : FieldConstants.BLUE_HUB_CENTER;
+
+        Translation2d delta = hubCenter.minus(robotTranslation);
+        return delta.getAngle().minus(Rotation2d.fromDegrees(90));
     }
 
 }
