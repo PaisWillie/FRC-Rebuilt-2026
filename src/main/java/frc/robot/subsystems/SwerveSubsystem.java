@@ -11,6 +11,7 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
+import java.util.logging.Logger;
 
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -21,6 +22,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -96,14 +98,6 @@ public class SwerveSubsystem extends SubsystemBase {
                 SwerveConstants.MAX_SPEED,
                 new Pose2d(new Translation2d(Meter.of(2), Meter.of(0)),
                         Rotation2d.fromDegrees(0)));
-    }
-
-    @Override
-    public void periodic() {
-    }
-
-    @Override
-    public void simulationPeriodic() {
     }
 
     /**
@@ -579,14 +573,33 @@ public class SwerveSubsystem extends SubsystemBase {
         return Meters.of(position.getDistance(FieldConstants.BLUE_HUB_CENTER));
     }
 
+    Translation2d futureTranslation = new Translation2d();
+
     public Rotation2d getAutoAimHeading() {
         Translation2d robotTranslation = getPose().getTranslation();
+
+        ChassisSpeeds fieldRelativeChassisSpeeds = getFieldVelocity();
+
+        Translation2d deltaPos = new Translation2d(fieldRelativeChassisSpeeds.vxMetersPerSecond,
+                fieldRelativeChassisSpeeds.vyMetersPerSecond);
+
+        futureTranslation = robotTranslation
+                .plus(deltaPos.times(SwerveConstants.AUTOM_AIM_VELOCITY_COMPENSATION_FACTOR)); // Look ahead 0.5
+                                                                                               // seconds
+
         Translation2d hubCenter = isRedAlliance()
                 ? FieldConstants.RED_HUB_CENTER
                 : FieldConstants.BLUE_HUB_CENTER;
 
-        Translation2d delta = hubCenter.minus(robotTranslation);
+        Translation2d delta = hubCenter.minus(futureTranslation);
         return delta.getAngle().minus(Rotation2d.fromDegrees(90));
     }
 
+    @Override
+    public void periodic() {
+    }
+
+    @Override
+    public void simulationPeriodic() {
+    }
 }
