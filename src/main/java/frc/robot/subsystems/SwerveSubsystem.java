@@ -533,6 +533,11 @@ public class SwerveSubsystem extends SubsystemBase {
         NEUTRAL_ZONE_BLUE_RIGHT
     }
 
+    /**
+     * Gets the current zone of the robot based on its position on the field.
+     * 
+     * @return The current zone of the robot as a Zone enum.
+     */
     public Zone getCurrentZone() {
         Translation2d position = getPose().getTranslation();
 
@@ -616,6 +621,11 @@ public class SwerveSubsystem extends SubsystemBase {
                 : FieldConstants.BLUE_HUB_CENTER;
     }
 
+    /**
+     * Calculates the target rotation for auto-aiming based on the current position
+     * and
+     * velocity of the robot, and the target translation for auto-aiming.
+     */
     private void calculateAutoAimHeading() {
         Translation2d robotTranslation = getPose().getTranslation();
 
@@ -633,6 +643,14 @@ public class SwerveSubsystem extends SubsystemBase {
         autoAimTargetRotation = delta.getAngle().minus(Rotation2d.fromDegrees(90));
     }
 
+    /**
+     * Checks if the robot is on target for auto-aiming by comparing the current
+     * heading
+     * to the target rotation for auto-aiming, and checking if the angle error is
+     * within a certain tolerance.
+     * 
+     * @return true if the robot is on target for auto-aiming, false otherwise
+     */
     public boolean isAutoAimOnTarget() {
         Rotation2d currentHeading = getHeading();
         double angleError = Math
@@ -641,6 +659,11 @@ public class SwerveSubsystem extends SubsystemBase {
         return angleError < SwerveConstants.AUTO_AIM_ANGLE_TOLERANCE.in(Degrees);
     }
 
+    /**
+     * Gets the target rotation for auto-aiming.
+     * 
+     * @return The target rotation for auto-aiming.
+     */
     public Rotation2d getAutoAimHeading() {
         calculateAutoAimHeading();
         return autoAimTargetRotation;
