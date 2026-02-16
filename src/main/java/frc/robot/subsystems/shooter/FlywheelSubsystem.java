@@ -173,9 +173,8 @@ public class FlywheelSubsystem extends SubsystemBase {
         if (!setpoint.isPresent())
             return false;
 
-        double deltaRPM = setpoint.get().in(RPM) - getVelocity().in(RPM);
-
-        return m_atRPMDebouncer.calculate(Math.abs(deltaRPM) <= FlywheelConstants.RPM_TOLERANCE.in(RPM));
+        return m_atRPMDebouncer.calculate(
+                setpoint.get().isNear(getVelocity(), FlywheelConstants.RPM_TOLERANCE));
     }
 
     public Command stop() {

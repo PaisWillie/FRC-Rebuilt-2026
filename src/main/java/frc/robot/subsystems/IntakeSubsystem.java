@@ -50,8 +50,6 @@ public class IntakeSubsystem extends SubsystemBase {
 
     private final Elevator m_linearIntake;
 
-    private Distance m_linearSetpoint = IntakeConstants.LinearConstants.STARTING_HEIGHT_METERS;
-
     /**
      * Constructs the intake subsystem and initializes the motor controller.
      */
@@ -145,21 +143,21 @@ public class IntakeSubsystem extends SubsystemBase {
      * @return the command that sets the height
      */
     public Command setLinearPosition(Distance position) {
-        m_linearSetpoint = position;
         return m_linearIntake.setHeight(position);
     }
 
     public boolean isLinearAtTargetPosition() {
-        Optional<Angle> setpoint = m_linearIntake.getMechanismSetpoint();
+        Optional<Angle> angle_setpoint = m_linearIntake.getMechanismSetpoint();
 
-        if (!setpoint.isPresent())
+        if (!angle_setpoint.isPresent())
             return false;
 
-        m_linearMotorSMCConfig.convertFromMechanism(setpoint.get());
-        double deltaMeters = m_linearSetpoint.minus(m_linearIntake.getHeight()).in(Meters);
-        return Math.abs(deltaMeters) <= IntakeConstants.LinearConstants.POSITION_TOLERANCE.in(Meters); // TODO: Do we
-                                                                                                       // need a
-                                                                                                       // debouncer?
+        Distance setpoint = m_linearMotorSMCConfig.convertFromMechanism(angle_setpoint.get());
+
+        // TODO: Do we need a debouncer?
+        return setpoint.isNear(m_linearIntake.getHeight(), IntakeConstants.LinearConstants.POSITION_TOLERANCE);
+    }
+
     }
 
     public Command elevCmd(double dutycycle) {

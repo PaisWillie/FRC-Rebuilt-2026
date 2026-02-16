@@ -151,8 +151,8 @@ public class HoodSubsystem extends SubsystemBase {
         if (!setpoint.isPresent())
             return false;
 
-        double deltaDeg = setpoint.get().minus(m_hood.getAngle()).in(Units.Degrees);
-        return m_atAngleDebouncer.calculate(Math.abs(deltaDeg) <= HoodConstants.ANGLE_TOLERANCE.in(Units.Degrees));
+        return m_atAngleDebouncer.calculate(
+                setpoint.get().isNear(m_hood.getAngle(), HoodConstants.ANGLE_TOLERANCE));
     }
 
     /**
