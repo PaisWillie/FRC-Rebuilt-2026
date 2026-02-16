@@ -34,11 +34,11 @@ import swervelib.SwerveInputStream;
 public class RobotContainer {
     final CommandPS5Controller m_driverController = new CommandPS5Controller(Constants.DRIVER_CONTROLLER_PORT);
 
-    private final ClimbSubsystem m_climbSubsystem = new ClimbSubsystem();
-    private final HopperSubsystem m_hopperSubsystem = new HopperSubsystem();
-    private final IndexerSubsystem m_indexerSubsystem = new IndexerSubsystem();
-    private final IntakeSubsystem m_intakeSubsystem = new IntakeSubsystem();
-    private final ShooterSubsystem m_shooterSubsystem = new ShooterSubsystem();
+    // private final ClimbSubsystem m_climbSubsystem = new ClimbSubsystem();
+    // private final HopperSubsystem m_hopperSubsystem = new HopperSubsystem();
+    // private final IndexerSubsystem m_indexerSubsystem = new IndexerSubsystem();
+    // private final IntakeSubsystem m_intakeSubsystem = new IntakeSubsystem();
+    // private final ShooterSubsystem m_shooterSubsystem = new ShooterSubsystem();
     private final SwerveSubsystem m_swerveSubsystem = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
             "swerve"));
 
@@ -198,71 +198,71 @@ public class RobotContainer {
         m_driverController.options().onTrue((Commands.runOnce(m_swerveSubsystem::zeroGyro)));
 
         // TODO: Maybe run indexer while intaking?
-        m_driverController.L2().whileTrue(
-                Commands.sequence(
-                        m_intakeSubsystem.extend().until(m_intakeSubsystem::isLinearAtTargetPosition),
-                        Commands.parallel(
-                                m_hopperSubsystem.expand(),
-                                m_intakeSubsystem.intake())))
-                .onFalse(
-                        Commands.sequence(
-                                m_intakeSubsystem.retract().until(m_intakeSubsystem::isLinearAtTargetPosition),
-                                m_intakeSubsystem.stopRollers()));
+        // m_driverController.L2().whileTrue(
+        // Commands.sequence(
+        // m_intakeSubsystem.extend().until(m_intakeSubsystem::isLinearAtTargetPosition),
+        // Commands.parallel(
+        // m_hopperSubsystem.expand(),
+        // m_intakeSubsystem.intake())))
+        // .onFalse(
+        // Commands.sequence(
+        // m_intakeSubsystem.retract().until(m_intakeSubsystem::isLinearAtTargetPosition),
+        // m_intakeSubsystem.stopRollers()));
 
-        m_driverController.R2()
-                .whileTrue(Commands.parallel(
-                        m_shooterSubsystem.aimAndShoot(m_swerveSubsystem::getDistanceToTarget,
-                                m_swerveSubsystem::isAutoAimOnTarget),
-                        driveFieldOrientedAutoAim))
-                .onFalse(m_shooterSubsystem.stopShooting());
+        // m_driverController.R2()
+        // .whileTrue(Commands.parallel(
+        // m_shooterSubsystem.aimAndShoot(m_swerveSubsystem::getDistanceToTarget,
+        // m_swerveSubsystem::isAutoAimOnTarget),
+        // driveFieldOrientedAutoAim))
+        // .onFalse(m_shooterSubsystem.stopShooting());
 
-        // TODO: Expand intake DLI then retract
-        m_driverController.R1().whileTrue(
-                Commands.sequence(
-                        m_intakeSubsystem.extend().until(m_intakeSubsystem::isLinearAtTargetPosition),
-                        Commands.parallel(
-                                m_indexerSubsystem.reverse(),
-                                m_intakeSubsystem.outtake())))
-                .onFalse(
-                        Commands.sequence(
-                                m_intakeSubsystem.retract().until(m_intakeSubsystem::isLinearAtTargetPosition),
-                                Commands.parallel(
-                                        m_indexerSubsystem.stop(),
-                                        m_intakeSubsystem.stopRollers())));
+        // // TODO: Expand intake DLI then retract
+        // m_driverController.R1().whileTrue(
+        // Commands.sequence(
+        // m_intakeSubsystem.extend().until(m_intakeSubsystem::isLinearAtTargetPosition),
+        // Commands.parallel(
+        // m_indexerSubsystem.reverse(),
+        // m_intakeSubsystem.outtake())))
+        // .onFalse(
+        // Commands.sequence(
+        // m_intakeSubsystem.retract().until(m_intakeSubsystem::isLinearAtTargetPosition),
+        // Commands.parallel(
+        // m_indexerSubsystem.stop(),
+        // m_intakeSubsystem.stopRollers())));
 
-        // TODO: Move constants to Constants.java
-        driveAngularVelocity.driveToPose(m_swerveSubsystem::getSelectedClimbPose,
-                new ProfiledPIDController(5,
-                        0,
-                        0,
-                        new TrapezoidProfile.Constraints(1, 0.5)),
-                new ProfiledPIDController(5,
-                        0,
-                        0,
-                        new TrapezoidProfile.Constraints(Units.degreesToRadians(360),
-                                Units.degreesToRadians(180))));
+        // // TODO: Move constants to Constants.java
+        // driveAngularVelocity.driveToPose(m_swerveSubsystem::getSelectedClimbPose,
+        // new ProfiledPIDController(5,
+        // 0,
+        // 0,
+        // new TrapezoidProfile.Constraints(1, 0.5)),
+        // new ProfiledPIDController(5,
+        // 0,
+        // 0,
+        // new TrapezoidProfile.Constraints(Units.degreesToRadians(360),
+        // Units.degreesToRadians(180))));
 
-        m_driverController.povLeft().whileTrue(
-                Commands.sequence(
-                        new InstantCommand(
-                                () -> m_swerveSubsystem.setSelectedClimbPose(true)),
-                        Commands.runEnd(
-                                () -> driveAngularVelocity.driveToPoseEnabled(true),
-                                () -> driveAngularVelocity.driveToPoseEnabled(false))));
+        // m_driverController.povLeft().whileTrue(
+        // Commands.sequence(
+        // new InstantCommand(
+        // () -> m_swerveSubsystem.setSelectedClimbPose(true)),
+        // Commands.runEnd(
+        // () -> driveAngularVelocity.driveToPoseEnabled(true),
+        // () -> driveAngularVelocity.driveToPoseEnabled(false))));
 
-        m_driverController.povRight().whileTrue(
-                Commands.sequence(
-                        new InstantCommand(
-                                () -> m_swerveSubsystem.setSelectedClimbPose(false)),
-                        Commands.runEnd(
-                                () -> driveAngularVelocity.driveToPoseEnabled(true),
-                                () -> driveAngularVelocity.driveToPoseEnabled(false))));
+        // m_driverController.povRight().whileTrue(
+        // Commands.sequence(
+        // new InstantCommand(
+        // () -> m_swerveSubsystem.setSelectedClimbPose(false)),
+        // Commands.runEnd(
+        // () -> driveAngularVelocity.driveToPoseEnabled(true),
+        // () -> driveAngularVelocity.driveToPoseEnabled(false))));
 
-        m_intakeSubsystem.setDefaultCommand(m_intakeSubsystem.set(0));
+        // m_intakeSubsystem.setDefaultCommand(m_intakeSubsystem.set(0));
 
-        m_driverController.cross().whileTrue(m_intakeSubsystem.sysId());
-        m_driverController.circle().whileTrue(m_intakeSubsystem.set(0));
-        m_driverController.triangle().whileTrue(m_intakeSubsystem.set(-0.3));
-        m_driverController.square().whileTrue(m_intakeSubsystem.set(0.3));
+        // m_driverController.cross().whileTrue(m_intakeSubsystem.sysId());
+        // m_driverController.circle().whileTrue(m_intakeSubsystem.set(0));
+        // m_driverController.triangle().whileTrue(m_intakeSubsystem.set(-0.3));
+        // m_driverController.square().whileTrue(m_intakeSubsystem.set(0.3));
     }
 }
