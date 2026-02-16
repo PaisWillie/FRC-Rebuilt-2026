@@ -158,8 +158,6 @@ public class IntakeSubsystem extends SubsystemBase {
         return setpoint.isNear(m_linearIntake.getHeight(), IntakeConstants.LinearConstants.POSITION_TOLERANCE);
     }
 
-    }
-
     public Command elevCmd(double dutycycle) {
         return m_linearIntake.set(dutycycle);
     }
