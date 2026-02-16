@@ -625,8 +625,7 @@ public class SwerveSubsystem extends SubsystemBase {
                 fieldRelativeChassisSpeeds.vyMetersPerSecond);
 
         Translation2d futureTranslation = robotTranslation
-                .plus(deltaPos.times(SwerveConstants.AUTO_AIM_VELOCITY_COMPENSATION_FACTOR)); // Look ahead 0.5
-                                                                                              // seconds
+                .plus(deltaPos.times(SwerveConstants.AUTO_AIM_VELOCITY_COMPENSATION_FACTOR));
 
         Translation2d target = getAutoAimTarget();
 
