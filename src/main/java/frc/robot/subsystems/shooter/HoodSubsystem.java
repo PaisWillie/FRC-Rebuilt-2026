@@ -10,6 +10,7 @@ import java.util.function.Supplier;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 
+import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -26,24 +27,22 @@ import yams.motorcontrollers.SmartMotorControllerConfig.MotorMode;
 import yams.motorcontrollers.remote.TalonFXWrapper;
 
 public class HoodSubsystem extends SubsystemBase {
+
     private final TalonFX m_motor;
     private final CANcoder m_encoder;
 
-    private final SmartMotorControllerConfig m_smcConfig;
-
     private final SmartMotorController m_smartMotorController;
 
-    // The Hood can be modeled as an arm since it has a gravitational force acting
-    // on it
-    private final ArmConfig m_hoodConfig;
-
     private final Arm m_hood;
+
+    private final Debouncer m_atAngleDebouncer = new Debouncer(HoodConstants.AT_ANGLE_DEBOUNCE_TIME,
+            Debouncer.DebounceType.kRising);
 
     public HoodSubsystem() {
         m_motor = new TalonFX(HoodConstants.MOTOR_CAN_ID);
         m_encoder = new CANcoder(HoodConstants.ENCODER_CAN_ID);
 
-        m_smcConfig = new SmartMotorControllerConfig(this)
+        SmartMotorControllerConfig m_smcConfig = new SmartMotorControllerConfig(this)
                 .withClosedLoopController(
                         HoodConstants.PID_kP,
                         HoodConstants.PID_kI,
@@ -77,7 +76,9 @@ public class HoodSubsystem extends SubsystemBase {
                 HoodConstants.MOTOR,
                 m_smcConfig);
 
-        m_hoodConfig = new ArmConfig(m_smartMotorController)
+        // The Hood can be modeled as an arm since it has a gravitational force acting
+        // on it
+        ArmConfig m_hoodConfig = new ArmConfig(m_smartMotorController)
                 .withTelemetry("HoodMech", Constants.TELEMETRY_VERBOSITY)
                 .withSoftLimits(HoodConstants.SOFT_LIMIT_MIN, HoodConstants.SOFT_LIMIT_MAX)
                 .withHardLimit(HoodConstants.HARD_LIMIT_MIN, HoodConstants.HARD_LIMIT_MAX)
@@ -133,7 +134,7 @@ public class HoodSubsystem extends SubsystemBase {
             return false;
 
         double deltaDeg = setpoint.get().minus(m_hood.getAngle()).in(Units.Degrees);
-        return Math.abs(deltaDeg) <= HoodConstants.ANGLE_TOLERANCE.in(Units.Degrees);
+        return m_atAngleDebouncer.calculate(Math.abs(deltaDeg) <= HoodConstants.ANGLE_TOLERANCE.in(Units.Degrees));
     }
 
     /**

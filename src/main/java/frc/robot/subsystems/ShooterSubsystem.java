@@ -6,14 +6,18 @@ package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.RPM;
 
 import java.util.function.Supplier;
 
+import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.subsystems.shooter.FeederSubsystem;
@@ -61,41 +65,23 @@ public class ShooterSubsystem extends SubsystemBase {
      *         executed
      */
     public Command aimAndShoot(Supplier<Distance> getDistanceToTarget) {
-        // return Commands.parallel(
-
-        // // Spin up flywheel and adjust hood angle in parallel, then feed balls when
-        // // ready
-        // m_flywheelSubsystem.shoot(),
-        // m_hoodSubsystem.setAngle(Degrees.of(m_distanceToHoodAngleMap.get(getDistanceToTarget.get().in(Meters))))
-        // .repeatedly(),
-        // new ConditionalCommand(m_feederSubsystem.feed(), m_feederSubsystem.stop(),
-        // this::isShooterReady)
-        // .repeatedly()
-
-        // // Slow flywheel, lower hood, and stop feeder when we stop shooting
-        // ).finallyDo((interrupted) -> {
-        // m_flywheelSubsystem.setDefaultRPM();
-        // m_hoodSubsystem.lowerHood();
-        // m_feederSubsystem.stop();
-        // }) // TODO: Check if this requires .schedule(), or a Commands.parallel(), or
-        // // if it will run automatically after the parallel command finishes
-        // .withName("Aim and Shoot");
-
-        return m_hoodSubsystem.setAngle(
-                () -> {
-                    return Degrees.of(m_distanceToHoodAngleMap
-                            .get(getDistanceToTarget.get().in(Meters)));
-                });
+        return Commands.parallel(
+                m_hoodSubsystem.setAngle(
+                        () -> {
+                            return Degrees.of(m_distanceToHoodAngleMap
+                                    .get(getDistanceToTarget.get().in(Meters)));
+                        }),
+                m_flywheelSubsystem.shoot(),
+                new ConditionalCommand(m_feederSubsystem.feed(), m_feederSubsystem.stop(), this::isShooterReady))
+                .withName("SHTR - Aim and Shoot");
     }
 
     public Command stopShooting() {
         return Commands.parallel(
-                m_hoodSubsystem.lowerHood());
-    }
-
-    // TOOD: Delete this
-    public Command runFlywheel() {
-        return m_flywheelSubsystem.shoot();
+                m_hoodSubsystem.lowerHood(),
+                m_flywheelSubsystem.setDefaultRPM(),
+                m_feederSubsystem.stop())
+                .withName("SHTR - Stop Shooting");
     }
 
     @Override
@@ -104,6 +90,13 @@ public class ShooterSubsystem extends SubsystemBase {
 
     @Override
     public void simulationPeriodic() {
-        SmartDashboard.putNumber("m_distanceToHoodAngleMap", m_distanceToHoodAngleMap.get(4.0));
+        // SmartDashboard.putNumber("m_distanceToHoodAngleMap",
+        // m_distanceToHoodAngleMap.get(4.0));
+
+        SmartDashboard.putNumber("hood angle", m_hoodSubsystem.getAngle().in(Degrees));
+        SmartDashboard.putNumber("flywheel RPM", m_flywheelSubsystem.getVelocity().in(RPM));
+
+        SmartDashboard.putBoolean("isHoodReady", m_hoodSubsystem.isAtAngle());
+        SmartDashboard.putBoolean("isFlywheelReady", m_flywheelSubsystem.isAtTargetRPM());
     }
 }

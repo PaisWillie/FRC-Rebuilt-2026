@@ -8,8 +8,7 @@ import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 
-import com.revrobotics.spark.SparkLowLevel;
-import com.revrobotics.spark.SparkMax;
+import com.ctre.phoenix6.hardware.TalonFX;
 
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.filter.Debouncer;
@@ -29,11 +28,10 @@ import yams.motorcontrollers.SmartMotorController;
 import yams.motorcontrollers.SmartMotorControllerConfig;
 import yams.motorcontrollers.SmartMotorControllerConfig.ControlMode;
 import yams.motorcontrollers.SmartMotorControllerConfig.MotorMode;
-import yams.motorcontrollers.local.SparkWrapper;
+import yams.motorcontrollers.remote.TalonFXWrapper;
 
 public class ClimbSubsystem extends SubsystemBase {
-    private final SparkMax elevatorMotor = new SparkMax(ClimbConstants.MOTOR_CAN_ID,
-            SparkLowLevel.MotorType.kBrushless);
+    private final TalonFX elevatorMotor = new TalonFX(ClimbConstants.MOTOR_CAN_ID);
     private final Distance circumference = ClimbConstants.CHAIN_PITCH.times(ClimbConstants.TOOTH_COUNT);
     private final Distance radius = circumference.div(2 * Math.PI);
     /*
@@ -103,7 +101,7 @@ public class ClimbSubsystem extends SubsystemBase {
             .withFeedforward(elevatorFeedforward)
             .withSoftLimit(ClimbConstants.SOFT_LOWER_LIMIT, ClimbConstants.SOFT_UPPER_LIMIT);
     /// Generic Smart Motor Controller with our options and vendor motor.
-    private final SmartMotorController motor = new SparkWrapper(elevatorMotor, ClimbConstants.MOTOR, motorConfig);
+    private final SmartMotorController motor = new TalonFXWrapper(elevatorMotor, ClimbConstants.MOTOR, motorConfig);
     /// Elevator-specific options
     private ElevatorConfig m_config = new ElevatorConfig(motor)
             /*

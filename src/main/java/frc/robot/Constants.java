@@ -120,17 +120,18 @@ public final class Constants {
         public static final SimpleMotorFeedforward SIM_FEEDFORWARD = new SimpleMotorFeedforward(0.27937, 0.089836,
                 0.014557); // TODO
 
-        public static final double SOFT_LIMIT_RPM = 5000; // TODO
+        public static final double SOFT_LIMIT_RPM = 500; // TODO
 
-        public static final AngularVelocity MAX_VELOCITY_RPM = RPM.of(5000); // TODO
-        public static final AngularVelocity SIM_MAX_VELOCITY_RPM = RPM.of(7500); // TODO
+        public static final AngularVelocity MAX_VELOCITY_RPM = RPM.of(500); // TODO
+        public static final AngularVelocity SIM_MAX_VELOCITY_RPM = RPM.of(500); // TODO
 
         public static final AngularAcceleration MAX_ACCELERATION_RPS2 = RotationsPerSecondPerSecond.of(2500); // TODO
 
-        public static final AngularVelocity DEFAULT_VELOCITY_RPM = RPM.of(2000); // TODO
-        public static final AngularVelocity SHOOTING_VELOCITY_RPM = RPM.of(4000); // TODO
+        public static final AngularVelocity DEFAULT_VELOCITY_RPM = RPM.of(250); // TODO
+        public static final AngularVelocity SHOOTING_VELOCITY_RPM = RPM.of(450); // TODO
 
-        public static final AngularVelocity RPM_TOLERANCE = RPM.of(100); // TODO
+        public static final AngularVelocity RPM_TOLERANCE = RPM.of(25); // TODO
+        public static final double AT_RPM_DEBOUNCE_TIME = 0.2; // TODO
     }
 
     public static final class HoodConstants {
@@ -179,6 +180,7 @@ public final class Constants {
         public static final Angle EXTERNAL_ENCODER_ZERO_OFFSET = Degrees.of(0); // TODO
 
         public static final Angle ANGLE_TOLERANCE = Degrees.of(2); // TODO
+        public static final double AT_ANGLE_DEBOUNCE_TIME = 0.2; // TODO
     }
 
     public static final class FeederConstants {
@@ -208,7 +210,7 @@ public final class Constants {
 
     public static final class ClimbConstants {
         public static final int MOTOR_CAN_ID = 7; // TODO
-        public static final DCMotor MOTOR = DCMotor.getNEO(1); // TODO
+        public static final DCMotor MOTOR = DCMotor.getFalcon500(2); // TODO
         public static final Distance CHAIN_PITCH = Inches.of(0.25); // TODO
         public static final int TOOTH_COUNT = 22; // TODO
         public static final MechanismGearing GEARBOX = new MechanismGearing(GearBox.fromReductionStages(3, 4)); // TODO

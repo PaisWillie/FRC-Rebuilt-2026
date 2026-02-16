@@ -116,7 +116,10 @@ public class RobotContainer {
             .headingWhile(true);
 
     public RobotContainer() {
-        DriverStation.silenceJoystickConnectionWarning(true);
+        if (Robot.isSimulation()) {
+            DriverStation.silenceJoystickConnectionWarning(true);
+        }
+
         configureBindings();
     }
 
@@ -195,8 +198,6 @@ public class RobotContainer {
 
         m_driverController.R1().whileTrue(m_shooterSubsystem.aimAndShoot(m_swerveSubsystem::getDistanceToHub))
                 .onFalse(m_shooterSubsystem.stopShooting());
-
-        m_driverController.cross().whileTrue(m_shooterSubsystem.runFlywheel());
     }
 
     public Command getAutonomousCommand() {

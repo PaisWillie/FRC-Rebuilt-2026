@@ -33,11 +33,8 @@ public class IntakeSubsystem extends SubsystemBase {
     private final PWMTalonFX m_rollerMotor;
 
     private final TalonFX m_linearMotor;
-    private final SmartMotorControllerConfig m_linearMotorSMCConfig;
     private final SmartMotorController m_linearMotorSMC;
 
-    private final MechanismPositionConfig m_robotToMechanism;
-    private ElevatorConfig m_linearConfig;
     private final Elevator m_linearIntake;
 
     /**
@@ -48,7 +45,7 @@ public class IntakeSubsystem extends SubsystemBase {
         m_rollerMotor = new PWMTalonFX(IntakeConstants.ROLLER_MOTOR_PWM_ID);
         m_linearMotor = new TalonFX(IntakeConstants.LinearConstants.LINEAR_MOTOR_CAN_ID);
 
-        m_linearMotorSMCConfig = new SmartMotorControllerConfig(this)
+        SmartMotorControllerConfig m_linearMotorSMCConfig = new SmartMotorControllerConfig(this)
                 .withMechanismCircumference(IntakeConstants.LinearConstants.MOTOR_CIRCUMFERENCE_METERS)
                 .withClosedLoopController(
                         IntakeConstants.LinearConstants.PID_kP,
@@ -80,12 +77,12 @@ public class IntakeSubsystem extends SubsystemBase {
                 IntakeConstants.LinearConstants.MOTOR,
                 m_linearMotorSMCConfig);
 
-        m_robotToMechanism = new MechanismPositionConfig()
+        MechanismPositionConfig m_robotToMechanism = new MechanismPositionConfig()
                 .withMaxRobotHeight(IntakeConstants.LinearConstants.ROBOT_MAX_HEIGHT_METERS)
                 .withMaxRobotLength(IntakeConstants.LinearConstants.ROBOT_MAX_LENGTH_METERS)
                 .withRelativePosition(IntakeConstants.LinearConstants.RELATIVE_POSITION_METERS);
 
-        m_linearConfig = new ElevatorConfig(m_linearMotorSMC)
+        ElevatorConfig m_linearConfig = new ElevatorConfig(m_linearMotorSMC)
                 .withStartingHeight(IntakeConstants.LinearConstants.STARTING_HEIGHT_METERS)
                 .withHardLimits(
                         IntakeConstants.LinearConstants.HARD_LIMIT_MIN_METERS,
