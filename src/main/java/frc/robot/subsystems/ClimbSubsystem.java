@@ -10,6 +10,7 @@ import static edu.wpi.first.units.Units.Volts;
 
 import com.ctre.phoenix6.hardware.TalonFX;
 
+import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.units.measure.AngularVelocity;
@@ -31,19 +32,19 @@ import yams.motorcontrollers.SmartMotorControllerConfig.MotorMode;
 import yams.motorcontrollers.remote.TalonFXWrapper;
 
 public class ClimbSubsystem extends SubsystemBase {
-    private final TalonFX elevatorMotor = new TalonFX(ClimbConstants.MOTOR_CAN_ID);
-    private final Distance circumference = ClimbConstants.CHAIN_PITCH.times(ClimbConstants.TOOTH_COUNT);
-    private final Distance radius = circumference.div(2 * Math.PI);
+    private final TalonFX m_motor = new TalonFX(ClimbConstants.LEADER_MOTOR_CAN_ID);
+    private final Distance m_circumference = ClimbConstants.CHAIN_PITCH.times(ClimbConstants.TOOTH_COUNT);
+    private final Distance m_radius = m_circumference.div(2 * Math.PI);
     /*
      * Using a measuring tape, where 0 cm marks the elevator at its lowest point,
      * you can measure the height to determine the starting position reference.
      */
-    private final Distance startingHeight = ClimbConstants.STARTING_HEIGHT;
+    private final Distance m_startingHeight = ClimbConstants.STARTING_HEIGHT;
     /*
      * This is the STARTING PID Controller for the Elevator. If you are using a
      * TalonFX or TalonFXS this will run on the motor controller itself.
      */
-    private final ExponentialProfilePIDController pidController = new ExponentialProfilePIDController(
+    private final ExponentialProfilePIDController m_pidController = new ExponentialProfilePIDController(
             ClimbConstants.PID_kP,
             ClimbConstants.PID_kI,
             ClimbConstants.PID_kD,
@@ -51,10 +52,10 @@ public class ClimbSubsystem extends SubsystemBase {
                     Volts.of(12),
                     ClimbConstants.MOTOR,
                     ClimbConstants.MASS,
-                    radius,
+                    m_radius,
                     ClimbConstants.GEARBOX));
 
-    private final ExponentialProfilePIDController simPidController = new ExponentialProfilePIDController(
+    private final ExponentialProfilePIDController m_simPidController = new ExponentialProfilePIDController(
             ClimbConstants.SIM_PID_kP,
             ClimbConstants.SIM_PID_kI,
             ClimbConstants.SIM_PID_kD,
@@ -62,13 +63,13 @@ public class ClimbSubsystem extends SubsystemBase {
                     Volts.of(12),
                     ClimbConstants.MOTOR,
                     ClimbConstants.MASS,
-                    radius,
+                    m_radius,
                     ClimbConstants.GEARBOX));
     /*
      * This is the STARTING Feedforward for the Elevator. If you are using a TalonFX
      * or TalonFXS this will run on the motor controller itself.
      */
-    private final ElevatorFeedforward elevatorFeedforward = new ElevatorFeedforward(
+    private final ElevatorFeedforward m_elevatorFeedforward = new ElevatorFeedforward(
             ClimbConstants.FEEDFORWARD_kS,
             ClimbConstants.FEEDFORWARD_kG,
             ClimbConstants.FEEDFORWARD_kV,
@@ -76,14 +77,14 @@ public class ClimbSubsystem extends SubsystemBase {
     /**
      * {@link SmartMotorControllerConfig} for the elevator motor.
      */
-    private final SmartMotorControllerConfig motorConfig = new SmartMotorControllerConfig(this)
+    private final SmartMotorControllerConfig m_leaderMotorConfig = new SmartMotorControllerConfig(this)
             /*
              * Basic Configuration options for the motor
              */
             .withMotorInverted(false)
             .withIdleMode(MotorMode.BRAKE)
             .withControlMode(ControlMode.CLOSED_LOOP)
-            .withMechanismCircumference(circumference)
+            .withMechanismCircumference(m_circumference)
             .withGearing(ClimbConstants.GEARBOX)
             .withStatorCurrentLimit(ClimbConstants.STATOR_CURRENT_LIMIT)
             .withClosedLoopRampRate(ClimbConstants.CLOSED_LOOP_RAMP_RATE)
@@ -96,27 +97,32 @@ public class ClimbSubsystem extends SubsystemBase {
             /*
              * Closed loop configuration options for the motor.
              */
-            .withClosedLoopController(pidController)
-            .withSimClosedLoopController(simPidController)
-            .withFeedforward(elevatorFeedforward)
-            .withSoftLimit(ClimbConstants.SOFT_LOWER_LIMIT, ClimbConstants.SOFT_UPPER_LIMIT);
+            .withClosedLoopController(m_pidController)
+            .withSimClosedLoopController(m_simPidController)
+            .withFeedforward(m_elevatorFeedforward)
+            .withSoftLimit(ClimbConstants.SOFT_LOWER_LIMIT, ClimbConstants.SOFT_UPPER_LIMIT)
+            .withFollowers(Pair.of(new TalonFX(ClimbConstants.FOLLOWER_MOTOR_CAN_ID), true));
+
     /// Generic Smart Motor Controller with our options and vendor motor.
-    private final SmartMotorController motor = new TalonFXWrapper(elevatorMotor, ClimbConstants.MOTOR, motorConfig);
+    private final SmartMotorController m_smartMotorController = new TalonFXWrapper(m_motor, ClimbConstants.MOTOR,
+            m_leaderMotorConfig);
+
     /// Elevator-specific options
-    private ElevatorConfig m_config = new ElevatorConfig(motor)
+    private ElevatorConfig m_climbConfig = new ElevatorConfig(m_smartMotorController)
             /*
              * Basic configuration options for the arm.
              */
             .withMass(ClimbConstants.MASS)
-            .withStartingHeight(startingHeight) // The starting position should ONLY be defined if you are NOT using an
-                                                // absolute encoder.
+            .withStartingHeight(m_startingHeight) // The starting position should ONLY be defined if you are NOT using
+                                                  // an
+                                                  // absolute encoder.
             .withTelemetry("ExponentiallyProfiledElevator", Constants.TELEMETRY_VERBOSITY)
             /*
              * Simulation configuration options for the arm.
              */
             .withHardLimits(ClimbConstants.HARD_LOWER_LIMIT, ClimbConstants.HARD_UPPER_LIMIT);
     // Arm mechanism
-    private final Elevator m_elevator = new Elevator(m_config);
+    private final Elevator m_climb = new Elevator(m_climbConfig);
 
     public ClimbSubsystem() {
     }
@@ -137,25 +143,28 @@ public class ClimbSubsystem extends SubsystemBase {
         Voltage runVolts = ClimbConstants.HOMING_RUN_VOLTS;
         Distance limitHit = ClimbConstants.HARD_UPPER_LIMIT;
         AngularVelocity velocityThreshold = ClimbConstants.HOMING_VELOCITY_THRESHOLD;
-        return Commands.startRun(motor::stopClosedLoopController, () -> motor.setVoltage(runVolts))
-                .until(() -> currentDebouncer.calculate(motor.getStatorCurrent().gte(threshold) &&
-                        motor.getMechanismVelocity().abs(DegreesPerSecond) <= velocityThreshold.in(DegreesPerSecond)))
+        return Commands
+                .startRun(m_smartMotorController::stopClosedLoopController,
+                        () -> m_smartMotorController.setVoltage(runVolts))
+                .until(() -> currentDebouncer.calculate(m_smartMotorController.getStatorCurrent().gte(threshold) &&
+                        m_smartMotorController.getMechanismVelocity().abs(DegreesPerSecond) <= velocityThreshold
+                                .in(DegreesPerSecond)))
                 .finallyDo(() -> {
-                    motor.setEncoderPosition(limitHit);
-                    motor.startClosedLoopController();
+                    m_smartMotorController.setEncoderPosition(limitHit);
+                    m_smartMotorController.startClosedLoopController();
                 });
     }
 
     public Command elevCmd(double dutycycle) {
-        return m_elevator.set(dutycycle);
+        return m_climb.set(dutycycle);
     }
 
     public Command setHeight(Distance height) {
-        return m_elevator.setHeight(height);
+        return m_climb.setHeight(height);
     }
 
     public Command sysId() {
-        return m_elevator.sysId(ClimbConstants.SYSID_MAX_VOLTAGE, ClimbConstants.SYSID_STEP,
+        return m_climb.sysId(ClimbConstants.SYSID_MAX_VOLTAGE, ClimbConstants.SYSID_STEP,
                 ClimbConstants.SYSID_DURATION);
     }
 
@@ -165,11 +174,11 @@ public class ClimbSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        m_elevator.updateTelemetry();
+        m_climb.updateTelemetry();
     }
 
     @Override
     public void simulationPeriodic() {
-        m_elevator.simIterate();
+        m_climb.simIterate();
     }
 }
