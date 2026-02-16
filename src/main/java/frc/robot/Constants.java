@@ -214,7 +214,8 @@ public final class Constants {
     }
 
     public static final class HopperConstants {
-        public static final int MOTOR_PWM_ID = 2; // TODO
+        public static final int MOTOR_PWM_ID_LEFT = 2; // TODO
+        public static final int MOTOR_PWM_ID_RIGHT = 3; // TODO
     }
 
     public static final class ClimbConstants {

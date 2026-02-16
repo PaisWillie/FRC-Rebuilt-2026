@@ -10,10 +10,12 @@ import frc.robot.Constants.HopperConstants;
 
 public class HopperSubsystem extends SubsystemBase {
 
-  private final Servo m_motor;
+  private final Servo m_leftMotor;
+  private final Servo m_rightMotor;
 
   public HopperSubsystem() {
-    m_motor = new Servo(HopperConstants.MOTOR_PWM_ID);
+    m_leftMotor = new Servo(HopperConstants.MOTOR_PWM_ID_LEFT);
+    m_rightMotor = new Servo(HopperConstants.MOTOR_PWM_ID_RIGHT);
   }
 
   /**
@@ -22,7 +24,8 @@ public class HopperSubsystem extends SubsystemBase {
    * @param degrees the target angle
    */
   public void setAngle(double degrees) {
-    m_motor.setAngle(degrees);
+    m_leftMotor.setAngle(degrees);
+    m_rightMotor.setAngle(180.0 - degrees);
   }
 
   /**
@@ -31,7 +34,7 @@ public class HopperSubsystem extends SubsystemBase {
    * @return the current angle of the servo
    */
   public double getAngle() {
-    return m_motor.getAngle();
+    return m_leftMotor.getAngle();
   }
 
   @Override
