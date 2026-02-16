@@ -568,17 +568,57 @@ public class SwerveSubsystem extends SubsystemBase {
      *
      * @return the distance to the hub to the center of the robot in meters
      */
-    public Distance getDistanceToHub() {
+    public Distance getDistanceToTarget() {
         Translation2d position = getPose().getTranslation();
-        if (isRedAlliance())
-            return Meters.of(position.getDistance(FieldConstants.RED_HUB_CENTER));
-
-        return Meters.of(position.getDistance(FieldConstants.BLUE_HUB_CENTER));
+        return Meters.of(position.getDistance(getAutoAimTarget()));
     }
 
     Translation2d futureTranslation = new Translation2d();
 
-    public void calculateAutoAimHeading() {
+    /**
+     * Gets the target translation for auto-aiming based on the current zone and
+     * alliance.
+     * 
+     * @return The target translation for auto-aiming.
+     */
+    private Translation2d getAutoAimTarget() {
+        if (isRedAlliance()) {
+            switch (getCurrentZone()) {
+                case NEUTRAL_ZONE_RED_LEFT:
+                case NEUTRAL_ZONE_BLUE_RIGHT:
+                case BLUE_ALLIANCE_RIGHT:
+                    return SwerveConstants.RED_LEFT_FEEDING_TARGET;
+                case NEUTRAL_ZONE_RED_RIGHT:
+                case NEUTRAL_ZONE_BLUE_LEFT:
+                case BLUE_ALLIANCE_LEFT:
+                    return SwerveConstants.RED_RIGHT_FEEDING_TARGET;
+                case RED_ALLIANCE_LEFT:
+                case RED_ALLIANCE_RIGHT:
+                    return FieldConstants.RED_HUB_CENTER;
+            }
+        } else {
+            switch (getCurrentZone()) {
+                case NEUTRAL_ZONE_RED_LEFT:
+                case NEUTRAL_ZONE_BLUE_RIGHT:
+                case RED_ALLIANCE_RIGHT:
+                    return SwerveConstants.BLUE_LEFT_FEEDING_TARGET;
+                case NEUTRAL_ZONE_RED_RIGHT:
+                case NEUTRAL_ZONE_BLUE_LEFT:
+                case RED_ALLIANCE_LEFT:
+                    return SwerveConstants.BLUE_RIGHT_FEEDING_TARGET;
+                case BLUE_ALLIANCE_LEFT:
+                case BLUE_ALLIANCE_RIGHT:
+                    return FieldConstants.BLUE_HUB_CENTER;
+            }
+        }
+
+        // Default to hub center if something goes wrong
+        return isRedAlliance()
+                ? FieldConstants.RED_HUB_CENTER
+                : FieldConstants.BLUE_HUB_CENTER;
+    }
+
+    private void calculateAutoAimHeading() {
         Translation2d robotTranslation = getPose().getTranslation();
 
         ChassisSpeeds fieldRelativeChassisSpeeds = getFieldVelocity();
@@ -590,11 +630,9 @@ public class SwerveSubsystem extends SubsystemBase {
                 .plus(deltaPos.times(SwerveConstants.AUTO_AIM_VELOCITY_COMPENSATION_FACTOR)); // Look ahead 0.5
                                                                                               // seconds
 
-        Translation2d hubCenter = isRedAlliance()
-                ? FieldConstants.RED_HUB_CENTER
-                : FieldConstants.BLUE_HUB_CENTER;
+        Translation2d target = getAutoAimTarget();
 
-        Translation2d delta = hubCenter.minus(futureTranslation);
+        Translation2d delta = target.minus(futureTranslation);
         autoAimTargetRotation = delta.getAngle().minus(Rotation2d.fromDegrees(90));
     }
 

@@ -17,6 +17,7 @@ import static edu.wpi.first.units.Units.Volts;
 import java.util.Map;
 
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.VoltageUnit;
@@ -45,6 +46,11 @@ public final class Constants {
 
         public static final double AUTO_AIM_VELOCITY_COMPENSATION_FACTOR = 0.5; // TODO
         public static final Angle AUTO_AIM_ANGLE_TOLERANCE = Degrees.of(10); // TODO
+
+        public static final Translation2d BLUE_LEFT_FEEDING_TARGET = new Translation2d(2.067625, 6.05175);
+        public static final Translation2d BLUE_RIGHT_FEEDING_TARGET = new Translation2d(2.067625, 2.01725);
+        public static final Translation2d RED_LEFT_FEEDING_TARGET = new Translation2d(14.473375, 2.01725);
+        public static final Translation2d RED_RIGHT_FEEDING_TARGET = new Translation2d(14.473375, 6.05175);
     }
 
     public static final class OperatorConstants {
