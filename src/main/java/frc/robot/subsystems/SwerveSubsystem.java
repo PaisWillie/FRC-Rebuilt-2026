@@ -638,12 +638,12 @@ public class SwerveSubsystem extends SubsystemBase {
             }
         } else {
             switch (getCurrentZone()) {
-                case NEUTRAL_ZONE_RED_LEFT:
-                case NEUTRAL_ZONE_BLUE_RIGHT:
-                case RED_ALLIANCE_RIGHT:
-                    return SwerveConstants.BLUE_LEFT_FEEDING_TARGET;
                 case NEUTRAL_ZONE_RED_RIGHT:
                 case NEUTRAL_ZONE_BLUE_LEFT:
+                case RED_ALLIANCE_RIGHT:
+                    return SwerveConstants.BLUE_LEFT_FEEDING_TARGET;
+                case NEUTRAL_ZONE_RED_LEFT:
+                case NEUTRAL_ZONE_BLUE_RIGHT:
                 case RED_ALLIANCE_LEFT:
                     return SwerveConstants.BLUE_RIGHT_FEEDING_TARGET;
                 case BLUE_ALLIANCE_LEFT:
