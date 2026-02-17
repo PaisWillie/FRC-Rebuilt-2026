@@ -100,12 +100,6 @@ public class ShooterSubsystem extends SubsystemBase {
 
     @Override
     public void simulationPeriodic() {
-        // SmartDashboard.putNumber("m_distanceToHoodAngleMap",
-        // m_distanceToHoodAngleMap.get(4.0));
-
-        SmartDashboard.putNumber("hood angle", m_hoodSubsystem.getAngle().in(Degrees));
-        SmartDashboard.putNumber("flywheel RPM", m_flywheelSubsystem.getVelocity().in(RPM));
-
         SmartDashboard.putBoolean("isHoodReady", m_hoodSubsystem.isAtTargetAngle());
         SmartDashboard.putBoolean("isFlywheelReady", m_flywheelSubsystem.isAtTargetRPM());
     }

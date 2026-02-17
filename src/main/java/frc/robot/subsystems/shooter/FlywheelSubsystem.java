@@ -16,6 +16,7 @@ import java.util.function.Supplier;
 import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.hardware.TalonFX;
 
+import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.LinearVelocity;
@@ -35,7 +36,8 @@ import yams.motorcontrollers.remote.TalonFXWrapper;
 
 public class FlywheelSubsystem extends SubsystemBase {
 
-    private final TalonFX m_motor;
+    private final TalonFX m_leaderMotor;
+    private final TalonFX m_followerMotor;
 
     private final SmartMotorController m_smartMotorController;
 
@@ -45,7 +47,8 @@ public class FlywheelSubsystem extends SubsystemBase {
             Debouncer.DebounceType.kRising);
 
     public FlywheelSubsystem() {
-        m_motor = new TalonFX(FlywheelConstants.MOTOR_CAN_ID);
+        m_leaderMotor = new TalonFX(FlywheelConstants.LEADER_MOTOR_CAN_ID);
+        m_followerMotor = new TalonFX(FlywheelConstants.FOLLOWER_MOTOR_CAN_ID);
 
         SmartMotorControllerConfig m_smcConfig = new SmartMotorControllerConfig(this)
                 .withClosedLoopController(
@@ -69,10 +72,11 @@ public class FlywheelSubsystem extends SubsystemBase {
                 .withOpenLoopRampRate(FlywheelConstants.OPEN_LOOP_RAMP_RATE_SEC)
                 .withFeedforward(FlywheelConstants.FEEDFORWARD)
                 .withSimFeedforward(FlywheelConstants.SIM_FEEDFORWARD)
-                .withControlMode(ControlMode.CLOSED_LOOP);
+                .withControlMode(ControlMode.CLOSED_LOOP)
+                .withFollowers(Pair.of(m_followerMotor, true));
 
         m_smartMotorController = new TalonFXWrapper(
-                m_motor,
+                m_leaderMotor,
                 FlywheelConstants.MOTOR,
                 m_smcConfig);
 
@@ -196,7 +200,9 @@ public class FlywheelSubsystem extends SubsystemBase {
         // Run the flywheel simulation step
         m_flywheel.simIterate();
 
-        SmartDashboard.putNumber("flywheelRPM", getVelocity().in(RPM));
-        SmartDashboard.putNumber("flywheelSetpointRPM", getSetpointVelocity().map(v -> v.in(RPM)).orElse(0.0));
+        SmartDashboard.putNumber("Flywheel Velocity (RPM)", getVelocity().in(RPM));
+        SmartDashboard.putNumber("Flywheel Setpoint Velocity (RPM)",
+                getSetpointVelocity().orElse(RotationsPerSecond.of(0)).in(RPM)
+                        * FlywheelConstants.GEARBOX.getOutputToInputConversionFactor());
     }
 }

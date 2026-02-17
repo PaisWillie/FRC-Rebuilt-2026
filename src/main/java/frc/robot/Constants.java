@@ -122,13 +122,14 @@ public final class Constants {
     }
 
     public static final class FlywheelConstants {
-        public static final int MOTOR_CAN_ID = 3; // TODO
-        public static final DCMotor MOTOR = DCMotor.getKrakenX60Foc(1);
+        public static final int LEADER_MOTOR_CAN_ID = 3; // TODO
+        public static final int FOLLOWER_MOTOR_CAN_ID = 10; // TODO
+        public static final DCMotor MOTOR = DCMotor.getKrakenX60Foc(2);
 
         public static final Distance DIAMETER_INCHES = Inches.of(4.0); // TODO
-        public static final Mass MASS_POUNDS = Pounds.of(1); // TODO
+        public static final Mass MASS_POUNDS = Pounds.of(4); // TODO
 
-        public static final GearBox GEARBOX = GearBox.fromReductionStages(3, 4); // TODO
+        public static final GearBox GEARBOX = GearBox.fromReductionStages(0.5); // TODO
 
         public static final Current STATOR_CURRENT_LIMIT_AMPS = Amps.of(40); // TODO
 
@@ -149,13 +150,13 @@ public final class Constants {
 
         public static final double SOFT_LIMIT_RPM = 500; // TODO
 
-        public static final AngularVelocity MAX_VELOCITY_RPM = RPM.of(500); // TODO
-        public static final AngularVelocity SIM_MAX_VELOCITY_RPM = RPM.of(500); // TODO
+        public static final AngularVelocity MAX_VELOCITY_RPM = RPM.of(12000); // TODO
+        public static final AngularVelocity SIM_MAX_VELOCITY_RPM = RPM.of(12000); // TODO
 
         public static final AngularAcceleration MAX_ACCELERATION_RPS2 = RotationsPerSecondPerSecond.of(2500); // TODO
 
-        public static final AngularVelocity DEFAULT_VELOCITY_RPM = RPM.of(250); // TODO
-        public static final AngularVelocity SHOOTING_VELOCITY_RPM = RPM.of(450); // TODO
+        public static final AngularVelocity DEFAULT_VELOCITY_RPM = RPM.of(6000); // TODO
+        public static final AngularVelocity SHOOTING_VELOCITY_RPM = RPM.of(10000); // TODO
 
         public static final AngularVelocity RPM_TOLERANCE = RPM.of(25); // TODO
         public static final double AT_RPM_DEBOUNCE_TIME = 0.2; // TODO
