@@ -4,7 +4,6 @@
 
 package frc.robot.subsystems;
 
-import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Volts;
 
@@ -13,17 +12,13 @@ import java.util.Optional;
 import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.hardware.TalonFX;
 
-import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.motorcontrol.PWMTalonFX;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
-import frc.robot.Constants.HoodConstants;
 import frc.robot.Constants.IntakeConstants;
-import frc.robot.Constants.ClimbConstants.ElevatorConstants;
-import frc.robot.Constants.IntakeConstants.LinearConstants;
 import yams.gearing.MechanismGearing;
 import yams.mechanisms.config.ElevatorConfig;
 import yams.mechanisms.config.MechanismPositionConfig;

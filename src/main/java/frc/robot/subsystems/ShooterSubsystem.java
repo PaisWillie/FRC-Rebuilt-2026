@@ -6,7 +6,6 @@ package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Meters;
-import static edu.wpi.first.units.Units.RPM;
 
 import java.util.function.Supplier;
 
