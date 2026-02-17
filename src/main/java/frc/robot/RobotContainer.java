@@ -38,7 +38,7 @@ public class RobotContainer {
     private final ClimbSubsystem m_climbSubsystem = new ClimbSubsystem();
     private final HopperSubsystem m_hopperSubsystem = new HopperSubsystem();
     private final IndexerSubsystem m_indexerSubsystem = new IndexerSubsystem();
-    private final IntakeRollerSubsystem m_intakeSubsystem = new IntakeRollerSubsystem();
+    private final IntakeRollerSubsystem m_intakeRollerSubsystem = new IntakeRollerSubsystem();
     private final LinearIntakeSubsystem m_linearIntakeSubsystem = new LinearIntakeSubsystem();
     private final ShooterSubsystem m_shooterSubsystem = new ShooterSubsystem();
     private final SwerveSubsystem m_swerveSubsystem = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
@@ -205,12 +205,12 @@ public class RobotContainer {
                         m_linearIntakeSubsystem.extend().until(m_linearIntakeSubsystem::isLinearAtTargetPosition),
                         Commands.parallel(
                                 m_hopperSubsystem.expand(),
-                                m_intakeSubsystem.intake())))
+                                m_intakeRollerSubsystem.intake())))
                 .onFalse(
                         Commands.sequence(
                                 m_linearIntakeSubsystem.retract()
                                         .until(m_linearIntakeSubsystem::isLinearAtTargetPosition),
-                                m_intakeSubsystem.stopRollers()));
+                                m_intakeRollerSubsystem.stopRollers()));
 
         m_driverController.R2()
                 .whileTrue(Commands.parallel(
@@ -225,14 +225,14 @@ public class RobotContainer {
                         m_linearIntakeSubsystem.extend().until(m_linearIntakeSubsystem::isLinearAtTargetPosition),
                         Commands.parallel(
                                 m_indexerSubsystem.reverse(),
-                                m_intakeSubsystem.outtake())))
+                                m_intakeRollerSubsystem.outtake())))
                 .onFalse(
                         Commands.sequence(
                                 m_linearIntakeSubsystem.retract()
                                         .until(m_linearIntakeSubsystem::isLinearAtTargetPosition),
                                 Commands.parallel(
                                         m_indexerSubsystem.stop(),
-                                        m_intakeSubsystem.stopRollers())));
+                                        m_intakeRollerSubsystem.stopRollers())));
 
         // TODO: Move constants to Constants.java
         driveAngularVelocity.driveToPose(m_swerveSubsystem::getSelectedClimbPose,
