@@ -26,9 +26,10 @@ import frc.robot.Constants.SwerveConstants;
 import frc.robot.subsystems.ClimbSubsystem;
 import frc.robot.subsystems.HopperSubsystem;
 import frc.robot.subsystems.IndexerSubsystem;
-import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
+import frc.robot.subsystems.intake.IntakeRollerSubsystem;
+import frc.robot.subsystems.intake.LinearIntakeSubsystem;
 import swervelib.SwerveInputStream;
 
 public class RobotContainer {
@@ -37,7 +38,8 @@ public class RobotContainer {
     private final ClimbSubsystem m_climbSubsystem = new ClimbSubsystem();
     private final HopperSubsystem m_hopperSubsystem = new HopperSubsystem();
     private final IndexerSubsystem m_indexerSubsystem = new IndexerSubsystem();
-    private final IntakeSubsystem m_intakeSubsystem = new IntakeSubsystem();
+    private final IntakeRollerSubsystem m_intakeSubsystem = new IntakeRollerSubsystem();
+    private final LinearIntakeSubsystem m_linearIntakeSubsystem = new LinearIntakeSubsystem();
     private final ShooterSubsystem m_shooterSubsystem = new ShooterSubsystem();
     private final SwerveSubsystem m_swerveSubsystem = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
             "swerve"));
@@ -200,13 +202,14 @@ public class RobotContainer {
         // TODO: Maybe run indexer while intaking?
         m_driverController.L2().whileTrue(
                 Commands.sequence(
-                        m_intakeSubsystem.extend().until(m_intakeSubsystem::isLinearAtTargetPosition),
+                        m_linearIntakeSubsystem.extend().until(m_linearIntakeSubsystem::isLinearAtTargetPosition),
                         Commands.parallel(
                                 m_hopperSubsystem.expand(),
                                 m_intakeSubsystem.intake())))
                 .onFalse(
                         Commands.sequence(
-                                m_intakeSubsystem.retract().until(m_intakeSubsystem::isLinearAtTargetPosition),
+                                m_linearIntakeSubsystem.retract()
+                                        .until(m_linearIntakeSubsystem::isLinearAtTargetPosition),
                                 m_intakeSubsystem.stopRollers()));
 
         m_driverController.R2()
@@ -219,13 +222,14 @@ public class RobotContainer {
         // TODO: Expand intake DLI then retract
         m_driverController.R1().whileTrue(
                 Commands.sequence(
-                        m_intakeSubsystem.extend().until(m_intakeSubsystem::isLinearAtTargetPosition),
+                        m_linearIntakeSubsystem.extend().until(m_linearIntakeSubsystem::isLinearAtTargetPosition),
                         Commands.parallel(
                                 m_indexerSubsystem.reverse(),
                                 m_intakeSubsystem.outtake())))
                 .onFalse(
                         Commands.sequence(
-                                m_intakeSubsystem.retract().until(m_intakeSubsystem::isLinearAtTargetPosition),
+                                m_linearIntakeSubsystem.retract()
+                                        .until(m_linearIntakeSubsystem::isLinearAtTargetPosition),
                                 Commands.parallel(
                                         m_indexerSubsystem.stop(),
                                         m_intakeSubsystem.stopRollers())));
@@ -258,11 +262,11 @@ public class RobotContainer {
                                 () -> driveAngularVelocity.driveToPoseEnabled(true),
                                 () -> driveAngularVelocity.driveToPoseEnabled(false))));
 
-        m_intakeSubsystem.setDefaultCommand(m_intakeSubsystem.set(0));
+        m_linearIntakeSubsystem.setDefaultCommand(m_linearIntakeSubsystem.set(0));
 
-        m_driverController.cross().whileTrue(m_intakeSubsystem.sysId());
-        m_driverController.circle().whileTrue(m_intakeSubsystem.set(0));
-        m_driverController.triangle().whileTrue(m_intakeSubsystem.set(-0.3));
-        m_driverController.square().whileTrue(m_intakeSubsystem.set(0.3));
+        m_driverController.cross().whileTrue(m_linearIntakeSubsystem.sysId());
+        m_driverController.circle().whileTrue(m_linearIntakeSubsystem.set(0));
+        m_driverController.triangle().whileTrue(m_linearIntakeSubsystem.set(-0.3));
+        m_driverController.square().whileTrue(m_linearIntakeSubsystem.set(0.3));
     }
 }

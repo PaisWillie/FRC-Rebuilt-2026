@@ -87,7 +87,8 @@ public class HoodSubsystem extends SubsystemBase {
                 .withHardLimit(HoodConstants.HARD_LIMIT_MIN, HoodConstants.HARD_LIMIT_MAX)
                 .withLength(HoodConstants.LENGTH)
                 .withMass(HoodConstants.MASS)
-                .withStartingPosition(HoodConstants.STARTING_ANGLE);
+                .withStartingPosition(HoodConstants.STARTING_ANGLE); // TODO: Might not need since we have absolute
+                                                                     // encoder
 
         m_hood = new Arm(m_hoodConfig);
     }
