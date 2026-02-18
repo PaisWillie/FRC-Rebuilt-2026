@@ -35,7 +35,6 @@ public class ClimbSubsystem extends SubsystemBase {
         m_currentClimbPosition = newPosition;
     }
 
-    // TODO
     public Command climbToL1() {
 
         if (m_isClimbInterrupted)
@@ -49,7 +48,6 @@ public class ClimbSubsystem extends SubsystemBase {
                 .andThen(Commands.runOnce(() -> setClimbPosition(ClimbPosition.L1))));
     }
 
-    // TODO
     public Command climbToL2() {
 
         if (m_isClimbInterrupted)
