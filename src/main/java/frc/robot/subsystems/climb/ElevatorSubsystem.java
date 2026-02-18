@@ -42,31 +42,7 @@ public class ElevatorSubsystem extends SubsystemBase {
      * you can measure the height to determine the starting position reference.
      */
     private final Distance m_startingHeight = ElevatorConstants.STARTING_HEIGHT;
-    /*
-     * This is the STARTING PID Controller for the Elevator. If you are using a
-     * TalonFX or TalonFXS this will run on the motor controller itself.
-     */
-    private final ExponentialProfilePIDController m_pidController = new ExponentialProfilePIDController(
-            ElevatorConstants.PID_kP,
-            ElevatorConstants.PID_kI,
-            ElevatorConstants.PID_kD,
-            ExponentialProfilePIDController.createElevatorConstraints(
-                    Volts.of(12),
-                    ElevatorConstants.MOTOR,
-                    ElevatorConstants.MASS,
-                    m_radius,
-                    ElevatorConstants.GEARBOX));
 
-    private final ExponentialProfilePIDController m_simPidController = new ExponentialProfilePIDController(
-            ElevatorConstants.SIM_PID_kP,
-            ElevatorConstants.SIM_PID_kI,
-            ElevatorConstants.SIM_PID_kD,
-            ExponentialProfilePIDController.createElevatorConstraints(
-                    Volts.of(12),
-                    ElevatorConstants.MOTOR,
-                    ElevatorConstants.MASS,
-                    m_radius,
-                    ElevatorConstants.GEARBOX));
     /*
      * This is the STARTING Feedforward for the Elevator. If you are using a TalonFX
      * or TalonFXS this will run on the motor controller itself.
@@ -100,8 +76,18 @@ public class ElevatorSubsystem extends SubsystemBase {
             /*
              * Closed loop configuration options for the motor.
              */
-            .withClosedLoopController(m_pidController)
-            .withSimClosedLoopController(m_simPidController)
+            .withClosedLoopController(
+                    ElevatorConstants.PID_kP,
+                    ElevatorConstants.PID_kI,
+                    ElevatorConstants.PID_kD,
+                    ElevatorConstants.MAX_VELOCITY_RPM,
+                    ElevatorConstants.MAX_ACCELERATION_RPS2)
+            .withSimClosedLoopController(
+                    ElevatorConstants.SIM_PID_kP,
+                    ElevatorConstants.SIM_PID_kI,
+                    ElevatorConstants.SIM_PID_kD,
+                    ElevatorConstants.MAX_VELOCITY_RPM,
+                    ElevatorConstants.MAX_ACCELERATION_RPS2)
             .withFeedforward(m_elevatorFeedforward)
             .withSoftLimit(ElevatorConstants.SOFT_LOWER_LIMIT, ElevatorConstants.SOFT_UPPER_LIMIT)
             .withFollowers(Pair.of(new TalonFX(ElevatorConstants.FOLLOWER_MOTOR_CAN_ID), true));
