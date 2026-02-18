@@ -221,6 +221,7 @@ public final class Constants {
 
     public static final class FeederConstants {
         public static final int MOTOR_CAN_ID = 6; // TODO
+        public static final int BEAM_BREAK_DIO_PORT = 0; // TODO
 
         public static final int MOTOR_STATOR_CURRENT_LIMIT = -1; // TODO
         public static final int MOTOR_SUPPLY_CURRENT_LIMIT = -1; // TODO

@@ -9,6 +9,7 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.FeederConstants;
@@ -17,10 +18,11 @@ public class FeederSubsystem extends SubsystemBase {
 
     private final TalonFX m_motor;
 
-    // TODO: Add beam break sensors
+    private final DigitalInput m_beamBreak;
 
     public FeederSubsystem() {
         m_motor = new TalonFX(FeederConstants.MOTOR_CAN_ID);
+        m_beamBreak = new DigitalInput(FeederConstants.BEAM_BREAK_DIO_PORT);
 
         TalonFXConfiguration m_motorConfig = new TalonFXConfiguration();
         MotorOutputConfigs m_motorOutputConfig = new MotorOutputConfigs();
@@ -67,6 +69,16 @@ public class FeederSubsystem extends SubsystemBase {
         return this.runOnce(() -> {
             setSpeed(FeederConstants.FEEDER_SPEED);
         });
+    }
+
+    /**
+     * Checks if the beam break sensor is triggered, indicating that a ball is
+     * present in the feeder.
+     * 
+     * @return true if the beam is broken, false otherwise
+     */
+    public boolean isBeamBroken() {
+        return m_beamBreak.get();
     }
 
     @Override
