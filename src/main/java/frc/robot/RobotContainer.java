@@ -12,7 +12,6 @@ import choreo.auto.AutoFactory;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -208,7 +207,8 @@ public class RobotContainer {
                 .whileTrue(Commands.parallel(
                         m_linearIntakeSubsystem.extend(),
                         m_hopperSubsystem.expand(),
-                        m_intakeRollerSubsystem.intake()))
+                        m_intakeRollerSubsystem.intake(),
+                        m_shooterSubsystem.storeFuel()))
 
                 // Retract intake and stop rollers (but keep hopper expanded)
                 .onFalse(
@@ -230,7 +230,7 @@ public class RobotContainer {
                         // jams when fuel is stuck on top of intake rollers
                         new ConditionalCommand(
                                 m_intakeRollerSubsystem.outtake(),
-                                new InstantCommand(),
+                                Commands.none(),
                                 () -> m_linearIntakeSubsystem
                                         .getCurrentPosition() != LinearIntakePosition.EXTENDED)))
 
@@ -256,17 +256,22 @@ public class RobotContainer {
                                         m_indexerSubsystem.stop(),
                                         m_intakeRollerSubsystem.stop())));
 
-        // TODO: Move constants to Constants.java
+        // PID-tuned auto-align for climbing start position
         driveAngularVelocity.driveToPose(m_swerveSubsystem::getSelectedClimbPose,
-                new ProfiledPIDController(5,
-                        0,
-                        0,
-                        new TrapezoidProfile.Constraints(1, 0.5)),
-                new ProfiledPIDController(5,
-                        0,
-                        0,
-                        new TrapezoidProfile.Constraints(Units.degreesToRadians(360),
-                                Units.degreesToRadians(180))));
+                new ProfiledPIDController(
+                        SwerveConstants.DRIVE_TO_POSE_TRANSLATION_kP,
+                        SwerveConstants.DRIVE_TO_POSE_TRANSLATION_kI,
+                        SwerveConstants.DRIVE_TO_POSE_TRANSLATION_kD,
+                        new TrapezoidProfile.Constraints(
+                                SwerveConstants.DRIVE_TO_POSE_TRANSLATION_MAX_VELOCITY,
+                                SwerveConstants.DRIVE_TO_POSE_TRANSLATION_MAX_ACCELERATION)),
+                new ProfiledPIDController(
+                        SwerveConstants.DRIVE_TO_POSE_ROTATION_kP,
+                        SwerveConstants.DRIVE_TO_POSE_ROTATION_kI,
+                        SwerveConstants.DRIVE_TO_POSE_ROTATION_kD,
+                        new TrapezoidProfile.Constraints(
+                                SwerveConstants.DRIVE_TO_POSE_ROTATION_MAX_VELOCITY_RAD,
+                                SwerveConstants.DRIVE_TO_POSE_ROTATION_MAX_ACCELERATION_RAD)));
 
         m_driverController.povLeft().whileTrue(
                 Commands.sequence(
@@ -284,7 +289,7 @@ public class RobotContainer {
                                 () -> driveAngularVelocity.driveToPoseEnabled(true),
                                 () -> driveAngularVelocity.driveToPoseEnabled(false))));
 
-        m_linearIntakeSubsystem.setDefaultCommand(m_linearIntakeSubsystem.set(0));
+        // m_linearIntakeSubsystem.setDefaultCommand(m_linearIntakeSubsystem.set(0));
 
         // m_driverController.cross().whileTrue(m_linearIntakeSubsystem.sysId());
         // m_driverController.cross().whileTrue(m_swerveSubsystem.sysIdDriveMotorCommand());

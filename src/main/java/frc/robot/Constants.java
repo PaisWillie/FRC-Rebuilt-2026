@@ -60,6 +60,18 @@ public final class Constants {
         public static final Pose2d BLUE_LEFT_TOWER_CLIMB_POS = new Pose2d(1.428, 4.175, new Rotation2d(Degree.of(180)));
         public static final Pose2d BLUE_RIGHT_TOWER_CLIMB_POS = new Pose2d(1.428, 3.317,
                 new Rotation2d(Degree.of(180)));
+
+        public static final double DRIVE_TO_POSE_TRANSLATION_kP = 5;
+        public static final double DRIVE_TO_POSE_TRANSLATION_kI = 0;
+        public static final double DRIVE_TO_POSE_TRANSLATION_kD = 0;
+        public static final double DRIVE_TO_POSE_TRANSLATION_MAX_VELOCITY = 1;
+        public static final double DRIVE_TO_POSE_TRANSLATION_MAX_ACCELERATION = 0.5;
+
+        public static final double DRIVE_TO_POSE_ROTATION_kP = 5;
+        public static final double DRIVE_TO_POSE_ROTATION_kI = 0;
+        public static final double DRIVE_TO_POSE_ROTATION_kD = 0;
+        public static final double DRIVE_TO_POSE_ROTATION_MAX_VELOCITY_RAD = Units.degreesToRadians(360);
+        public static final double DRIVE_TO_POSE_ROTATION_MAX_ACCELERATION_RAD = Units.degreesToRadians(180);
     }
 
     public static final class OperatorConstants {
@@ -227,6 +239,7 @@ public final class Constants {
         public static final int MOTOR_SUPPLY_CURRENT_LIMIT = -1; // TODO
 
         public static final double FEEDER_SPEED = 0.5; // TODO
+        public static final double REVERSE_SPEED = 0.5; // TODO
     }
 
     public static final class ShooterConstants {

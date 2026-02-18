@@ -72,6 +72,17 @@ public class FeederSubsystem extends SubsystemBase {
     }
 
     /**
+     * Runs the feeder in reverse at the predefined reverse speed.
+     * 
+     * @return a Command that runs the feeder in reverse when executed
+     */
+    public Command reverse() {
+        return this.runOnce(() -> {
+            setSpeed(FeederConstants.REVERSE_SPEED);
+        });
+    }
+
+    /**
      * Checks if the beam break sensor is triggered, indicating that a ball is
      * present in the feeder.
      * 

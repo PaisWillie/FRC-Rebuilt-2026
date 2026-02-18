@@ -85,12 +85,33 @@ public class ShooterSubsystem extends SubsystemBase {
                 .withName("SHTR - Aim and Shoot");
     }
 
+    /**
+     * Stops the shooting process by lowering the hood, setting the flywheel to its
+     * default RPM, and stopping the feeder.
+     * 
+     * @return a Command that stops the shooting process when executed
+     */
     public Command stopShooting() {
         return Commands.parallel(
                 m_hoodSubsystem.lowerHood(),
                 m_flywheelSubsystem.setDefaultRPM(),
                 m_feederSubsystem.stop())
                 .withName("SHTR - Stop Shooting");
+    }
+
+    /**
+     * Feeds fuel into the shooter until fuel is detected by the beam break sensor,
+     * then reverses the feeder until the fuel is no longer detected, effectively
+     * positioning fuel correctly in the feeder for shooting.
+     * 
+     * @return a Command that performs the fuel storing sequence when executed
+     */
+    public Command storeFuel() {
+        return m_feederSubsystem.feed()
+                .until(m_feederSubsystem::isBeamBroken)
+                .finallyDo(interrupted -> m_feederSubsystem.reverse() // TODO: Check behavious if interrupted while
+                                                                      // feeding
+                        .until(() -> !m_feederSubsystem.isBeamBroken()));
     }
 
     @Override
