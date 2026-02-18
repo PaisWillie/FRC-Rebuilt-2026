@@ -17,6 +17,8 @@ public class FeederSubsystem extends SubsystemBase {
 
     TalonFX m_motor;
 
+    // TODO: Add beam break sensors
+
     public FeederSubsystem() {
         m_motor = new TalonFX(FeederConstants.MOTOR_CAN_ID);
 

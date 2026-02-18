@@ -150,7 +150,7 @@ public class HoodSubsystem extends SubsystemBase {
             return false;
 
         return m_atAngleDebouncer.calculate(
-                setpoint.get().isNear(m_hood.getAngle(), HoodConstants.ANGLE_TOLERANCE));
+                setpoint.get().isNear(m_hood.getAngle(), HoodConstants.ANGLE_TARGET_ERROR));
     }
 
     /**

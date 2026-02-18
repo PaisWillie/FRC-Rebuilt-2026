@@ -178,7 +178,7 @@ public class FlywheelSubsystem extends SubsystemBase {
             return false;
 
         return m_atRPMDebouncer.calculate(
-                setpoint.get().isNear(getVelocity(), FlywheelConstants.RPM_TOLERANCE));
+                setpoint.get().isNear(getVelocity(), FlywheelConstants.RPM_TARGET_ERROR));
     }
 
     public Command stop() {

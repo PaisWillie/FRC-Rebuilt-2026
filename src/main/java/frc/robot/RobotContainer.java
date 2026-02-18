@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
@@ -30,6 +31,7 @@ import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.intake.IntakeRollerSubsystem;
 import frc.robot.subsystems.intake.LinearIntakeSubsystem;
+import frc.robot.subsystems.intake.LinearIntakeSubsystem.LinearIntakePosition;
 import swervelib.SwerveInputStream;
 
 public class RobotContainer {
@@ -200,39 +202,59 @@ public class RobotContainer {
         m_driverController.options().onTrue((Commands.runOnce(m_swerveSubsystem::zeroGyro)));
 
         // TODO: Maybe run indexer while intaking?
-        m_driverController.L2().whileTrue(
-                Commands.sequence(
-                        m_linearIntakeSubsystem.extend().until(m_linearIntakeSubsystem::isLinearAtTargetPosition),
-                        Commands.parallel(
-                                m_hopperSubsystem.expand(),
-                                m_intakeRollerSubsystem.intake())))
+        m_driverController.L2()
+
+                // Extend intake, run rollers, and expand hopper at the same time
+                .whileTrue(Commands.parallel(
+                        m_linearIntakeSubsystem.extend(),
+                        m_hopperSubsystem.expand(),
+                        m_intakeRollerSubsystem.intake()))
+
+                // Retract intake and stop rollers (but keep hopper expanded)
                 .onFalse(
                         Commands.sequence(
-                                m_linearIntakeSubsystem.retract()
-                                        .until(m_linearIntakeSubsystem::isLinearAtTargetPosition),
-                                m_intakeRollerSubsystem.stopRollers()));
+                                m_linearIntakeSubsystem.retract(),
+                                m_intakeRollerSubsystem.stop()));
 
         m_driverController.R2()
+
+                // Auto-aim, shoot, and run indexer at the same time
                 .whileTrue(Commands.parallel(
+                        m_indexerSubsystem.run(),
                         m_shooterSubsystem.aimAndShoot(m_swerveSubsystem::getDistanceToTarget,
                                 m_swerveSubsystem::isAutoAimOnTarget),
-                        driveFieldOrientedAutoAim))
-                .onFalse(m_shooterSubsystem.stopShooting());
+                        driveFieldOrientedAutoAim,
 
-        // TODO: Expand intake DLI then retract
-        m_driverController.R1().whileTrue(
-                Commands.sequence(
-                        m_linearIntakeSubsystem.extend().until(m_linearIntakeSubsystem::isLinearAtTargetPosition),
+                        // TODO: Test this to see if it causes issues; maybe outtake instead
+                        // Only run intake rollers if linear intake is not fully extended to prevent
+                        // jams when fuel is stuck on top of intake rollers
+                        new ConditionalCommand(
+                                m_intakeRollerSubsystem.outtake(),
+                                new InstantCommand(),
+                                () -> m_linearIntakeSubsystem
+                                        .getCurrentPosition() != LinearIntakePosition.EXTENDED)))
+
+                // Stop shooter and indexer
+                .onFalse(Commands.parallel(
+                        m_shooterSubsystem.stopShooting(),
+                        m_indexerSubsystem.stop()));
+
+        m_driverController.R1()
+
+                // Extend intake, reverse indexer and intake rollers at the same time
+                .whileTrue(Commands.sequence(
+                        m_linearIntakeSubsystem.extend(),
                         Commands.parallel(
                                 m_indexerSubsystem.reverse(),
                                 m_intakeRollerSubsystem.outtake())))
+
+                // Retract intake, then stop indexer and intake rollers
                 .onFalse(
                         Commands.sequence(
-                                m_linearIntakeSubsystem.retract()
-                                        .until(m_linearIntakeSubsystem::isLinearAtTargetPosition),
+                                m_linearIntakeSubsystem.retract(),
                                 Commands.parallel(
                                         m_indexerSubsystem.stop(),
-                                        m_intakeRollerSubsystem.stopRollers())));
+                                        m_intakeRollerSubsystem.stop())));
 
         // TODO: Move constants to Constants.java
         driveAngularVelocity.driveToPose(m_swerveSubsystem::getSelectedClimbPose,

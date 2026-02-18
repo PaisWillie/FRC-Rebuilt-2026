@@ -29,106 +29,131 @@ import yams.motorcontrollers.SmartMotorControllerConfig.MotorMode;
 import yams.motorcontrollers.remote.TalonFXWrapper;
 
 public class LinearIntakeSubsystem extends SubsystemBase {
-  private final TalonFX m_linearMotor;
-  private final SmartMotorController m_linearMotorSMC;
-  private final SmartMotorControllerConfig m_linearMotorSMCConfig;
-  private final Elevator m_linearIntake;
+    private final TalonFX m_linearMotor;
+    private final SmartMotorController m_linearMotorSMC;
+    private final SmartMotorControllerConfig m_linearMotorSMCConfig;
+    private final Elevator m_linearIntake;
 
-  public LinearIntakeSubsystem() {
-    m_linearMotor = new TalonFX(LinearIntakeConstants.MOTOR_CAN_ID);
+    public LinearIntakeSubsystem() {
+        m_linearMotor = new TalonFX(LinearIntakeConstants.MOTOR_CAN_ID);
 
-    m_linearMotorSMCConfig = new SmartMotorControllerConfig(this)
-        .withMechanismCircumference(LinearIntakeConstants.MOTOR_CIRCUMFERENCE_METERS)
-        .withClosedLoopController(
-            LinearIntakeConstants.PID_kP,
-            LinearIntakeConstants.PID_kI,
-            LinearIntakeConstants.PID_kD,
-            LinearIntakeConstants.MAX_VELOCITY_MPS,
-            LinearIntakeConstants.MAX_ACCELERATION_MPS2)
-        .withSimClosedLoopController(
-            LinearIntakeConstants.SIM_PID_kP,
-            LinearIntakeConstants.SIM_PID_kI,
-            LinearIntakeConstants.SIM_PID_kD,
-            LinearIntakeConstants.MAX_VELOCITY_MPS,
-            LinearIntakeConstants.MAX_ACCELERATION_MPS2)
-        .withSoftLimit(
-            LinearIntakeConstants.SOFT_LIMIT_MIN_METERS,
-            LinearIntakeConstants.SOFT_LIMIT_MAX_METERS)
-        .withGearing(new MechanismGearing(LinearIntakeConstants.GEARBOX))
-        .withIdleMode(MotorMode.BRAKE)
-        .withTelemetry("LinearIntakeMotor", Constants.TELEMETRY_VERBOSITY)
-        .withStatorCurrentLimit(LinearIntakeConstants.STATOR_CURRENT_LIMIT_AMPS)
-        .withMotorInverted(false)
-        .withClosedLoopRampRate(LinearIntakeConstants.CLOSED_LOOP_RAMP_RATE_SEC)
-        .withOpenLoopRampRate(LinearIntakeConstants.OPEN_LOOP_RAMP_RATE_SEC)
-        .withFeedforward(LinearIntakeConstants.FEEDFORWARD)
-        .withControlMode(ControlMode.CLOSED_LOOP);
+        m_linearMotorSMCConfig = new SmartMotorControllerConfig(this)
+                .withMechanismCircumference(LinearIntakeConstants.MOTOR_CIRCUMFERENCE_METERS)
+                .withClosedLoopController(
+                        LinearIntakeConstants.PID_kP,
+                        LinearIntakeConstants.PID_kI,
+                        LinearIntakeConstants.PID_kD,
+                        LinearIntakeConstants.MAX_VELOCITY_MPS,
+                        LinearIntakeConstants.MAX_ACCELERATION_MPS2)
+                .withSimClosedLoopController(
+                        LinearIntakeConstants.SIM_PID_kP,
+                        LinearIntakeConstants.SIM_PID_kI,
+                        LinearIntakeConstants.SIM_PID_kD,
+                        LinearIntakeConstants.MAX_VELOCITY_MPS,
+                        LinearIntakeConstants.MAX_ACCELERATION_MPS2)
+                .withSoftLimit(
+                        LinearIntakeConstants.SOFT_LIMIT_MIN_METERS,
+                        LinearIntakeConstants.SOFT_LIMIT_MAX_METERS)
+                .withGearing(new MechanismGearing(LinearIntakeConstants.GEARBOX))
+                .withIdleMode(MotorMode.BRAKE)
+                .withTelemetry("LinearIntakeMotor", Constants.TELEMETRY_VERBOSITY)
+                .withStatorCurrentLimit(LinearIntakeConstants.STATOR_CURRENT_LIMIT_AMPS)
+                .withMotorInverted(false)
+                .withClosedLoopRampRate(LinearIntakeConstants.CLOSED_LOOP_RAMP_RATE_SEC)
+                .withOpenLoopRampRate(LinearIntakeConstants.OPEN_LOOP_RAMP_RATE_SEC)
+                .withFeedforward(LinearIntakeConstants.FEEDFORWARD)
+                .withControlMode(ControlMode.CLOSED_LOOP);
 
-    m_linearMotorSMC = new TalonFXWrapper(
-        m_linearMotor,
-        LinearIntakeConstants.MOTOR,
-        m_linearMotorSMCConfig);
+        m_linearMotorSMC = new TalonFXWrapper(
+                m_linearMotor,
+                LinearIntakeConstants.MOTOR,
+                m_linearMotorSMCConfig);
 
-    MechanismPositionConfig m_robotToMechanism = new MechanismPositionConfig()
-        .withMaxRobotHeight(LinearIntakeConstants.ROBOT_MAX_HEIGHT_METERS)
-        .withMaxRobotLength(LinearIntakeConstants.ROBOT_MAX_LENGTH_METERS)
-        .withRelativePosition(LinearIntakeConstants.RELATIVE_POSITION_METERS);
+        MechanismPositionConfig m_robotToMechanism = new MechanismPositionConfig()
+                .withMaxRobotHeight(LinearIntakeConstants.ROBOT_MAX_HEIGHT_METERS)
+                .withMaxRobotLength(LinearIntakeConstants.ROBOT_MAX_LENGTH_METERS)
+                .withRelativePosition(LinearIntakeConstants.RELATIVE_POSITION_METERS);
 
-    ElevatorConfig m_linearConfig = new ElevatorConfig(m_linearMotorSMC)
-        .withStartingHeight(LinearIntakeConstants.STARTING_HEIGHT_METERS)
-        .withHardLimits(
-            LinearIntakeConstants.HARD_LIMIT_MIN_METERS,
-            LinearIntakeConstants.HARD_LIMIT_MAX_METERS)
-        .withTelemetry("LinearIntake", Constants.TELEMETRY_VERBOSITY)
-        .withMechanismPositionConfig(m_robotToMechanism)
-        .withMass(LinearIntakeConstants.MECHANISM_MASS_POUNDS);
+        ElevatorConfig m_linearConfig = new ElevatorConfig(m_linearMotorSMC)
+                .withStartingHeight(LinearIntakeConstants.STARTING_HEIGHT_METERS)
+                .withHardLimits(
+                        LinearIntakeConstants.HARD_LIMIT_MIN_METERS,
+                        LinearIntakeConstants.HARD_LIMIT_MAX_METERS)
+                .withTelemetry("LinearIntake", Constants.TELEMETRY_VERBOSITY)
+                .withMechanismPositionConfig(m_robotToMechanism)
+                .withMass(LinearIntakeConstants.MECHANISM_MASS_POUNDS);
 
-    m_linearIntake = new Elevator(m_linearConfig);
-  }
-
-  public Command sysId() {
-    return m_linearIntake.sysId(
-        Volts.of(12), Volts.of(12).per(Second), Second.of(30))
-        .beforeStarting(SignalLogger::start)
-        .finallyDo(SignalLogger::stop);
-  }
-
-  public Command setLinearPosition(Distance position) {
-    return m_linearIntake.setHeight(position);
-  }
-
-  public boolean isLinearAtTargetPosition() {
-    Optional<Angle> angle_setpoint = m_linearIntake.getMechanismSetpoint();
-    if (!angle_setpoint.isPresent()) {
-      return false;
+        m_linearIntake = new Elevator(m_linearConfig);
     }
-    Distance setpoint = m_linearMotorSMCConfig.convertFromMechanism(angle_setpoint.get());
-    return setpoint.isNear(m_linearIntake.getHeight(), LinearIntakeConstants.POSITION_TOLERANCE);
-  }
 
-  public Command elevCmd(double dutycycle) {
-    return m_linearIntake.set(dutycycle);
-  }
+    public Command sysId() {
+        return m_linearIntake.sysId(
+                Volts.of(12), Volts.of(12).per(Second), Second.of(30))
+                .beforeStarting(SignalLogger::start)
+                .finallyDo(SignalLogger::stop);
+    }
 
-  public Command extend() {
-    return setLinearPosition(LinearIntakeConstants.EXTENDED_POSITION);
-  }
+    public Command setLinearPosition(Distance position) {
+        return m_linearIntake.setHeight(position);
+    }
 
-  public Command retract() {
-    return setLinearPosition(LinearIntakeConstants.RETRACTED_POSITION);
-  }
+    public boolean isLinearAtTargetPosition() {
+        Optional<Angle> angle_setpoint = m_linearIntake.getMechanismSetpoint();
+        if (!angle_setpoint.isPresent()) {
+            return false;
+        }
+        Distance setpoint = m_linearMotorSMCConfig.convertFromMechanism(angle_setpoint.get());
+        return setpoint.isNear(m_linearIntake.getHeight(), LinearIntakeConstants.POSITION_TARGET_ERROR);
+    }
 
-  public Command set(double dutycycle) {
-    return m_linearIntake.set(dutycycle);
-  }
+    public Command elevCmd(double dutycycle) {
+        return m_linearIntake.set(dutycycle);
+    }
 
-  @Override
-  public void periodic() {
-    m_linearIntake.updateTelemetry();
-  }
+    public Command extend() {
+        return setLinearPosition(LinearIntakeConstants.EXTENDED_POSITION).until(this::isLinearAtTargetPosition);
+    }
 
-  @Override
-  public void simulationPeriodic() {
-    m_linearIntake.simIterate();
-  }
+    public Command retract() {
+        return setLinearPosition(LinearIntakeConstants.RETRACTED_POSITION).until(this::isLinearAtTargetPosition);
+    }
+
+    public Command fullyRetract() {
+        return setLinearPosition(LinearIntakeConstants.FULLY_RETRACTED_POSITION).until(this::isLinearAtTargetPosition);
+    }
+
+    public Command set(double dutycycle) {
+        return m_linearIntake.set(dutycycle);
+    }
+
+    public enum LinearIntakePosition {
+        EXTENDED, RETRACTED, FULLY_RETRACTED
+    }
+
+    public LinearIntakePosition getCurrentPosition() {
+        Distance currentPosition = m_linearIntake.getHeight();
+
+        if (currentPosition.isNear(LinearIntakeConstants.EXTENDED_POSITION,
+                LinearIntakeConstants.POSITION_TARGET_ERROR)) {
+            return LinearIntakePosition.EXTENDED;
+        } else if (currentPosition.isNear(LinearIntakeConstants.RETRACTED_POSITION,
+                LinearIntakeConstants.POSITION_TARGET_ERROR)) {
+            return LinearIntakePosition.RETRACTED;
+        } else if (currentPosition.isNear(LinearIntakeConstants.FULLY_RETRACTED_POSITION,
+                LinearIntakeConstants.POSITION_TARGET_ERROR)) {
+            return LinearIntakePosition.FULLY_RETRACTED;
+        } else {
+            return null; // or throw an exception, or return an Optional
+        }
+    }
+
+    @Override
+    public void periodic() {
+        m_linearIntake.updateTelemetry();
+    }
+
+    @Override
+    public void simulationPeriodic() {
+        m_linearIntake.simIterate();
+    }
 }

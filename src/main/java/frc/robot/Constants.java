@@ -46,7 +46,7 @@ public final class Constants {
         public static final double MAX_SPEED = Units.feetToMeters(14.5); // TODO
 
         public static final double AUTO_AIM_VELOCITY_COMPENSATION_FACTOR = 0.5; // TODO
-        public static final Angle AUTO_AIM_ANGLE_TOLERANCE = Degrees.of(10); // TODO
+        public static final Angle AUTO_AIM_ANGLE_TARGET_ERROR = Degrees.of(10); // TODO
         public static final double AUTO_AIM_SCALE_TRANSLATION = 0.3; // TODO
 
         public static final Translation2d BLUE_LEFT_FEEDING_TARGET = new Translation2d(2.067625, 6.05175);
@@ -120,7 +120,8 @@ public final class Constants {
             public static final Distance STARTING_HEIGHT_METERS = Meters.of(0.5); // TODO
             public static final Distance EXTENDED_POSITION = Meters.of(1.5); // TODO
             public static final Distance RETRACTED_POSITION = Meters.of(0.5); // TODO
-            public static final Distance POSITION_TOLERANCE = Meters.of(0.1); // TODO
+            public static final Distance POSITION_TARGET_ERROR = Meters.of(0.1); // TODO
+            public static final Distance FULLY_RETRACTED_POSITION = Meters.of(0); // TODO
 
             public static final Distance ROBOT_MAX_HEIGHT_METERS = Meters.of(1.5); // TODO
             public static final Distance ROBOT_MAX_LENGTH_METERS = Meters.of(0.75); // TODO
@@ -167,7 +168,7 @@ public final class Constants {
         public static final AngularVelocity DEFAULT_VELOCITY_RPM = RPM.of(4500); // TODO
         public static final AngularVelocity SHOOTING_VELOCITY_RPM = RPM.of(9000); // TODO
 
-        public static final AngularVelocity RPM_TOLERANCE = RPM.of(25); // TODO
+        public static final AngularVelocity RPM_TARGET_ERROR = RPM.of(25); // TODO
         public static final double AT_RPM_DEBOUNCE_TIME = 0.2; // TODO
     }
 
@@ -212,7 +213,7 @@ public final class Constants {
         public static final double EXTERNAL_ENCODER_GEARING = 17;
         public static final Angle EXTERNAL_ENCODER_ZERO_OFFSET = Degrees.of(0); // TODO
 
-        public static final Angle ANGLE_TOLERANCE = Degrees.of(7); // TODO
+        public static final Angle ANGLE_TARGET_ERROR = Degrees.of(7); // TODO
         public static final double AT_ANGLE_DEBOUNCE_TIME = 0.2; // TODO
 
         public static final Angle DEFAULT_ANGLE = Degrees.of(20); // TODO

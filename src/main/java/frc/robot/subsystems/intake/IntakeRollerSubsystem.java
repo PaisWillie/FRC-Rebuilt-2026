@@ -32,22 +32,22 @@ public class IntakeRollerSubsystem extends SubsystemBase {
      *
      * @param speed the desired motor output (-1.0 to 1.0)
      */
-    public void setRollerSpeed(double speed) {
+    public void setSpeed(double speed) {
         m_rollerMotor.set(speed);
     }
 
     /**
      * Stops the intake motor.
      */
-    public Command stopRollers() {
+    public Command stop() {
         return runOnce(() -> m_rollerMotor.stopMotor());
     }
 
     public Command intake() {
-        return this.runOnce(() -> setRollerSpeed(IntakeRollerConstants.SPEED));
+        return this.runOnce(() -> setSpeed(IntakeRollerConstants.SPEED));
     }
 
     public Command outtake() {
-        return this.runOnce(() -> setRollerSpeed(-IntakeRollerConstants.SPEED));
+        return this.runOnce(() -> setSpeed(-IntakeRollerConstants.SPEED));
     }
 }
