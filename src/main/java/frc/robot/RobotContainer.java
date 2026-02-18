@@ -217,7 +217,10 @@ public class RobotContainer {
 
         // Store fuel in the feeder if and only if L2 is held and R2 is not held
         // This prevents running the storeFuel command when trying to shoot (R2)
-        m_driverController.L2().and(m_driverController.R2().negate()).whileTrue(m_shooterSubsystem.storeFuel())
+        m_driverController.L2().and(m_driverController.R2().negate())
+                .whileTrue(Commands.parallel(
+                        m_shooterSubsystem.storeFuel(),
+                        m_indexerSubsystem.run()));
 
         m_driverController.R2()
 
