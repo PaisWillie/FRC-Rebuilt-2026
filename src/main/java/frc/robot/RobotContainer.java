@@ -286,9 +286,7 @@ public class RobotContainer {
 
         m_linearIntakeSubsystem.setDefaultCommand(m_linearIntakeSubsystem.set(0));
 
-        m_driverController.cross().whileTrue(m_linearIntakeSubsystem.sysId());
-        m_driverController.circle().whileTrue(m_linearIntakeSubsystem.set(0));
-        m_driverController.triangle().whileTrue(m_linearIntakeSubsystem.set(-0.3));
-        m_driverController.square().whileTrue(m_linearIntakeSubsystem.set(0.3));
+        // m_driverController.cross().whileTrue(m_linearIntakeSubsystem.sysId());
+        // m_driverController.cross().whileTrue(m_swerveSubsystem.sysIdDriveMotorCommand());
     }
 }

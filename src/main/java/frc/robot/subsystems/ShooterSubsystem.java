@@ -23,11 +23,11 @@ import frc.robot.subsystems.shooter.HoodSubsystem;
 
 public class ShooterSubsystem extends SubsystemBase {
 
-    private FeederSubsystem m_feederSubsystem;
-    private FlywheelSubsystem m_flywheelSubsystem;
-    private HoodSubsystem m_hoodSubsystem;
+    private final FeederSubsystem m_feederSubsystem;
+    private final FlywheelSubsystem m_flywheelSubsystem;
+    private final HoodSubsystem m_hoodSubsystem;
 
-    private InterpolatingDoubleTreeMap m_distanceToHoodAngleMap;
+    private final InterpolatingDoubleTreeMap m_distanceToHoodAngleMap;
 
     public ShooterSubsystem() {
         m_feederSubsystem = new FeederSubsystem();

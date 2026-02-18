@@ -15,7 +15,7 @@ import frc.robot.Constants.FeederConstants;
 
 public class FeederSubsystem extends SubsystemBase {
 
-    TalonFX m_motor;
+    private final TalonFX m_motor;
 
     // TODO: Add beam break sensors
 
