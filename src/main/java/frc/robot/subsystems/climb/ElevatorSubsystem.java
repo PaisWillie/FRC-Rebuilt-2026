@@ -182,6 +182,10 @@ public class ElevatorSubsystem extends SubsystemBase {
         return m_climb.setHeight(height);
     }
 
+    public Command stop() {
+        return setHeight(m_climb.getHeight());
+    }
+
     @Override
     public void periodic() {
         m_climb.updateTelemetry();

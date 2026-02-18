@@ -31,7 +31,7 @@ public class TongueSubsystem extends SubsystemBase {
 
     private final SparkMax m_motor;
     private final SmartMotorController m_smartMotorController;
-    private final Elevator m_elevator;
+    private final Elevator m_tongue;
 
     public TongueSubsystem() {
         m_motor = new SparkMax(TongueConstants.MOTOR_CAN_ID, SparkLowLevel.MotorType.kBrushless);
@@ -69,7 +69,7 @@ public class TongueSubsystem extends SubsystemBase {
                 .withMechanismPositionConfig(robotToMechanism)
                 .withMass(TongueConstants.MECHANISM_MASS);
 
-        m_elevator = new Elevator(config);
+        m_tongue = new Elevator(config);
     }
 
     /**
@@ -78,7 +78,7 @@ public class TongueSubsystem extends SubsystemBase {
      * @return the SysId command
      */
     public Command sysId() {
-        return m_elevator.sysId(
+        return m_tongue.sysId(
                 Volts.of(12), Volts.of(12).per(Second), Second.of(30))
                 .beforeStarting(
                         () -> SignalLogger.start())
@@ -86,20 +86,24 @@ public class TongueSubsystem extends SubsystemBase {
     }
 
     public Command elevCmd(double dutycycle) {
-        return m_elevator.set(dutycycle);
+        return m_tongue.set(dutycycle);
     }
 
     public Command setDistance(Distance distance) {
-        return m_elevator.setHeight(distance);
+        return m_tongue.setHeight(distance);
+    }
+
+    public Command stop() {
+        return setDistance(m_tongue.getHeight());
     }
 
     @Override
     public void periodic() {
-        m_elevator.updateTelemetry();
+        m_tongue.updateTelemetry();
     }
 
     @Override
     public void simulationPeriodic() {
-        m_elevator.simIterate();
+        m_tongue.simIterate();
     }
 }

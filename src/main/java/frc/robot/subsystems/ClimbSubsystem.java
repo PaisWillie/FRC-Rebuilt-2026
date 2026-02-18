@@ -6,6 +6,7 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.climb.ElevatorSubsystem;
 import frc.robot.subsystems.climb.TongueSubsystem;
@@ -20,11 +21,14 @@ public class ClimbSubsystem extends SubsystemBase {
     }
 
     private ClimbPosition m_currentClimbPosition;
+    private boolean m_isClimbAttempted;
+    private boolean m_isClimbInterrupted;
 
     public ClimbSubsystem() {
         m_elevatorSubsystem = new ElevatorSubsystem();
         m_tongueSubsystem = new TongueSubsystem();
         m_currentClimbPosition = ClimbPosition.NONE;
+        m_isClimbInterrupted = false;
     }
 
     private void setClimbPosition(ClimbPosition newPosition) {
@@ -33,14 +37,23 @@ public class ClimbSubsystem extends SubsystemBase {
 
     // TODO
     public Command climbToL1() {
-        return Commands.sequence(Commands.none()) // TODO
+
+        if (m_isClimbInterrupted)
+            return Commands.none(); // Prevent climbing if the climb was previously interrupted
+
+        return new InstantCommand(() -> {
+            m_isClimbAttempted = true;
+        }).andThen(Commands.sequence(Commands.none()) // TODO
                 .withName("CLMB - Climb to L1 from ground")
                 .onlyIf(() -> m_currentClimbPosition == ClimbPosition.NONE)
-                .andThen(Commands.runOnce(() -> setClimbPosition(ClimbPosition.L1)));
+                .andThen(Commands.runOnce(() -> setClimbPosition(ClimbPosition.L1))));
     }
 
     // TODO
     public Command climbToL2() {
+
+        if (m_isClimbInterrupted)
+            return Commands.none(); // Prevent climbing if the climb was previously interrupted
 
         Command L1toL2 = Commands.sequence(Commands.none()) // TODO
                 .withName("CLMB - Climb to L2 from L1")
@@ -58,6 +71,9 @@ public class ClimbSubsystem extends SubsystemBase {
 
     public Command climbToL3() {
 
+        if (m_isClimbInterrupted)
+            return Commands.none(); // Prevent climbing if the climb was previously interrupted
+
         Command L2toL3 = Commands.sequence(Commands.none()) // TODO
                 .withName("CLMB - Climb to L3 from L2")
                 .andThen(Commands.runOnce(() -> setClimbPosition(ClimbPosition.L3)));
@@ -72,6 +88,18 @@ public class ClimbSubsystem extends SubsystemBase {
             default:
                 return Commands.none();
         }
+    }
+
+    public Command interruptClimb() {
+        if (!m_isClimbAttempted) {
+            return Commands.none(); // Don't interrupt if climb hasn't been attempted
+        }
+
+        return new InstantCommand(() -> {
+            m_isClimbInterrupted = true;
+            m_elevatorSubsystem.stop();
+            m_tongueSubsystem.stop();
+        }).withName("CLMB - Interrupt Climb");
     }
 
     @Override
