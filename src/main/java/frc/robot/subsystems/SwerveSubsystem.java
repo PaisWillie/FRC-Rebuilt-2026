@@ -691,7 +691,6 @@ public class SwerveSubsystem extends SubsystemBase {
         Rotation2d currentHeading = getHeading();
         double angleError = Math
                 .abs(currentHeading.minus(autoAimTargetRotation.plus(Rotation2d.fromDegrees(90))).getDegrees());
-        SmartDashboard.putNumber("angleError", angleError);
         return angleError < SwerveConstants.AUTO_AIM_ANGLE_TARGET_ERROR.in(Degrees);
     }
 
