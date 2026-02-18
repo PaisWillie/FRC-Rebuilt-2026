@@ -40,7 +40,7 @@ public class IntakeRollerSubsystem extends SubsystemBase {
      * Stops the intake motor.
      */
     public Command stop() {
-        return runOnce(() -> m_rollerMotor.stopMotor());
+        return this.runOnce(() -> m_rollerMotor.stopMotor());
     }
 
     public Command intake() {

@@ -182,7 +182,7 @@ public class FlywheelSubsystem extends SubsystemBase {
     }
 
     public Command stop() {
-        return runOnce(() -> {
+        return this.runOnce(() -> {
             m_smartMotorController.setVoltage(Volts.of(0));
         });
     }
