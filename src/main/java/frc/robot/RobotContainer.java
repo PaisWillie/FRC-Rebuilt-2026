@@ -207,14 +207,17 @@ public class RobotContainer {
                 .whileTrue(Commands.parallel(
                         m_linearIntakeSubsystem.extend(),
                         m_hopperSubsystem.expand(),
-                        m_intakeRollerSubsystem.intake(),
-                        m_shooterSubsystem.storeFuel()))
+                        m_intakeRollerSubsystem.intake()))
 
                 // Retract intake and stop rollers (but keep hopper expanded)
                 .onFalse(
                         Commands.sequence(
                                 m_linearIntakeSubsystem.retract(),
                                 m_intakeRollerSubsystem.stop()));
+
+        // Store fuel in the feeder if and only if L2 is held and R2 is not held
+        // This prevents running the storeFuel command when trying to shoot (R2)
+        m_driverController.L2().and(m_driverController.R2().negate()).whileTrue(m_shooterSubsystem.storeFuel())
 
         m_driverController.R2()
 
