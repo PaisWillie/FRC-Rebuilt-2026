@@ -202,6 +202,12 @@ public class HoodSubsystem extends SubsystemBase {
         return m_hood.set(dutyCycle);
     }
 
+    /**
+     * Lowers the hood to the default angle, to avoid hitting the hood on the trench
+     * when not shooting.
+     * 
+     * @return the command that lowers the hood
+     */
     public Command lowerHood() {
         return m_hood.setAngle(HoodConstants.DEFAULT_ANGLE);
     }

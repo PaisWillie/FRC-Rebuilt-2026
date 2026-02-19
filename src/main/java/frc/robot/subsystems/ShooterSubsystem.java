@@ -113,6 +113,12 @@ public class ShooterSubsystem extends SubsystemBase {
                         .until(() -> !m_feederSubsystem.isBeamBroken()));
     }
 
+    /**
+     * Starts the flywheel spinning at its default RPM, the speed at which it should
+     * spin when the shooter is not actively shooting
+     * 
+     * @return a Command that starts the flywheel at its default RPM when executed
+     */
     public Command startFlywheelDefaultRPM() {
         return m_flywheelSubsystem.setDefaultRPM();
     }

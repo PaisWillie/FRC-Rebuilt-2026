@@ -162,10 +162,23 @@ public class FlywheelSubsystem extends SubsystemBase {
                 .of(speed.in(MetersPerSecond) / FlywheelConstants.DIAMETER_INCHES.times(Math.PI).in(Meters)));
     }
 
+    /**
+     * Starts the flywheel spinning at the shooting RPM, the speed at which it
+     * should
+     * spin when the shooter is actively shooting.
+     * 
+     * @return a Command that starts the flywheel at the shooting RPM when executed
+     */
     public Command shoot() {
         return setVelocity(FlywheelConstants.SHOOTING_VELOCITY_RPM);
     }
 
+    /**
+     * Starts the flywheel spinning at the default RPM, the speed at which it
+     * should spin when the shooter is not actively shooting.
+     * 
+     * @return a Command that starts the flywheel at the default RPM when executed
+     */
     public Command setDefaultRPM() {
         return setVelocity(FlywheelConstants.DEFAULT_VELOCITY_RPM);
     }
