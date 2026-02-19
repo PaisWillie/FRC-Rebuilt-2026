@@ -25,7 +25,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.FlywheelConstants;
-import frc.robot.Constants.HoodConstants;
 import frc.robot.Constants.MechanismPositionConstants;
 import yams.gearing.MechanismGearing;
 import yams.mechanisms.config.FlyWheelConfig;

@@ -145,8 +145,6 @@ public class RobotContainer {
 
     private void configureBindings() {
         Command driveFieldOrientedAnglularVelocity = m_swerveSubsystem.driveFieldOriented(driveAngularVelocity);
-        Command driveFieldOrientedDirectAngleKeyboard = m_swerveSubsystem
-                .driveFieldOriented(driveDirectAngleKeyboard);
         Command driveFieldOrientedAutoAim = m_swerveSubsystem.driveFieldOriented(driveAutoAim);
 
         m_swerveSubsystem.setDefaultCommand(driveFieldOrientedAnglularVelocity);
