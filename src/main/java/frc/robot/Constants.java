@@ -49,6 +49,10 @@ public final class Constants {
         public static final Angle AUTO_AIM_ANGLE_TARGET_ERROR = Degrees.of(10); // TODO
         public static final double AUTO_AIM_SCALE_TRANSLATION = 0.3; // TODO
 
+        // Extra distance past the starting line (towards the neutral zone) that would
+        // still be considered "in the alliance zone" for the purposes of auto-aiming.
+        public static final double ALLIANCE_ZONE_TOLERANCE_TO_STARTING_LINE = 0.1281386;
+
         public static final Translation2d BLUE_LEFT_FEEDING_TARGET = new Translation2d(2.067625, 6.05175);
         public static final Translation2d BLUE_RIGHT_FEEDING_TARGET = new Translation2d(2.067625, 2.01725);
         public static final Translation2d RED_LEFT_FEEDING_TARGET = new Translation2d(14.473375, 2.01725);

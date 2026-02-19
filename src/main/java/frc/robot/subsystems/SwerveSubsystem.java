@@ -577,13 +577,15 @@ public class SwerveSubsystem extends SubsystemBase {
     public Zone getCurrentZone() {
         Translation2d position = getPose().getTranslation();
 
-        if (position.getX() < FieldConstants.BLUE_STARTING_LINE_X) {
+        if (position.getX() < FieldConstants.BLUE_STARTING_LINE_X
+                + SwerveConstants.ALLIANCE_ZONE_TOLERANCE_TO_STARTING_LINE) {
             if (position.getY() < FieldConstants.FIELD_WIDTH / 2) {
                 return Zone.BLUE_ALLIANCE_RIGHT;
             } else {
                 return Zone.BLUE_ALLIANCE_LEFT;
             }
-        } else if (position.getX() > FieldConstants.RED_STARTING_LINE_X) {
+        } else if (position.getX() > FieldConstants.RED_STARTING_LINE_X
+                - SwerveConstants.ALLIANCE_ZONE_TOLERANCE_TO_STARTING_LINE) {
             if (position.getY() < FieldConstants.FIELD_WIDTH / 2) {
                 return Zone.RED_ALLIANCE_LEFT;
             } else {
