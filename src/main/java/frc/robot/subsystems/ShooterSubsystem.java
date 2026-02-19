@@ -128,11 +128,6 @@ public class ShooterSubsystem extends SubsystemBase {
         return m_flywheelSubsystem.setDefaultRPM();
     }
 
-    // TODO: Delete this
-    public HoodSubsystem getHoodSubsystem() {
-        return m_hoodSubsystem;
-    }
-
     @Override
     public void periodic() {
     }

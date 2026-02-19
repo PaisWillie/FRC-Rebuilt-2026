@@ -5,7 +5,6 @@
 package frc.robot;
 
 import java.io.File;
-import java.util.concurrent.locks.Condition;
 import java.util.function.DoubleSupplier;
 
 import choreo.auto.AutoChooser;
@@ -31,7 +30,6 @@ import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.intake.IntakeRollerSubsystem;
 import frc.robot.subsystems.intake.LinearIntakeSubsystem;
-import frc.robot.subsystems.intake.LinearIntakeSubsystem.LinearIntakePosition;
 import swervelib.SwerveInputStream;
 
 public class RobotContainer {
@@ -292,7 +290,6 @@ public class RobotContainer {
 
         // m_driverController.cross().whileTrue(m_linearIntakeSubsystem.sysId());
         // m_driverController.cross().whileTrue(m_swerveSubsystem.sysIdDriveMotorCommand());
-        m_driverController.cross().whileTrue(m_shooterSubsystem.getHoodSubsystem().sysId());
     }
 
     public Command startFlywheelDefaultRPM() {
