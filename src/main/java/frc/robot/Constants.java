@@ -111,7 +111,7 @@ public final class Constants {
             public static final Mass MECHANISM_MASS = Pounds.of(6.825);
             public static final Angle MECHANISM_ANGLE = Degrees.of(-24.159);
 
-            public static final double PID_kP = 10.0; // TODO
+            public static final double PID_kP = 1.0; // TODO
             public static final double PID_kI = 0.0; // TODO
             public static final double PID_kD = 0.0; // TODO
 
@@ -158,11 +158,11 @@ public final class Constants {
 
         public static final Current STATOR_CURRENT_LIMIT_AMPS = Amps.of(40); // TODO
 
-        public static final double PID_kP = 0.00016541; // TODO
+        public static final double PID_kP = 1; // TODO
         public static final double PID_kI = 0.0; // TODO
         public static final double PID_kD = 0.0; // TODO
 
-        public static final double SIM_PID_kP = 0.00016541; // TODO
+        public static final double SIM_PID_kP = 5; // TODO
         public static final double SIM_PID_kI = 0.0; // TODO
         public static final double SIM_PID_kD = 0.0; // TODO
 
@@ -174,16 +174,16 @@ public final class Constants {
         public static final Time CLOSED_LOOP_RAMP_RATE_SEC = Seconds.of(0.25); // TODO
         public static final Time OPEN_LOOP_RAMP_RATE_SEC = Seconds.of(0.25); // TODO
 
-        public static final AngularVelocity MAX_VELOCITY_RPM = RPM.of(9000);
-        public static final AngularVelocity SIM_MAX_VELOCITY_RPM = RPM.of(9000);
+        public static final AngularVelocity MAX_VELOCITY_RPM = RPM.of(12000);
+        public static final AngularVelocity SIM_MAX_VELOCITY_RPM = RPM.of(12000);
         public static final AngularAcceleration MAX_ACCELERATION_RPS2 = RotationsPerSecondPerSecond.of(2500); // TODO
 
-        public static final double SOFT_LIMIT_RPM = 500; // TODO
+        public static final double SOFT_LIMIT_RPM = 9000; // TODO
 
         public static final AngularVelocity DEFAULT_VELOCITY_RPM = RPM.of(4500); // TODO
         public static final AngularVelocity SHOOTING_VELOCITY_RPM = RPM.of(9000); // TODO
 
-        public static final AngularVelocity RPM_TARGET_ERROR = RPM.of(25); // TODO
+        public static final AngularVelocity RPM_TARGET_ERROR = RPM.of(100); // TODO
         public static final double AT_RPM_DEBOUNCE_TIME = 0.2; // TODO
 
         public static final Translation3d RELATIVE_POSITION = new Translation3d(Inches.of(-5.087),
@@ -200,7 +200,7 @@ public final class Constants {
 
         public static final Current STATOR_CURRENT_LIMIT_AMPS = Amps.of(40); // TODO
 
-        public static final double PID_kP = 20; // TODO
+        public static final double PID_kP = 1; // TODO
         public static final double PID_kI = 0.0; // TODO
         public static final double PID_kD = 0.0; // TODO
 
