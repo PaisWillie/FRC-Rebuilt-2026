@@ -284,6 +284,11 @@ public class RobotContainer {
                                 () -> driveAngularVelocity.driveToPoseEnabled(true),
                                 () -> driveAngularVelocity.driveToPoseEnabled(false))));
 
+        m_driverController.triangle().whileTrue(
+                autoFactory.trajectoryCmd("TrenchTopToAlliance"));
+        m_driverController.square().whileTrue(
+                autoFactory.trajectoryCmd("TrenchBottomToAlliance"));
+
         // m_linearIntakeSubsystem.setDefaultCommand(m_linearIntakeSubsystem.set(0));
 
         // m_driverController.cross().whileTrue(m_linearIntakeSubsystem.sysId());
