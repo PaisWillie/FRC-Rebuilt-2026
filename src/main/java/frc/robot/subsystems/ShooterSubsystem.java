@@ -36,11 +36,6 @@ public class ShooterSubsystem extends SubsystemBase {
 
         m_distanceToHoodAngleMap = new InterpolatingDoubleTreeMap();
         ShooterConstants.SHOOTER_DISTANCE_TO_HOOD_ANGLE.forEach(m_distanceToHoodAngleMap::put);
-
-        // Set default command for flywheel to maintain a default RPM when not shooting
-        m_flywheelSubsystem.setDefaultCommand(m_flywheelSubsystem.setDefaultRPM()); // TODO: Check if this is still
-                                                                                    // active after running
-                                                                                    // flywheel.stop()
     }
 
     /**
@@ -100,6 +95,21 @@ public class ShooterSubsystem extends SubsystemBase {
     }
 
     /**
+     * Stops the shooting process by lowering the hood, setting the flywheel to its
+     * default RPM, and optionally stopping the feeder.
+     * 
+     * @param stopFeeder whether to stop the feeder
+     * @return a Command that stops the shooting process when executed
+     */
+    public Command stopShooting(boolean stopFeeder) {
+        return Commands.parallel(
+                m_hoodSubsystem.lowerHood(),
+                m_flywheelSubsystem.setDefaultRPM(),
+                stopFeeder ? m_feederSubsystem.stop() : Commands.none())
+                .withName("SHTR - Stop Shooting");
+    }
+
+    /**
      * Feeds fuel into the shooter until fuel is detected by the beam break sensor,
      * then reverses the feeder until the fuel is no longer detected, effectively
      * positioning fuel correctly in the feeder for shooting.
@@ -112,6 +122,10 @@ public class ShooterSubsystem extends SubsystemBase {
                 .finallyDo(interrupted -> m_feederSubsystem.reverse() // TODO: Check behavious if interrupted while
                                                                       // feeding
                         .until(() -> !m_feederSubsystem.isBeamBroken()));
+    }
+
+    public Command startFlywheelDefaultRPM() {
+        return m_flywheelSubsystem.setDefaultRPM();
     }
 
     @Override

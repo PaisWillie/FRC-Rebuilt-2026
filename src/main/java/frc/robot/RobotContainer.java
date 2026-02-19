@@ -201,59 +201,44 @@ public class RobotContainer {
 
         m_driverController.options().onTrue((Commands.runOnce(m_swerveSubsystem::zeroGyro)));
 
-        // TODO: Maybe run indexer while intaking?
-        m_driverController.L2()
-
-                // Extend intake, run rollers, and expand hopper at the same time
-                .whileTrue(Commands.parallel(
-                        m_linearIntakeSubsystem.extend(),
-                        m_hopperSubsystem.expand(),
-                        m_intakeRollerSubsystem.intake(),
-                        // Store fuel in the feeder if and only if L2 is held and R2 is not held
-                        // This prevents running the storeFuel command when trying to shoot (R2)
-                        Commands.parallel(
-                                m_shooterSubsystem.storeFuel(),
-                                m_indexerSubsystem.run())
-                                .unless(m_driverController.R2()::getAsBoolean)))
-
-                // Retract intake and stop rollers (but keep hopper expanded)
-                .onFalse(
-                        Commands.sequence(
-                                m_indexerSubsystem.stop()
-                                        .unless(m_driverController.R2()::getAsBoolean),
-                                m_linearIntakeSubsystem.retract(),
-                                m_intakeRollerSubsystem.stop()));
-
+        m_driverController.R2().whileTrue(driveFieldOrientedAutoAim);
         m_driverController.R2()
+                .onTrue(m_shooterSubsystem.aimAndShoot(m_swerveSubsystem::getDistanceToTarget,
+                        m_swerveSubsystem::isAutoAimOnTarget))
+                .onFalse(new ConditionalCommand(
+                        Commands.sequence(
+                                m_shooterSubsystem.stopShooting(),
+                                m_shooterSubsystem.storeFuel()),
+                        m_shooterSubsystem.stopShooting(),
+                        m_driverController.L2()::getAsBoolean));
+        m_driverController.R2()
+                .onTrue(m_indexerSubsystem.run())
+                .onFalse(m_indexerSubsystem.stop()
+                        .unless(m_driverController.L2()::getAsBoolean));
 
-                // Auto-aim, shoot, and run indexer at the same time
-                .whileTrue(Commands.parallel(
-                        m_indexerSubsystem.run(),
-                        m_shooterSubsystem.aimAndShoot(m_swerveSubsystem::getDistanceToTarget,
-                                m_swerveSubsystem::isAutoAimOnTarget),
-                        driveFieldOrientedAutoAim,
-
-                        // TODO: Test this to see if it causes issues; maybe outtake instead
-                        // Only run intake rollers if linear intake is not fully extended to prevent
-                        // jams when fuel is stuck on top of intake rollers
-                        new ConditionalCommand(
-                                m_intakeRollerSubsystem.outtake(),
-                                Commands.none(),
-                                () -> m_linearIntakeSubsystem
-                                        .getCurrentPosition() != LinearIntakePosition.EXTENDED)))
-
-                // Stop shooter and indexer
-                .onFalse(Commands.parallel(
-                        // If L2 is still held, store fuel instead of stopping the feeder entirely
-                        new ConditionalCommand(m_shooterSubsystem.storeFuel(), m_shooterSubsystem.stopShooting(),
-                                m_driverController.L2()::getAsBoolean),
+        m_driverController.L2()
+                .onTrue(m_linearIntakeSubsystem.extend())
+                .onFalse(m_linearIntakeSubsystem.retract());
+        m_driverController.L2()
+                .onTrue(m_hopperSubsystem.expand());
+        m_driverController.L2()
+                .onTrue(m_intakeRollerSubsystem.intake())
+                .onFalse(m_intakeRollerSubsystem.stop());
+        m_driverController.L2()
+                .whileTrue(
+                        Commands.parallel(
+                                m_indexerSubsystem.run(),
+                                m_shooterSubsystem.storeFuel()))
+                .onFalse(
                         m_indexerSubsystem.stop()
-                                .unless(m_driverController.L2()::getAsBoolean)));
+                                .unless(m_driverController.R2()::getAsBoolean));
 
         m_driverController.R1()
+                .and(m_driverController.R2().negate()) // Not shooting
+                .and(m_driverController.L2().negate()) // Not intaking
 
                 // Extend intake, reverse indexer and intake rollers at the same time
-                .whileTrue(Commands.sequence(
+                .whileTrue(Commands.sequence( // TODO: Check if sequence is needed, or if parallel alone is fine
                         m_linearIntakeSubsystem.extend(),
                         Commands.parallel(
                                 m_indexerSubsystem.reverse(),
@@ -304,5 +289,9 @@ public class RobotContainer {
 
         // m_driverController.cross().whileTrue(m_linearIntakeSubsystem.sysId());
         // m_driverController.cross().whileTrue(m_swerveSubsystem.sysIdDriveMotorCommand());
+    }
+
+    public Command startFlywheelDefaultRPM() {
+        return m_shooterSubsystem.startFlywheelDefaultRPM();
     }
 }
