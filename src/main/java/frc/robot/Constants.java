@@ -180,8 +180,8 @@ public final class Constants {
 
         public static final double SOFT_LIMIT_RPM = 9000; // TODO
 
-        public static final AngularVelocity DEFAULT_VELOCITY_RPM = RPM.of(4500); // TODO
-        public static final AngularVelocity SHOOTING_VELOCITY_RPM = RPM.of(9000); // TODO
+        public static final AngularVelocity DEFAULT_VELOCITY_RPM = RPM.of(5000); // TODO
+        public static final AngularVelocity SHOOTING_VELOCITY_RPM = RPM.of(6700); // TODO
 
         public static final AngularVelocity RPM_TARGET_ERROR = RPM.of(100); // TODO
         public static final double AT_RPM_DEBOUNCE_TIME = 0.2; // TODO
