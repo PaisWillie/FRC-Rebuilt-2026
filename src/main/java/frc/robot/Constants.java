@@ -58,8 +58,8 @@ public final class Constants {
         public static final Translation2d RED_LEFT_FEEDING_TARGET = new Translation2d(14.473375, 2.01725);
         public static final Translation2d RED_RIGHT_FEEDING_TARGET = new Translation2d(14.473375, 6.05175);
 
-        public static final Pose2d RED_LEFT_TOWER_CLIMB_POS = new Pose2d(15.105, 4.764, new Rotation2d(Degree.of(0)));
-        public static final Pose2d RED_RIGHT_TOWER_CLIMB_POS = new Pose2d(15.105, 3.885, new Rotation2d(Degree.of(0)));
+        public static final Pose2d RED_LEFT_TOWER_CLIMB_POS = new Pose2d(15.105, 3.885, new Rotation2d(Degree.of(0)));
+        public static final Pose2d RED_RIGHT_TOWER_CLIMB_POS = new Pose2d(15.105, 4.764, new Rotation2d(Degree.of(0)));
 
         public static final Pose2d BLUE_LEFT_TOWER_CLIMB_POS = new Pose2d(1.428, 4.175, new Rotation2d(Degree.of(180)));
         public static final Pose2d BLUE_RIGHT_TOWER_CLIMB_POS = new Pose2d(1.428, 3.317,
