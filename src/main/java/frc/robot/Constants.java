@@ -197,7 +197,7 @@ public final class Constants {
         public static final double PID_kI = 0.0; // TODO
         public static final double PID_kD = 0.0; // TODO
 
-        public static final double SIM_PID_kP = 25; // TODO
+        public static final double SIM_PID_kP = 0.00016541; // TODO
         public static final double SIM_PID_kI = 0.0; // TODO
         public static final double SIM_PID_kD = 0.0; // TODO
 
