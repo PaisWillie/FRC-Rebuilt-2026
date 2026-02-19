@@ -16,6 +16,7 @@ import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ClimbConstants.TongueConstants;
+import frc.robot.Constants.MechanismPositionConstants;
 import yams.gearing.MechanismGearing;
 import yams.mechanisms.config.ElevatorConfig;
 import yams.mechanisms.config.MechanismPositionConfig;
@@ -58,8 +59,8 @@ public class TongueSubsystem extends SubsystemBase {
         m_smartMotorController = new SparkWrapper(m_motor, DCMotor.getNEO(1), motorConfig);
 
         MechanismPositionConfig robotToMechanism = new MechanismPositionConfig()
-                .withMaxRobotHeight(TongueConstants.ROBOT_MAX_HEIGHT)
-                .withMaxRobotLength(TongueConstants.ROBOT_MAX_LENGTH)
+                .withMaxRobotHeight(MechanismPositionConstants.ROBOT_MAX_HEIGHT)
+                .withMaxRobotLength(MechanismPositionConstants.ROBOT_MAX_LENGTH)
                 .withRelativePosition(TongueConstants.RELATIVE_POSITION);
 
         ElevatorConfig config = new ElevatorConfig(m_smartMotorController)

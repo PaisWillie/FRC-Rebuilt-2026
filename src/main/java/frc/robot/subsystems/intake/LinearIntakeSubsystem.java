@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems.intake;
 
+import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Volts;
 
@@ -18,6 +19,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.IntakeConstants.LinearIntakeConstants;
+import frc.robot.Constants.MechanismPositionConstants;
 import yams.gearing.MechanismGearing;
 import yams.mechanisms.config.ElevatorConfig;
 import yams.mechanisms.config.MechanismPositionConfig;
@@ -43,24 +45,24 @@ public class LinearIntakeSubsystem extends SubsystemBase {
                         LinearIntakeConstants.PID_kP,
                         LinearIntakeConstants.PID_kI,
                         LinearIntakeConstants.PID_kD,
-                        LinearIntakeConstants.MAX_VELOCITY_MPS,
-                        LinearIntakeConstants.MAX_ACCELERATION_MPS2)
+                        LinearIntakeConstants.MAX_VELOCITY,
+                        LinearIntakeConstants.MAX_ACCELERATION)
                 .withSimClosedLoopController(
                         LinearIntakeConstants.SIM_PID_kP,
                         LinearIntakeConstants.SIM_PID_kI,
                         LinearIntakeConstants.SIM_PID_kD,
-                        LinearIntakeConstants.MAX_VELOCITY_MPS,
-                        LinearIntakeConstants.MAX_ACCELERATION_MPS2)
+                        LinearIntakeConstants.MAX_VELOCITY,
+                        LinearIntakeConstants.MAX_ACCELERATION)
                 .withSoftLimit(
-                        LinearIntakeConstants.SOFT_LIMIT_MIN_METERS,
-                        LinearIntakeConstants.SOFT_LIMIT_MAX_METERS)
+                        LinearIntakeConstants.SOFT_LIMIT_MIN,
+                        LinearIntakeConstants.SOFT_LIMIT_MAX)
                 .withGearing(new MechanismGearing(LinearIntakeConstants.GEARBOX))
                 .withIdleMode(MotorMode.BRAKE)
                 .withTelemetry("LinearIntakeMotor", Constants.TELEMETRY_VERBOSITY)
-                .withStatorCurrentLimit(LinearIntakeConstants.STATOR_CURRENT_LIMIT_AMPS)
+                .withStatorCurrentLimit(LinearIntakeConstants.STATOR_CURRENT_LIMIT)
                 .withMotorInverted(false)
-                .withClosedLoopRampRate(LinearIntakeConstants.CLOSED_LOOP_RAMP_RATE_SEC)
-                .withOpenLoopRampRate(LinearIntakeConstants.OPEN_LOOP_RAMP_RATE_SEC)
+                .withClosedLoopRampRate(LinearIntakeConstants.CLOSED_LOOP_RAMP_RATE)
+                .withOpenLoopRampRate(LinearIntakeConstants.OPEN_LOOP_RAMP_RATE)
                 .withFeedforward(LinearIntakeConstants.FEEDFORWARD)
                 .withControlMode(ControlMode.CLOSED_LOOP);
 
@@ -70,18 +72,19 @@ public class LinearIntakeSubsystem extends SubsystemBase {
                 m_linearMotorSMCConfig);
 
         MechanismPositionConfig m_robotToMechanism = new MechanismPositionConfig()
-                .withMaxRobotHeight(LinearIntakeConstants.ROBOT_MAX_HEIGHT_METERS)
-                .withMaxRobotLength(LinearIntakeConstants.ROBOT_MAX_LENGTH_METERS)
-                .withRelativePosition(LinearIntakeConstants.RELATIVE_POSITION_METERS);
+                .withMaxRobotHeight(MechanismPositionConstants.ROBOT_MAX_HEIGHT)
+                .withMaxRobotLength(MechanismPositionConstants.ROBOT_MAX_LENGTH)
+                .withRelativePosition(LinearIntakeConstants.RELATIVE_POSITION);
 
         ElevatorConfig m_linearConfig = new ElevatorConfig(m_linearMotorSMC)
-                .withStartingHeight(LinearIntakeConstants.STARTING_HEIGHT_METERS)
+                .withStartingHeight(LinearIntakeConstants.STARTING_HEIGHT)
                 .withHardLimits(
-                        LinearIntakeConstants.HARD_LIMIT_MIN_METERS,
-                        LinearIntakeConstants.HARD_LIMIT_MAX_METERS)
+                        LinearIntakeConstants.HARD_LIMIT_MIN,
+                        LinearIntakeConstants.HARD_LIMIT_MAX)
                 .withTelemetry("LinearIntake", Constants.TELEMETRY_VERBOSITY)
                 .withMechanismPositionConfig(m_robotToMechanism)
-                .withMass(LinearIntakeConstants.MECHANISM_MASS_POUNDS);
+                .withMass(LinearIntakeConstants.MECHANISM_MASS)
+                .withAngle(LinearIntakeConstants.MECHANISM_ANGLE);
 
         m_linearIntake = new Elevator(m_linearConfig);
     }

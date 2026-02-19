@@ -57,7 +57,8 @@ public class RobotContainer {
     SwerveInputStream driveAngularVelocity = SwerveInputStream.of(m_swerveSubsystem.getSwerveDrive(),
             () -> m_driverController.getLeftY() * -1,
             () -> m_driverController.getLeftX() * -1)
-            .withControllerRotationAxis(() -> m_driverController.getRightX() * -1) // TODO: Check if * -1 is needed IRL
+            .withControllerRotationAxis(() -> m_driverController.getRightX() * -1) // TODO: Check if * -1 is
+                                                                                   // needed IRL
             .deadband(OperatorConstants.DEADBAND)
             .scaleTranslation(0.8)
             .allianceRelativeControl(true);
@@ -127,7 +128,8 @@ public class RobotContainer {
 
         autoFactory = new AutoFactory(
                 m_swerveSubsystem::getPose, // A function that returns the current robot pose
-                m_swerveSubsystem::resetOdometry, // A function that resets the current robot pose to the provided
+                m_swerveSubsystem::resetOdometry, // A function that resets the current robot pose to
+                                                  // the provided
                                                   // Pose2d
                 m_swerveSubsystem::followTrajectory, // The drive subsystem trajectory follower
 
@@ -238,7 +240,8 @@ public class RobotContainer {
                 .and(m_driverController.L2().negate()) // Not intaking
 
                 // Extend intake, reverse indexer and intake rollers at the same time
-                .onTrue(Commands.sequence( // TODO: Check if sequence is needed, or if parallel alone is fine
+                .onTrue(Commands.sequence( // TODO: Check if sequence is needed, or if parallel alone is
+                                           // fine
                         m_linearIntakeSubsystem.extend(),
                         Commands.parallel(
                                 m_indexerSubsystem.reverse(),
@@ -289,6 +292,7 @@ public class RobotContainer {
 
         // m_driverController.cross().whileTrue(m_linearIntakeSubsystem.sysId());
         // m_driverController.cross().whileTrue(m_swerveSubsystem.sysIdDriveMotorCommand());
+        m_driverController.cross().whileTrue(m_shooterSubsystem.getHoodSubsystem().sysId());
     }
 
     public Command startFlywheelDefaultRPM() {

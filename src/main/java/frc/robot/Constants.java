@@ -105,42 +105,41 @@ public final class Constants {
 
             public static final Distance MOTOR_CIRCUMFERENCE = Inches.of(0.8).times(Math.PI);
             public static final GearBox GEARBOX = GearBox.fromReductionStages(5.0625);
-            public static final Mass MECHANISM_MASS_POUNDS = Pounds.of(6.825);
+            public static final Mass MECHANISM_MASS = Pounds.of(6.825);
+            public static final Angle MECHANISM_ANGLE = Degrees.of(-24.159);
 
-            public static final double PID_kP = 4.0; // TODO
+            public static final double PID_kP = 10.0; // TODO
             public static final double PID_kI = 0.0; // TODO
             public static final double PID_kD = 0.0; // TODO
 
-            public static final double SIM_PID_kP = 4.0; // TODO
+            public static final double SIM_PID_kP = 10.0; // TODO
             public static final double SIM_PID_kI = 0.0; // TODO
             public static final double SIM_PID_kD = 0.0; // TODO
 
             public static final SimpleMotorFeedforward FEEDFORWARD = new SimpleMotorFeedforward(0, 0, 0, 0.1); // TODO
 
-            public static final LinearVelocity MAX_VELOCITY_MPS = MetersPerSecond.of(0.5); // TODO
-            public static final LinearAcceleration MAX_ACCELERATION_MPS2 = MetersPerSecondPerSecond.of(0.5); // TODO
+            public static final LinearVelocity MAX_VELOCITY = MetersPerSecond.of(0.5); // TODO
+            public static final LinearAcceleration MAX_ACCELERATION = MetersPerSecondPerSecond.of(0.5); // TODO
 
-            public static final Time CLOSED_LOOP_RAMP_RATE_SEC = Seconds.of(0.25); // TODO
-            public static final Time OPEN_LOOP_RAMP_RATE_SEC = Seconds.of(0.25); // TODO
+            public static final Time CLOSED_LOOP_RAMP_RATE = Seconds.of(0.25);
+            public static final Time OPEN_LOOP_RAMP_RATE = Seconds.of(0.25);
 
-            public static final Current STATOR_CURRENT_LIMIT_AMPS = Amps.of(40); // TODO
+            public static final Current STATOR_CURRENT_LIMIT = Amps.of(40); // TODO
 
-            public static final Distance SOFT_LIMIT_MIN_METERS = Meters.of(0); // TODO
-            public static final Distance SOFT_LIMIT_MAX_METERS = Meters.of(2); // TODO
-            public static final Distance HARD_LIMIT_MIN_METERS = Meters.of(0); // TODO
-            public static final Distance HARD_LIMIT_MAX_METERS = Meters.of(3); // TODO
+            public static final Distance SOFT_LIMIT_MIN = Inches.of(0);
+            public static final Distance SOFT_LIMIT_MAX = Inches.of(16.7); // TODO
+            public static final Distance HARD_LIMIT_MIN = Inches.of(0);
+            public static final Distance HARD_LIMIT_MAX = Inches.of(16.7); // TODO
 
-            public static final Distance STARTING_HEIGHT_METERS = Meters.of(0.5); // TODO
-            public static final Distance EXTENDED_POSITION = Meters.of(1.5); // TODO
-            public static final Distance RETRACTED_POSITION = Meters.of(0.5); // TODO
-            public static final Distance POSITION_TARGET_ERROR = Meters.of(0.1); // TODO
-            public static final Distance FULLY_RETRACTED_POSITION = Meters.of(0); // TODO
+            public static final Distance STARTING_HEIGHT = Inches.of(0);
+            public static final Distance EXTENDED_POSITION = Inches.of(16.7); // TODO
+            public static final Distance RETRACTED_POSITION = Inches.of(10.0); // TODO
+            public static final Distance POSITION_TARGET_ERROR = Inches.of(0.5); // TODO
+            public static final Distance FULLY_RETRACTED_POSITION = Inches.of(0);
 
-            public static final Distance ROBOT_MAX_HEIGHT_METERS = Meters.of(1.5); // TODO
-            public static final Distance ROBOT_MAX_LENGTH_METERS = Meters.of(0.75); // TODO
-            public static final Translation3d RELATIVE_POSITION_METERS = new Translation3d(Meters.of(-0.25),
-                    Meters.of(0),
-                    Meters.of(0.5)); // TODO
+            public static final Translation3d RELATIVE_POSITION = new Translation3d(Inches.of(0),
+                    Inches.of(10.682),
+                    Inches.of(22.767));
         }
     }
 
@@ -190,15 +189,15 @@ public final class Constants {
         public static final int ENCODER_CAN_ID = 5; // TODO
 
         public static final DCMotor MOTOR = DCMotor.getKrakenX60Foc(1);
-        public static final GearBox GEARBOX = GearBox.fromReductionStages(3, 4); // TODO
+        public static final GearBox GEARBOX = GearBox.fromReductionStages(8);
 
         public static final Current STATOR_CURRENT_LIMIT_AMPS = Amps.of(40); // TODO
 
-        public static final double PID_kP = 0.00016541; // TODO
+        public static final double PID_kP = 10; // TODO
         public static final double PID_kI = 0.0; // TODO
         public static final double PID_kD = 0.0; // TODO
 
-        public static final double SIM_PID_kP = 0.00016541; // TODO
+        public static final double SIM_PID_kP = 10; // TODO
         public static final double SIM_PID_kI = 0.0; // TODO
         public static final double SIM_PID_kD = 0.0; // TODO
 
@@ -213,14 +212,13 @@ public final class Constants {
         public static final AngularVelocity MAX_VELOCITY_RPM = RPM.of(5000); // TODO
         public static final AngularAcceleration MAX_ACCELERATION_RPS2 = RotationsPerSecondPerSecond.of(2500); // TODO
 
-        public static final Angle SOFT_LIMIT_MIN = Degrees.of(5); // TODO
-        public static final Angle SOFT_LIMIT_MAX = Degrees.of(85); // TODO
-        public static final Angle HARD_LIMIT_MIN = Degrees.of(0); // TODO
-        public static final Angle HARD_LIMIT_MAX = Degrees.of(90); // TODO
+        public static final Angle SOFT_LIMIT_MIN = Degrees.of(57); // TODO
+        public static final Angle SOFT_LIMIT_MAX = Degrees.of(88); // TODO
+        public static final Angle HARD_LIMIT_MIN = Degrees.of(57);
+        public static final Angle HARD_LIMIT_MAX = Degrees.of(88);
 
-        public static final Distance LENGTH = Inches.of(12); // TODO
-        public static final Mass MASS = Pounds.of(5); // TODO
-        public static final Angle STARTING_ANGLE = Degrees.of(0); // TODO
+        public static final Distance LENGTH = Inches.of(8.5);
+        public static final Mass MASS = Pounds.of(4.39);
 
         public static final boolean EXTERNAL_ENCODER_INVERTED = false; // TODO
         public static final double EXTERNAL_ENCODER_GEARING = 17;
@@ -229,7 +227,7 @@ public final class Constants {
         public static final Angle ANGLE_TARGET_ERROR = Degrees.of(7); // TODO
         public static final double AT_ANGLE_DEBOUNCE_TIME = 0.2; // TODO
 
-        public static final Angle DEFAULT_ANGLE = Degrees.of(20); // TODO
+        public static final Angle DEFAULT_ANGLE = Degrees.of(57); // TODO
     }
 
     public static final class FeederConstants {
@@ -245,14 +243,14 @@ public final class Constants {
 
     public static final class ShooterConstants {
         public static final Map<Double, Double> SHOOTER_DISTANCE_TO_HOOD_ANGLE = Map.ofEntries(
-                Map.entry(1.0, 80.0),
-                Map.entry(2.0, 70.0),
-                Map.entry(3.0, 60.0),
-                Map.entry(4.0, 50.0),
-                Map.entry(5.0, 40.0),
-                Map.entry(6.0, 30.0),
-                Map.entry(7.0, 20.0),
-                Map.entry(8.0, 10.0));
+                Map.entry(1.0, 88.0),
+                Map.entry(2.0, 85.0),
+                Map.entry(3.0, 70.0),
+                Map.entry(4.0, 67.0),
+                Map.entry(5.0, 63.0),
+                Map.entry(6.0, 60.0),
+                Map.entry(7.0, 58.0),
+                Map.entry(8.0, 57.0));
     }
 
     public static final class HopperConstants {
@@ -334,11 +332,14 @@ public final class Constants {
             public static final Distance HARD_LIMIT_MIN = Meters.of(0); // TODO
             public static final Distance HARD_LIMIT_MAX = Meters.of(3); // TODO
 
-            public static final Distance ROBOT_MAX_HEIGHT = Meters.of(1.5); // TODO
-            public static final Distance ROBOT_MAX_LENGTH = Meters.of(0.75); // TODO
             public static final Translation3d RELATIVE_POSITION = new Translation3d(Meters.of(-0.25), Meters.of(0),
                     Meters.of(0.5)); // TODO
         }
+    }
+
+    public static final class MechanismPositionConstants {
+        public static final Distance ROBOT_MAX_HEIGHT = Inches.of(21.729);
+        public static final Distance ROBOT_MAX_LENGTH = Inches.of(27);
     }
 
     // Set the telemetry verbosity for YAMS subsystems
