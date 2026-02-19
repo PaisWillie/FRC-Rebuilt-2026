@@ -117,6 +117,14 @@ public class ShooterSubsystem extends SubsystemBase {
         return m_flywheelSubsystem.setDefaultRPM();
     }
 
+    public Command flywheelSysId() {
+        return m_flywheelSubsystem.sysId();
+    }
+
+    public Command hoodSysId() {
+        return m_hoodSubsystem.sysId();
+    }
+
     @Override
     public void periodic() {
     }
