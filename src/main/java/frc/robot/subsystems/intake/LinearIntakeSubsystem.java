@@ -38,7 +38,7 @@ public class LinearIntakeSubsystem extends SubsystemBase {
         m_linearMotor = new TalonFX(LinearIntakeConstants.MOTOR_CAN_ID);
 
         m_linearMotorSMCConfig = new SmartMotorControllerConfig(this)
-                .withMechanismCircumference(LinearIntakeConstants.MOTOR_CIRCUMFERENCE_METERS)
+                .withMechanismCircumference(LinearIntakeConstants.MOTOR_CIRCUMFERENCE)
                 .withClosedLoopController(
                         LinearIntakeConstants.PID_kP,
                         LinearIntakeConstants.PID_kI,

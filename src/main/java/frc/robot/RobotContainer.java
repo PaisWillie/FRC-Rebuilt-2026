@@ -238,7 +238,7 @@ public class RobotContainer {
                 .and(m_driverController.L2().negate()) // Not intaking
 
                 // Extend intake, reverse indexer and intake rollers at the same time
-                .whileTrue(Commands.sequence( // TODO: Check if sequence is needed, or if parallel alone is fine
+                .onTrue(Commands.sequence( // TODO: Check if sequence is needed, or if parallel alone is fine
                         m_linearIntakeSubsystem.extend(),
                         Commands.parallel(
                                 m_indexerSubsystem.reverse(),
