@@ -4,19 +4,14 @@
 
 package frc.robot.subsystems;
 
-import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.Meters;
-
 import java.util.function.Supplier;
 
-import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants.ShooterConstants;
 import frc.robot.subsystems.shooter.FeederSubsystem;
 import frc.robot.subsystems.shooter.FlywheelSubsystem;
 import frc.robot.subsystems.shooter.HoodSubsystem;
@@ -27,15 +22,10 @@ public class ShooterSubsystem extends SubsystemBase {
     private final FlywheelSubsystem m_flywheelSubsystem;
     private final HoodSubsystem m_hoodSubsystem;
 
-    private final InterpolatingDoubleTreeMap m_distanceToHoodAngleMap;
-
     public ShooterSubsystem() {
         m_feederSubsystem = new FeederSubsystem();
         m_flywheelSubsystem = new FlywheelSubsystem();
         m_hoodSubsystem = new HoodSubsystem();
-
-        m_distanceToHoodAngleMap = new InterpolatingDoubleTreeMap();
-        ShooterConstants.SHOOTER_DISTANCE_TO_HOOD_ANGLE.forEach(m_distanceToHoodAngleMap::put);
     }
 
     /**
@@ -66,8 +56,7 @@ public class ShooterSubsystem extends SubsystemBase {
         return Commands.parallel(
                 m_hoodSubsystem.setAngle(
                         () -> {
-                            return Degrees.of(m_distanceToHoodAngleMap
-                                    .get(getDistanceToTarget.get().in(Meters)));
+                            return m_hoodSubsystem.getAngleToTarget(getDistanceToTarget.get());
                         }),
                 m_flywheelSubsystem.shoot(),
                 new ConditionalCommand(m_feederSubsystem.feed(), m_feederSubsystem.stop(),

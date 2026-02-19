@@ -25,8 +25,11 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.FlywheelConstants;
+import frc.robot.Constants.HoodConstants;
+import frc.robot.Constants.MechanismPositionConstants;
 import yams.gearing.MechanismGearing;
 import yams.mechanisms.config.FlyWheelConfig;
+import yams.mechanisms.config.MechanismPositionConfig;
 import yams.mechanisms.velocity.FlyWheel;
 import yams.motorcontrollers.SmartMotorController;
 import yams.motorcontrollers.SmartMotorControllerConfig;
@@ -80,12 +83,18 @@ public class FlywheelSubsystem extends SubsystemBase {
                 FlywheelConstants.MOTOR,
                 m_smcConfig);
 
+        MechanismPositionConfig m_robotToMechanism = new MechanismPositionConfig()
+                .withMaxRobotHeight(MechanismPositionConstants.ROBOT_MAX_HEIGHT)
+                .withMaxRobotLength(MechanismPositionConstants.ROBOT_MAX_LENGTH)
+                .withRelativePosition(FlywheelConstants.RELATIVE_POSITION);
+
         FlyWheelConfig m_flywheelConfig = new FlyWheelConfig(m_smartMotorController)
                 .withDiameter(FlywheelConstants.DIAMETER_INCHES)
                 .withMass(FlywheelConstants.MASS_POUNDS)
                 .withTelemetry("FlywheelMech", Constants.TELEMETRY_VERBOSITY)
                 .withSoftLimit(RPM.of(-FlywheelConstants.SOFT_LIMIT_RPM), RPM.of(FlywheelConstants.SOFT_LIMIT_RPM))
-                .withSpeedometerSimulation(FlywheelConstants.SIM_MAX_VELOCITY_RPM);
+                .withSpeedometerSimulation(FlywheelConstants.SIM_MAX_VELOCITY_RPM)
+                .withMechanismPositionConfig(m_robotToMechanism);
 
         m_flywheel = new FlyWheel(m_flywheelConfig);
     }

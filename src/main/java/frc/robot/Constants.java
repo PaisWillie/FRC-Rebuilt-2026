@@ -138,7 +138,7 @@ public final class Constants {
 
             public static final Translation3d RELATIVE_POSITION = new Translation3d(Inches.of(0),
                     Inches.of(10.682),
-                    Inches.of(22.767));
+                    Inches.of(22.767 / 2));
         }
     }
 
@@ -181,6 +181,10 @@ public final class Constants {
 
         public static final AngularVelocity RPM_TARGET_ERROR = RPM.of(25); // TODO
         public static final double AT_RPM_DEBOUNCE_TIME = 0.2; // TODO
+
+        public static final Translation3d RELATIVE_POSITION = new Translation3d(Inches.of(-5.087),
+                Inches.of(0),
+                Inches.of(17.912 / 2));
     }
 
     public static final class HoodConstants {
@@ -192,11 +196,11 @@ public final class Constants {
 
         public static final Current STATOR_CURRENT_LIMIT_AMPS = Amps.of(40); // TODO
 
-        public static final double PID_kP = 10; // TODO
+        public static final double PID_kP = 20; // TODO
         public static final double PID_kI = 0.0; // TODO
         public static final double PID_kD = 0.0; // TODO
 
-        public static final double SIM_PID_kP = 10; // TODO
+        public static final double SIM_PID_kP = 20; // TODO
         public static final double SIM_PID_kI = 0.0; // TODO
         public static final double SIM_PID_kD = 0.0; // TODO
 
@@ -211,10 +215,10 @@ public final class Constants {
         public static final AngularVelocity MAX_VELOCITY_RPM = RPM.of(5000); // TODO
         public static final AngularAcceleration MAX_ACCELERATION_RPS2 = RotationsPerSecondPerSecond.of(2500); // TODO
 
-        public static final Angle SOFT_LIMIT_MIN = Degrees.of(57); // TODO
-        public static final Angle SOFT_LIMIT_MAX = Degrees.of(88); // TODO
-        public static final Angle HARD_LIMIT_MIN = Degrees.of(57);
-        public static final Angle HARD_LIMIT_MAX = Degrees.of(88);
+        public static final Angle SOFT_LIMIT_MIN = Degrees.of(90 - 79); // TODO
+        public static final Angle SOFT_LIMIT_MAX = Degrees.of(90 - 46); // TODO
+        public static final Angle HARD_LIMIT_MIN = Degrees.of(90 - 79);
+        public static final Angle HARD_LIMIT_MAX = Degrees.of(90 - 46);
 
         public static final Distance LENGTH = Inches.of(8.5);
         public static final Mass MASS = Pounds.of(4.39);
@@ -226,7 +230,21 @@ public final class Constants {
         public static final Angle ANGLE_TARGET_ERROR = Degrees.of(7); // TODO
         public static final double AT_ANGLE_DEBOUNCE_TIME = 0.2; // TODO
 
-        public static final Angle DEFAULT_ANGLE = Degrees.of(57); // TODO
+        public static final Angle DEFAULT_ANGLE = Degrees.of(90 - 79); // TODO
+
+        public static final Translation3d RELATIVE_POSITION = new Translation3d(Inches.of(-5.087),
+                Inches.of(9.017),
+                Inches.of(17.912 / 2));
+
+        public static final Map<Double, Double> SHOOTER_DISTANCE_TO_HOOD_ANGLE = Map.ofEntries(
+                Map.entry(1.0, 90 - 79.0),
+                Map.entry(2.0, 90 - 67.0),
+                Map.entry(3.0, 90 - 61.0),
+                Map.entry(4.0, 90 - 56.0),
+                Map.entry(5.0, 90 - 52.0),
+                Map.entry(6.0, 90 - 49.0),
+                Map.entry(7.0, 90 - 47.0),
+                Map.entry(8.0, 90 - 46.0));
     }
 
     public static final class FeederConstants {
@@ -238,18 +256,6 @@ public final class Constants {
 
         public static final double FEEDER_SPEED = 0.5; // TODO
         public static final double REVERSE_SPEED = 0.5; // TODO
-    }
-
-    public static final class ShooterConstants {
-        public static final Map<Double, Double> SHOOTER_DISTANCE_TO_HOOD_ANGLE = Map.ofEntries(
-                Map.entry(1.0, 88.0),
-                Map.entry(2.0, 85.0),
-                Map.entry(3.0, 70.0),
-                Map.entry(4.0, 67.0),
-                Map.entry(5.0, 63.0),
-                Map.entry(6.0, 60.0),
-                Map.entry(7.0, 58.0),
-                Map.entry(8.0, 57.0));
     }
 
     public static final class HopperConstants {

@@ -4,6 +4,8 @@
 
 package frc.robot.subsystems.shooter;
 
+import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Volts;
 
@@ -15,13 +17,17 @@ import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 
 import edu.wpi.first.math.filter.Debouncer;
+import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.HoodConstants;
+import frc.robot.Constants.MechanismPositionConstants;
 import yams.gearing.MechanismGearing;
 import yams.mechanisms.config.ArmConfig;
+import yams.mechanisms.config.MechanismPositionConfig;
 import yams.mechanisms.positional.Arm;
 import yams.motorcontrollers.SmartMotorController;
 import yams.motorcontrollers.SmartMotorControllerConfig;
@@ -40,6 +46,8 @@ public class HoodSubsystem extends SubsystemBase {
 
     private final Debouncer m_atAngleDebouncer = new Debouncer(HoodConstants.AT_ANGLE_DEBOUNCE_TIME,
             Debouncer.DebounceType.kRising);
+
+    private final InterpolatingDoubleTreeMap m_distanceToHoodAngleMap;
 
     public HoodSubsystem() {
         m_motor = new TalonFX(HoodConstants.MOTOR_CAN_ID);
@@ -79,16 +87,25 @@ public class HoodSubsystem extends SubsystemBase {
                 HoodConstants.MOTOR,
                 m_smcConfig);
 
+        MechanismPositionConfig m_robotToMechanism = new MechanismPositionConfig()
+                .withMaxRobotHeight(MechanismPositionConstants.ROBOT_MAX_HEIGHT)
+                .withMaxRobotLength(MechanismPositionConstants.ROBOT_MAX_LENGTH)
+                .withRelativePosition(HoodConstants.RELATIVE_POSITION);
+
         // The Hood can be modeled as an arm since it has a gravitational force acting
         // on it
         ArmConfig m_hoodConfig = new ArmConfig(m_smartMotorController)
                 .withTelemetry("HoodMech", Constants.TELEMETRY_VERBOSITY)
+                .withMechanismPositionConfig(m_robotToMechanism)
                 .withSoftLimits(HoodConstants.SOFT_LIMIT_MIN, HoodConstants.SOFT_LIMIT_MAX)
                 .withHardLimit(HoodConstants.HARD_LIMIT_MIN, HoodConstants.HARD_LIMIT_MAX)
                 .withLength(HoodConstants.LENGTH)
                 .withMass(HoodConstants.MASS);
 
         m_hood = new Arm(m_hoodConfig);
+
+        m_distanceToHoodAngleMap = new InterpolatingDoubleTreeMap();
+        HoodConstants.SHOOTER_DISTANCE_TO_HOOD_ANGLE.forEach(m_distanceToHoodAngleMap::put);
     }
 
     /**
@@ -151,6 +168,17 @@ public class HoodSubsystem extends SubsystemBase {
 
         return m_atAngleDebouncer.calculate(
                 setpoint.get().isNear(m_hood.getAngle(), HoodConstants.ANGLE_TARGET_ERROR));
+    }
+
+    /**
+     * Gets the target hood angle based on the distance to the target using
+     * interpolation.
+     * 
+     * @param distanceToTarget the distance from the robot to the target
+     * @return the target hood angle
+     */
+    public Angle getAngleToTarget(Distance distanceToTarget) {
+        return Degrees.of(m_distanceToHoodAngleMap.get(distanceToTarget.in(Meters)));
     }
 
     /**
