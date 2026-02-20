@@ -68,6 +68,8 @@ public class ShooterSubsystem extends SubsystemBase {
                                                                                       // running feed/stop commands
                 .withName("SHTR - Aim and Shoot");
     }
+    // TODO: What if we get pushed while we're auto-aiming? This may 'cause
+    // isAutoAimReady to never be true. Maybe lock swerve pose?
 
     public Command shootNoAutoAim() {
         return Commands.parallel(
