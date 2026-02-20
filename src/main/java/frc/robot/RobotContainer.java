@@ -298,6 +298,14 @@ public class RobotContainer {
                         selectRedLeftTrenchTraversal,
                         selectBlueLeftTrenchTraversal,
                         m_swerveSubsystem::isRedAlliance));
+        // Stop shooting to prevent hood from hitting trench
+        m_driverController.triangle().onTrue(
+                new ConditionalCommand(
+                        Commands.sequence( // If intake is active, continue storing fuel
+                                m_shooterSubsystem.stopShooting(),
+                                m_shooterSubsystem.storeFuel()),
+                        m_shooterSubsystem.stopShooting(),
+                        m_driverController.L2()::getAsBoolean));
 
         // Auto-traverse the trench through right side
         m_driverController.square().whileTrue(
@@ -305,7 +313,14 @@ public class RobotContainer {
                         selectRedRightTrenchTraversal,
                         selectBlueRightTrenchTraversal,
                         m_swerveSubsystem::isRedAlliance));
-
+        // Stop shooting to prevent hood from hitting trench
+        m_driverController.square().onTrue(
+                new ConditionalCommand(
+                        Commands.sequence( // If intake is active, continue storing fuel
+                                m_shooterSubsystem.stopShooting(),
+                                m_shooterSubsystem.storeFuel()),
+                        m_shooterSubsystem.stopShooting(),
+                        m_driverController.L2()::getAsBoolean));
     }
 
     /**
