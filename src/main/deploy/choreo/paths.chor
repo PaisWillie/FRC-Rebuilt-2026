@@ -1,5 +1,5 @@
 {
- "name":"trench_teleop",
+ "name":"paths",
  "version":2,
  "type":"Swerve",
  "variables":{

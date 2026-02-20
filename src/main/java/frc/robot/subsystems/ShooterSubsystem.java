@@ -141,6 +141,8 @@ public class ShooterSubsystem extends SubsystemBase {
         return m_hoodSubsystem.sysId();
     }
 
+    // TODO: isShooterAlmostEmpty()
+
     @Override
     public void periodic() {
     }
