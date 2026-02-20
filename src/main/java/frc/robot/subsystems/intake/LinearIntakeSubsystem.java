@@ -35,6 +35,8 @@ public class LinearIntakeSubsystem extends SubsystemBase {
     private final SmartMotorControllerConfig m_linearMotorSMCConfig;
     private final Elevator m_linearIntake;
 
+    // TODO: Add limit switches
+
     public LinearIntakeSubsystem() {
         m_linearMotor = new TalonFX(LinearIntakeConstants.MOTOR_CAN_ID);
 

@@ -94,6 +94,7 @@ public class FlywheelSubsystem extends SubsystemBase {
                 .withSoftLimit(RPM.of(-FlywheelConstants.SOFT_LIMIT_RPM), RPM.of(FlywheelConstants.SOFT_LIMIT_RPM))
                 .withSpeedometerSimulation(FlywheelConstants.SIM_MAX_VELOCITY_RPM)
                 .withMechanismPositionConfig(m_robotToMechanism);
+        // TODO: Add MOI?
 
         m_flywheel = new FlyWheel(m_flywheelConfig);
     }

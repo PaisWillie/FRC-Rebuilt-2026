@@ -606,6 +606,10 @@ public class SwerveSubsystem extends SubsystemBase {
         }
     }
 
+    public boolean isInZone(Zone zone) {
+        return getCurrentZone() == zone;
+    }
+
     /**
      * Gets the distance to the hub.
      *
@@ -727,5 +731,6 @@ public class SwerveSubsystem extends SubsystemBase {
     @Override
     public void simulationPeriodic() {
         SmartDashboard.putBoolean("isAutoAimReady", isAutoAimOnTarget());
+        SmartDashboard.putString("currentZone", getCurrentZone().toString());
     }
 }

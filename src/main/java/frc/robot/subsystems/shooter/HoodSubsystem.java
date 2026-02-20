@@ -101,6 +101,7 @@ public class HoodSubsystem extends SubsystemBase {
                 .withHardLimit(HoodConstants.HARD_LIMIT_MIN, HoodConstants.HARD_LIMIT_MAX)
                 .withLength(HoodConstants.LENGTH)
                 .withMass(HoodConstants.MASS);
+        // TODO: Add MOI?
 
         m_hood = new Arm(m_hoodConfig);
 
