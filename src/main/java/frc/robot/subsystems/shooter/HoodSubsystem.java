@@ -210,6 +210,10 @@ public class HoodSubsystem extends SubsystemBase {
      * @return the command that lowers the hood
      */
     public Command lowerHood() {
+        return m_hood.setAngle(HoodConstants.SOFT_LIMIT_MIN);
+    }
+
+    public Command setDefaultAngle() {
         return m_hood.setAngle(HoodConstants.DEFAULT_ANGLE);
     }
 

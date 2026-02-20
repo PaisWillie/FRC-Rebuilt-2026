@@ -119,16 +119,16 @@ public class RobotContainer {
             .translationHeadingOffset(Rotation2d.fromDegrees(
                     0));
 
-    private DoubleSupplier headingXSupplier() {
+    private DoubleSupplier autoAimHeadingX() {
         return () -> m_swerveSubsystem.getAutoAimHeading().getCos();
     }
 
-    private DoubleSupplier headingYSupplier() {
+    private DoubleSupplier autoAimHeadingY() {
         return () -> -m_swerveSubsystem.getAutoAimHeading().getSin();
     }
 
     SwerveInputStream driveAutoAim = driveAngularVelocity.copy()
-            .withControllerHeadingAxis(headingXSupplier(), headingYSupplier())
+            .withControllerHeadingAxis(autoAimHeadingX(), autoAimHeadingY())
             .headingWhile(true)
             .scaleTranslation(SwerveConstants.AUTO_AIM_SCALE_TRANSLATION);
 
@@ -186,6 +186,7 @@ public class RobotContainer {
         m_driverController.options().onTrue((Commands.runOnce(m_swerveSubsystem::zeroGyro)));
         m_driverController.create().whileTrue(m_swerveSubsystem.centerModulesCommand());
 
+        // Auto-aim (swerve heading with calculated hood angle) and shoot
         m_driverController.R2().whileTrue(driveFieldOrientedAutoAim);
         m_driverController.R2()
                 .onTrue(m_shooterSubsystem.aimAndShoot(m_swerveSubsystem::getDistanceToTarget,
@@ -201,6 +202,24 @@ public class RobotContainer {
                 .onFalse(m_indexerSubsystem.stop()
                         .unless(m_driverController.L2()::getAsBoolean));
 
+        // Shoot without auto-aiming, defaulting to a preset hood angle for shooting
+        // from directly in front of the hub
+        m_driverController.R1()
+                .and(m_driverController.R2().negate())
+                .onTrue(m_shooterSubsystem.shootNoAutoAim())
+                .onFalse(new ConditionalCommand(
+                        Commands.sequence(
+                                m_shooterSubsystem.stopShooting(),
+                                m_shooterSubsystem.storeFuel()),
+                        m_shooterSubsystem.stopShooting(),
+                        m_driverController.L2()::getAsBoolean));
+        m_driverController.R1()
+                .and(m_driverController.R2().negate())
+                .onTrue(m_indexerSubsystem.run())
+                .onFalse(m_indexerSubsystem.stop()
+                        .unless(m_driverController.L2()::getAsBoolean));
+
+        // Extend intake, expand hopper, and run intake rollers
         m_driverController.L2()
                 .onTrue(m_linearIntakeSubsystem.extend())
                 .onFalse(m_linearIntakeSubsystem.retract());
@@ -218,7 +237,7 @@ public class RobotContainer {
                         m_indexerSubsystem.stop()
                                 .unless(m_driverController.R2()::getAsBoolean));
 
-        m_driverController.R1()
+        m_driverController.L1()
                 .and(m_driverController.R2().negate()) // Not shooting
                 .and(m_driverController.L2().negate()) // Not intaking
 
@@ -255,6 +274,7 @@ public class RobotContainer {
                                 SwerveConstants.DRIVE_TO_POSE_ROTATION_MAX_VELOCITY_RAD,
                                 SwerveConstants.DRIVE_TO_POSE_ROTATION_MAX_ACCELERATION_RAD)));
 
+        // Auto-align to left side tower for climbing
         m_driverController.povLeft().whileTrue(
                 Commands.sequence(
                         new InstantCommand(
@@ -263,6 +283,7 @@ public class RobotContainer {
                                 () -> driveAngularVelocity.driveToPoseEnabled(true),
                                 () -> driveAngularVelocity.driveToPoseEnabled(false))));
 
+        // Auto-align to right side tower for climbing
         m_driverController.povRight().whileTrue(
                 Commands.sequence(
                         new InstantCommand(
@@ -271,12 +292,14 @@ public class RobotContainer {
                                 () -> driveAngularVelocity.driveToPoseEnabled(true),
                                 () -> driveAngularVelocity.driveToPoseEnabled(false))));
 
+        // Auto-traverse the trench through left side
         m_driverController.triangle().whileTrue(
                 new ConditionalCommand(
                         selectRedLeftTrenchTraversal,
                         selectBlueLeftTrenchTraversal,
                         m_swerveSubsystem::isRedAlliance));
 
+        // Auto-traverse the trench through right side
         m_driverController.square().whileTrue(
                 new ConditionalCommand(
                         selectRedRightTrenchTraversal,

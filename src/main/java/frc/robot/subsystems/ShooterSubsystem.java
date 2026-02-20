@@ -69,6 +69,14 @@ public class ShooterSubsystem extends SubsystemBase {
                 .withName("SHTR - Aim and Shoot");
     }
 
+    public Command shootNoAutoAim() {
+        return Commands.parallel(
+                m_hoodSubsystem.setDefaultAngle(),
+                m_flywheelSubsystem.shoot(),
+                new ConditionalCommand(m_feederSubsystem.feed(), m_feederSubsystem.stop(), this::isShooterReady)
+                        .repeatedly());
+    }
+
     /**
      * Stops the shooting process by lowering the hood, setting the flywheel to its
      * default RPM, and stopping the feeder.
