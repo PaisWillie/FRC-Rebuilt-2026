@@ -183,55 +183,8 @@ public class RobotContainer {
 
         m_swerveSubsystem.setDefaultCommand(driveFieldOrientedAnglularVelocity);
 
-        // if (Robot.isSimulation()) {
-        // Pose2d target = new Pose2d(new Translation2d(1, 4),
-        // Rotation2d.fromDegrees(90));
-        // // drivebase.getSwerveDrive().field.getObject("targetPose").setPose(target);
-        // driveDirectAngleKeyboard.driveToPose(() -> target,
-        // new ProfiledPIDController(5,
-        // 0,
-        // 0,
-        // new Constraints(5, 2)),
-        // new ProfiledPIDController(5,
-        // 0,
-        // 0,
-        // new Constraints(Units.degreesToRadians(360),
-        // Units.degreesToRadians(180))));
-        // m_driverController.start()
-        // .onTrue(Commands.runOnce(() -> m_swerveSubsystem
-        // .resetOdometry(new Pose2d(3, 3, new Rotation2d()))));
-        // m_driverController.button(1).whileTrue(m_swerveSubsystem.sysIdDriveMotorCommand());
-        // m_driverController.button(2)
-        // .whileTrue(Commands.runEnd(
-        // () -> driveDirectAngleKeyboard.driveToPoseEnabled(true),
-        // () -> driveDirectAngleKeyboard.driveToPoseEnabled(false)));
-
-        // }
-        // if (DriverStation.isTest()) {
-        // m_swerveSubsystem.setDefaultCommand(driveFieldOrientedAnglularVelocity); //
-        // Overrides drive
-        // // command
-        // // above!
-
-        // m_driverController.square()
-        // .whileTrue(Commands.runOnce(() -> m_swerveSubsystem::lock, m_swerveSubsystem)
-        // .repeatedly());
-        // m_driverController.options().onTrue((Commands.runOnce(m_swerveSubsystem::zeroGyro)));
-        // m_driverController.create().whileTrue(m_swerveSubsystem.centerModulesCommand());
-        // m_driverController.L1().onTrue(Commands.none());
-        // } else {
-
-        // m_driverController.L1()
-        // .whileTrue(Commands.runOnce(m_swerveSubsystem::lock, m_swerveSubsystem)
-        // .repeatedly());
-
-        // Cardinal directions for PID tuning
-        // m_driverController.povUp().whileTrue(m_swerveSubsystem.driveForward());
-        // m_driverController.povDown().whileTrue(m_swerveSubsystem.driveBackward());
-        // m_driverController.povLeft().whileTrue(m_swerveSubsystem.driveLeft());
-        // m_driverController.povRight().whileTrue(m_swerveSubsystem.driveRight());
-
         m_driverController.options().onTrue((Commands.runOnce(m_swerveSubsystem::zeroGyro)));
+        m_driverController.create().whileTrue(m_swerveSubsystem.centerModulesCommand());
 
         m_driverController.R2().whileTrue(driveFieldOrientedAutoAim);
         m_driverController.R2()
