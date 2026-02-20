@@ -20,6 +20,7 @@ import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -160,15 +161,19 @@ public class HoodSubsystem extends SubsystemBase {
         return m_hood.getAngle();
     }
 
+    public Optional<Angle> getAngleSetpoint() {
+        return m_hood.getMechanismSetpoint();
+    }
+
     public boolean isAtTargetAngle() {
-        // TODO: Maybe change this to get setpoint from SMC instead of hood
-        Optional<Angle> setpoint = m_hood.getMechanismSetpoint();
+
+        Optional<Angle> setpoint = getAngleSetpoint();
 
         if (!setpoint.isPresent())
             return false;
 
         return m_atAngleDebouncer.calculate(
-                setpoint.get().isNear(m_hood.getAngle(), HoodConstants.ANGLE_TARGET_ERROR));
+                getAngleSetpoint().get().isNear(m_hood.getAngle(), HoodConstants.ANGLE_TARGET_ERROR));
     }
 
     /**
@@ -223,6 +228,12 @@ public class HoodSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
         m_hood.updateTelemetry();
+
+        if (Constants.TELEMETRY) {
+            SmartDashboard.putNumber("HoodMech/angle (deg)", getAngle().in(Degrees));
+            SmartDashboard.putNumber("HoodMech/setpoint (deg)",
+                    getAngleSetpoint().map(angle -> angle.in(Degrees)).orElse(Double.NaN));
+        }
     }
 
     /**

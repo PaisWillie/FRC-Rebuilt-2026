@@ -34,9 +34,10 @@ import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.Mass;
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.units.measure.Voltage;
+import swervelib.telemetry.SwerveDriveTelemetry;
 import yams.gearing.GearBox;
 import yams.gearing.MechanismGearing;
-import yams.motorcontrollers.SmartMotorControllerConfig.TelemetryVerbosity;
+import yams.motorcontrollers.SmartMotorControllerConfig;
 
 public final class Constants {
 
@@ -352,9 +353,11 @@ public final class Constants {
         public static final Distance ROBOT_MAX_LENGTH = Inches.of(27);
     }
 
+    // Consider setting to LOW or MEDIUM for competition to reduce network traffic
+
     // Set the telemetry verbosity for YAMS subsystems
-    public static final TelemetryVerbosity TELEMETRY_VERBOSITY = TelemetryVerbosity.HIGH; // TODO: Consider setting to
-                                                                                          // LOW or MEDIUM for
-                                                                                          // competition to reduce
-                                                                                          // network traffic
+    public static final SmartMotorControllerConfig.TelemetryVerbosity TELEMETRY_VERBOSITY = SmartMotorControllerConfig.TelemetryVerbosity.HIGH; // TODO:
+
+    public static final SwerveDriveTelemetry.TelemetryVerbosity SWERVE_TELEMETRY_VERBOSITY = SwerveDriveTelemetry.TelemetryVerbosity.POSE;
+    public static final boolean TELEMETRY = true; // TODO: Set to false for competition to reduce network traffic
 }

@@ -29,6 +29,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import frc.robot.Constants.SwerveConstants;
+import frc.robot.Constants;
 import frc.robot.FieldConstants;
 import swervelib.SwerveController;
 import swervelib.SwerveDrive;
@@ -69,7 +70,7 @@ public class SwerveSubsystem extends SubsystemBase {
                         Rotation2d.fromDegrees(180));
         // Configure the Telemetry before creating the SwerveDrive to avoid unnecessary
         // objects being created.
-        SwerveDriveTelemetry.verbosity = TelemetryVerbosity.POSE;
+        SwerveDriveTelemetry.verbosity = Constants.SWERVE_TELEMETRY_VERBOSITY;
         try {
             swerveDrive = new SwerveParser(directory).createSwerveDrive(SwerveConstants.MAX_SPEED, startingPose);
             // Alternative method if you don't want to supply the conversion factor via JSON
