@@ -175,7 +175,7 @@
  },
  "generationFeatures":[],
  "codegen":{
-  "root":"Users/paiswillie/Repositories/Willie2026/src/main/deploy/choreo",
+  "root":"../../choreo_code_gen",
   "genVars":true,
   "genTrajData":true,
   "useChoreoLib":true

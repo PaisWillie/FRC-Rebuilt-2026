@@ -174,7 +174,7 @@ public class LinearIntakeSubsystem extends SubsystemBase {
 
         if (Constants.TELEMETRY) {
             SmartDashboard.putNumber("LinearIntakeMech/position (m)", getPosition().in(Meters));
-            SmartDashboard.putNumber("LinearIntakeMech/setpoin (m)",
+            SmartDashboard.putNumber("LinearIntakeMech/setpoint (m)",
                     getSetpoint().map(pos -> pos.in(Meters)).orElse(Double.NaN));
         }
     }
