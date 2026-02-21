@@ -14,6 +14,7 @@ import choreo.auto.AutoChooser;
 import choreo.auto.AutoFactory;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
@@ -28,7 +29,7 @@ import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.Constants.SwerveConstants;
 import frc.robot.subsystems.ClimbSubsystem;
-import frc.robot.subsystems.FuelSimSubsystem;
+import frc.robot.subsystems.SimSubsystem;
 import frc.robot.subsystems.HopperSubsystem;
 import frc.robot.subsystems.IndexerSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
@@ -37,6 +38,8 @@ import frc.robot.subsystems.SwerveSubsystem.Zone;
 import frc.robot.subsystems.intake.IntakeRollerSubsystem;
 import frc.robot.subsystems.intake.LinearIntakeSubsystem;
 import swervelib.SwerveInputStream;
+import swervelib.simulation.ironmaple.simulation.SimulatedArena;
+import swervelib.simulation.ironmaple.simulation.seasonspecific.rebuilt2026.RebuiltFuelOnField;
 
 public class RobotContainer {
     final CommandPS5Controller m_driverController = new CommandPS5Controller(Constants.DRIVER_CONTROLLER_PORT);
@@ -50,7 +53,8 @@ public class RobotContainer {
     private final SwerveSubsystem m_swerveSubsystem = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
             "swerve"));
 
-    private final FuelSimSubsystem m_fuelSimSubsystem = new FuelSimSubsystem();
+    private final SimSubsystem m_simSubsystem = new SimSubsystem(
+            m_swerveSubsystem.getSwerveDrive().getMapleSimDrive().get());
 
     // Choreo
     private final AutoFactory autoFactory = new AutoFactory(
@@ -208,9 +212,11 @@ public class RobotContainer {
                         .unless(m_driverController.L2()::getAsBoolean));
 
         if (Robot.isSimulation()) {
+            SimulatedArena.getInstance().addGamePiece(new RebuiltFuelOnField(new Translation2d(3, 3)));
+
             m_driverController.R2()
                     .whileTrue(Commands.sequence(
-                            FuelSimSubsystem.shootFuel(
+                            m_simSubsystem.shootFuel(
                                     m_shooterSubsystem::getFlywheelLinearVelocity,
                                     m_swerveSubsystem::getPose,
                                     m_swerveSubsystem::getFieldVelocity,
@@ -219,6 +225,10 @@ public class RobotContainer {
                             Commands.waitTime(Seconds.of(0.25)))
                             .onlyIf(() -> m_shooterSubsystem.isShooterReady() && m_swerveSubsystem.isAutoAimOnTarget())
                             .repeatedly());
+
+            m_driverController.L2()
+                    .onTrue(m_simSubsystem.startIntake())
+                    .onFalse(m_simSubsystem.stopIntake());
         }
 
         // Shoot without auto-aiming, defaulting to a preset hood angle for shooting
