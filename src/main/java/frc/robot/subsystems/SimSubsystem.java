@@ -9,6 +9,7 @@ import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 
+import java.util.Optional;
 import java.util.function.Supplier;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -21,7 +22,10 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.LinearVelocity;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -31,7 +35,6 @@ import swervelib.simulation.ironmaple.simulation.SimulatedArena;
 import swervelib.simulation.ironmaple.simulation.drivesims.AbstractDriveTrainSimulation;
 import swervelib.simulation.ironmaple.simulation.seasonspecific.rebuilt2026.RebuiltFuelOnField;
 import swervelib.simulation.ironmaple.simulation.seasonspecific.rebuilt2026.RebuiltFuelOnFly;
-import swervelib.simulation.ironmaple.utils.FieldMirroringUtils;
 
 public class SimSubsystem extends SubsystemBase {
     /** Creates a new FuelSimSubsystem. */
@@ -66,7 +69,7 @@ public class SimSubsystem extends SubsystemBase {
 
     public Command shootFuel(Supplier<LinearVelocity> flywheelLinearVelocity, Supplier<Pose2d> robotPose,
             Supplier<ChassisSpeeds> chassisSpeedsFieldRelative, Supplier<Rotation2d> heading,
-            Supplier<Angle> hoodAngle, Supplier<Boolean> isRedAlliance) {
+            Supplier<Angle> hoodAngle) {
 
         return Commands.runOnce(
                 () -> {
@@ -76,6 +79,11 @@ public class SimSubsystem extends SubsystemBase {
 
                     if (!intakeSimulation.obtainGamePieceFromIntake())
                         return;
+
+                    Optional<Alliance> alliance = DriverStation.getAlliance();
+                    boolean isRedAlliance = alliance.isPresent()
+                            ? alliance.get() == DriverStation.Alliance.Red
+                            : false;
 
                     RebuiltFuelOnFly fuelOnFly = new RebuiltFuelOnFly(
                             // Specify the position of the chassis when the note is launched
@@ -106,7 +114,7 @@ public class SimSubsystem extends SubsystemBase {
                             // Set the target center to the ReBuilt Hub of the current alliance
                             .withTargetPosition(
                                     () -> {
-                                        Translation2d target = isRedAlliance.get() ? FieldConstants.RED_HUB_CENTER
+                                        Translation2d target = isRedAlliance ? FieldConstants.RED_HUB_CENTER
                                                 : FieldConstants.BLUE_HUB_CENTER;
                                         return new Translation3d(target.getX(), target.getY(),
                                                 FieldConstants.HUB_HEIGHT);
@@ -115,8 +123,9 @@ public class SimSubsystem extends SubsystemBase {
                             .withTargetTolerance(
                                     new Translation3d(FieldConstants.HUB_WIDTH, FieldConstants.HUB_WIDTH, 0.5))
                             .withHitTargetCallBack(() -> {
+
                                 outputFuelFromHub(isRedAlliance);
-                                System.out.println("Hit target!");
+                                SimulatedArena.getInstance().addToScore(!isRedAlliance, 1);
                             });
 
                     SimulatedArena.getInstance().addGamePieceProjectile(
@@ -124,14 +133,14 @@ public class SimSubsystem extends SubsystemBase {
                 });
     }
 
-    private void outputFuelFromHub(Supplier<Boolean> isRedAlliance) {
+    private void outputFuelFromHub(boolean isRedAlliance) {
 
-        Translation2d hubLocation = isRedAlliance.get() ? FieldConstants.RED_HUB_CENTER
+        Translation2d hubLocation = isRedAlliance ? FieldConstants.RED_HUB_CENTER
                 : FieldConstants.BLUE_HUB_CENTER;
 
         Translation2d hubOutput = hubLocation.minus(new Translation2d(FieldConstants.HUB_WIDTH / 2, 0));
 
-        Rotation2d hubOutputRotation = isRedAlliance.get() ? Rotation2d.fromDegrees(180) : Rotation2d.fromDegrees(0);
+        Rotation2d hubOutputRotation = isRedAlliance ? Rotation2d.fromDegrees(180) : Rotation2d.fromDegrees(0);
 
         SimulatedArena.getInstance().addGamePieceProjectile(
                 new RebuiltFuelOnFly(
@@ -149,15 +158,13 @@ public class SimSubsystem extends SubsystemBase {
             .publish();
 
     @Override
-    public void periodic() {
-        // Get the positions of the fuel (both on the field and in the air)
-        // fuelPoses.accept(SimulatedArena.getInstance()
-        // .getGamePiecesArrayByType("Fuel")
-        // .toArray(Pose3d[]::new));
-
-        // Pose3d[] fuelPoses = SimulatedArena.getInstance()
-        // .getGamePiecesArrayByType("Fuel");
+    public void simulationPeriodic() {
         this.fuelPoses.accept(SimulatedArena.getInstance()
                 .getGamePiecesArrayByType("Fuel"));
+
+        Optional<Alliance> alliance = DriverStation.getAlliance();
+        boolean isBlueAlliance = alliance.isPresent() ? alliance.get() == DriverStation.Alliance.Blue : false;
+
+        SmartDashboard.putNumber("Score", SimulatedArena.getInstance().getScore(isBlueAlliance));
     }
 }

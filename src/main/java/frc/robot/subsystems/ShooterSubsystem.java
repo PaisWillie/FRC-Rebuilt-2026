@@ -11,11 +11,13 @@ import java.util.function.Supplier;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearVelocity;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Robot;
 import frc.robot.subsystems.shooter.FeederSubsystem;
 import frc.robot.subsystems.shooter.FlywheelSubsystem;
 import frc.robot.subsystems.shooter.HoodSubsystem;
@@ -39,11 +41,12 @@ public class ShooterSubsystem extends SubsystemBase {
      * @return true if the shooter is ready to shoot, false otherwise
      */
     public boolean isShooterReady() {
-        return m_flywheelSubsystem.isAtTargetRPM();
+        // TODO: Remove this one hood mech simulation is fixed
+        if (Robot.isSimulation())
+            return m_flywheelSubsystem.isAtTargetRPM();
 
-        // TODO: Uncomment this
-        // return m_hoodSubsystem.isAtTargetAngle() &&
-        // m_flywheelSubsystem.isAtTargetRPM();
+        return m_hoodSubsystem.isAtTargetAngle() &&
+                m_flywheelSubsystem.isAtTargetRPM();
     }
 
     /**

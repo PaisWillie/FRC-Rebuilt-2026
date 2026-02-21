@@ -24,8 +24,10 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import frc.robot.Constants;
@@ -383,6 +385,17 @@ public class SwerveSubsystem extends SubsystemBase {
      */
     public void zeroGyro() {
         swerveDrive.zeroGyro();
+    }
+
+    /**
+     * Simulates the localization of the robot. Not for use in real life, only for
+     * simulation.
+     */
+    public Command simulationLocalize() {
+        if (RobotBase.isReal())
+            return Commands.none();
+
+        return runOnce(() -> swerveDrive.resetOdometry(new Pose2d(getPose().getTranslation(), getHeading())));
     }
 
     /**

@@ -148,7 +148,7 @@ public class LinearIntakeSubsystem extends SubsystemBase {
     }
 
     public enum LinearIntakePosition {
-        EXTENDED, RETRACTED, FULLY_RETRACTED
+        EXTENDED, RETRACTED, FULLY_RETRACTED, UNKNOWN
     }
 
     public LinearIntakePosition getCurrentPositionEnum() {
@@ -164,7 +164,7 @@ public class LinearIntakeSubsystem extends SubsystemBase {
                 LinearIntakeConstants.POSITION_TARGET_ERROR)) {
             return LinearIntakePosition.FULLY_RETRACTED;
         } else {
-            return null; // or throw an exception, or return an Optional
+            return LinearIntakePosition.UNKNOWN;
         }
     }
 
@@ -176,6 +176,7 @@ public class LinearIntakeSubsystem extends SubsystemBase {
             SmartDashboard.putNumber("LinearIntakeMech/position (m)", getPosition().in(Meters));
             SmartDashboard.putNumber("LinearIntakeMech/setpoint (m)",
                     getSetpoint().map(pos -> pos.in(Meters)).orElse(Double.NaN));
+            SmartDashboard.putString("LinearIntakeMech/currentPositionEnum", getCurrentPositionEnum().name());
         }
     }
 

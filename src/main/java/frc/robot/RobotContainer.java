@@ -37,6 +37,7 @@ import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.SwerveSubsystem.Zone;
 import frc.robot.subsystems.intake.IntakeRollerSubsystem;
 import frc.robot.subsystems.intake.LinearIntakeSubsystem;
+import frc.robot.subsystems.intake.LinearIntakeSubsystem.LinearIntakePosition;
 import swervelib.SwerveInputStream;
 import swervelib.simulation.ironmaple.simulation.SimulatedArena;
 import swervelib.simulation.ironmaple.simulation.seasonspecific.rebuilt2026.RebuiltFuelOnField;
@@ -213,23 +214,30 @@ public class RobotContainer {
 
         if (Robot.isSimulation()) {
             SimulatedArena.getInstance().addGamePiece(new RebuiltFuelOnField(new Translation2d(3, 3)));
-
             m_driverController.R2()
-                    .whileTrue(Commands.sequence(
-                            m_simSubsystem.shootFuel(
-                                    m_shooterSubsystem::getFlywheelLinearVelocity,
-                                    m_swerveSubsystem::getPose,
-                                    m_swerveSubsystem::getFieldVelocity,
-                                    m_swerveSubsystem::getHeading,
-                                    m_shooterSubsystem::getHoodSetpointAngle,
-                                    m_swerveSubsystem::isRedAlliance),
-                            Commands.waitTime(Seconds.of(0.1)))
-                            .onlyIf(() -> m_shooterSubsystem.isShooterReady() && m_swerveSubsystem.isAutoAimOnTarget())
-                            .repeatedly());
+                    .whileTrue(
+                            Commands.sequence(
+                                    m_simSubsystem.shootFuel(
+                                            m_shooterSubsystem::getFlywheelLinearVelocity,
+                                            m_swerveSubsystem::getPose,
+                                            m_swerveSubsystem::getFieldVelocity,
+                                            m_swerveSubsystem::getHeading,
+                                            m_shooterSubsystem::getHoodSetpointAngle),
+                                    Commands.waitTime(Seconds.of(0.1)))
+                                    .onlyIf(() -> m_shooterSubsystem.isShooterReady()
+                                            && m_swerveSubsystem.isAutoAimOnTarget())
+                                    .repeatedly());
 
             m_driverController.L2()
-                    .onTrue(m_simSubsystem.startIntake())
+                    .onTrue(
+                            new ConditionalCommand(m_simSubsystem.startIntake(), m_simSubsystem.stopIntake(),
+                                    () -> m_linearIntakeSubsystem
+                                            .getCurrentPositionEnum() == LinearIntakePosition.EXTENDED)
+                                    .repeatedly())
                     .onFalse(m_simSubsystem.stopIntake());
+
+            m_driverController.L3().onTrue(m_swerveSubsystem.simulationLocalize());
+            m_driverController.R3().onTrue(m_swerveSubsystem.simulationLocalize());
         }
 
         // Shoot without auto-aiming, defaulting to a preset hood angle for shooting
