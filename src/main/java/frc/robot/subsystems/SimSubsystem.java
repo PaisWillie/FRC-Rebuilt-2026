@@ -47,7 +47,7 @@ public class SimSubsystem extends SubsystemBase {
                 // The extension length of the intake beyond the robot's frame (when activated)
                 Meters.of(0.2),
                 // The intake is mounted on the back side of the chassis
-                IntakeSimulation.IntakeSide.BACK,
+                IntakeSimulation.IntakeSide.FRONT,
                 // The intake can hold up to 25 fuel
                 25);
 
