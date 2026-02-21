@@ -24,6 +24,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.Robot;
 import frc.robot.Constants.HoodConstants;
 import frc.robot.Constants.MechanismPositionConstants;
 import yams.gearing.MechanismGearing;
@@ -83,6 +84,10 @@ public class HoodSubsystem extends SubsystemBase {
                 .withExternalEncoderZeroOffset(HoodConstants.EXTERNAL_ENCODER_ZERO_OFFSET)
                 .withUseExternalFeedbackEncoder(true);
 
+        if (Robot.isSimulation()) {
+            m_smcConfig.withStartingPosition(HoodConstants.SOFT_LIMIT_MIN);
+        }
+
         m_smartMotorController = new TalonFXWrapper(
                 m_motor,
                 HoodConstants.MOTOR,
@@ -102,6 +107,11 @@ public class HoodSubsystem extends SubsystemBase {
                 .withHardLimit(HoodConstants.HARD_LIMIT_MIN, HoodConstants.HARD_LIMIT_MAX)
                 .withLength(HoodConstants.LENGTH)
                 .withMass(HoodConstants.MASS);
+
+        if (Robot.isSimulation()) {
+            m_hoodConfig.withStartingPosition(HoodConstants.SOFT_LIMIT_MIN);
+        }
+
         // TODO: Add MOI?
 
         m_hood = new Arm(m_hoodConfig);

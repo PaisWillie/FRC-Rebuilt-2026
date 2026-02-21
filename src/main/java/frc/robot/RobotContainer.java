@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Seconds;
+
 import java.io.File;
 import java.util.Map;
 import java.util.function.DoubleSupplier;
@@ -26,6 +28,7 @@ import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.Constants.SwerveConstants;
 import frc.robot.subsystems.ClimbSubsystem;
+import frc.robot.subsystems.FuelSimSubsystem;
 import frc.robot.subsystems.HopperSubsystem;
 import frc.robot.subsystems.IndexerSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
@@ -46,6 +49,8 @@ public class RobotContainer {
     private final ShooterSubsystem m_shooterSubsystem = new ShooterSubsystem();
     private final SwerveSubsystem m_swerveSubsystem = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
             "swerve"));
+
+    private final FuelSimSubsystem m_fuelSimSubsystem = new FuelSimSubsystem();
 
     // Choreo
     private final AutoFactory autoFactory = new AutoFactory(
@@ -201,6 +206,20 @@ public class RobotContainer {
                 .onTrue(m_indexerSubsystem.run())
                 .onFalse(m_indexerSubsystem.stop()
                         .unless(m_driverController.L2()::getAsBoolean));
+
+        if (Robot.isSimulation()) {
+            m_driverController.R2()
+                    .whileTrue(Commands.sequence(
+                            FuelSimSubsystem.shootFuel(
+                                    m_shooterSubsystem::getFlywheelLinearVelocity,
+                                    m_swerveSubsystem::getPose,
+                                    m_swerveSubsystem::getFieldVelocity,
+                                    m_swerveSubsystem::getHeading,
+                                    m_shooterSubsystem::getHoodAngle),
+                            Commands.waitTime(Seconds.of(0.25)))
+                            .onlyIf(() -> m_shooterSubsystem.isShooterReady() && m_swerveSubsystem.isAutoAimOnTarget())
+                            .repeatedly());
+        }
 
         // Shoot without auto-aiming, defaulting to a preset hood angle for shooting
         // from directly in front of the hub

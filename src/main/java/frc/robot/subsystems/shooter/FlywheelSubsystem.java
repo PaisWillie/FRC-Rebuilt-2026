@@ -3,6 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 package frc.robot.subsystems.shooter;
 
+import static edu.wpi.first.units.Units.FeetPerSecond;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RPM;
@@ -122,6 +123,15 @@ public class FlywheelSubsystem extends SubsystemBase {
     }
 
     /**
+     * Gets the current flywheel velocity.
+     * 
+     * @return the current linear velocity
+     */
+    public LinearVelocity getLinearVelocity() {
+        return m_flywheel.getLinearVelocity();
+    }
+
+    /**
      * Creates a command to set the flywheel velocity.
      *
      * @param speed the target angular velocity
@@ -170,7 +180,7 @@ public class FlywheelSubsystem extends SubsystemBase {
      * @return a Command that starts the flywheel at the shooting RPM when executed
      */
     public Command shoot() {
-        return setVelocity(FlywheelConstants.SHOOTING_VELOCITY_RPM);
+        return setVelocity(FlywheelConstants.SHOOTING_VELOCITY);
     }
 
     /**
@@ -180,7 +190,7 @@ public class FlywheelSubsystem extends SubsystemBase {
      * @return a Command that starts the flywheel at the default RPM when executed
      */
     public Command setDefaultRPM() {
-        return setVelocity(FlywheelConstants.DEFAULT_VELOCITY_RPM);
+        return setVelocity(FlywheelConstants.DEFAULT_VELOCITY);
     }
 
     public Optional<AngularVelocity> getSetpointVelocity() {
@@ -218,6 +228,7 @@ public class FlywheelSubsystem extends SubsystemBase {
         m_flywheel.updateTelemetry();
 
         if (Constants.TELEMETRY) {
+            SmartDashboard.putNumber("FlywheelMech/linearVelocity (fps)", getLinearVelocity().in(FeetPerSecond));
             SmartDashboard.putNumber("FlywheelMech/velocity (RPM)", getVelocity().in(RPM));
             SmartDashboard.putNumber("FlywheelMech/setpoint (RPM)",
                     getSetpointVelocity().map(

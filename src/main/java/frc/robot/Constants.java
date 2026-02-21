@@ -4,6 +4,7 @@ import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Degree;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.DegreesPerSecond;
+import static edu.wpi.first.units.Units.Inch;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
@@ -46,8 +47,8 @@ public final class Constants {
     public static final class SwerveConstants {
         public static final double MAX_SPEED = Units.feetToMeters(14.5); // TODO
 
-        public static final double AUTO_AIM_VELOCITY_COMPENSATION_FACTOR = 0.5; // TODO
-        public static final Angle AUTO_AIM_ANGLE_TARGET_ERROR = Degrees.of(10); // TODO
+        public static final double AUTO_AIM_VELOCITY_COMPENSATION_FACTOR = 1.5; // TODO
+        public static final Angle AUTO_AIM_ANGLE_TARGET_ERROR = Degrees.of(5); // TODO
         public static final double AUTO_AIM_SCALE_TRANSLATION = 0.3; // TODO
 
         // Extra distance past the starting line (towards the neutral zone) that would
@@ -155,7 +156,7 @@ public final class Constants {
         public static final DCMotor MOTOR = DCMotor.getKrakenX60Foc(2);
         public static final GearBox GEARBOX = GearBox.fromReductionStages(0.5); // TODO
 
-        public static final Distance DIAMETER_INCHES = Inches.of(4.0); // TODO
+        public static final Distance DIAMETER_INCHES = Inches.of(3); // TODO
         public static final Mass MASS_POUNDS = Pounds.of(4); // TODO
 
         public static final Current STATOR_CURRENT_LIMIT_AMPS = Amps.of(40); // TODO
@@ -182,10 +183,10 @@ public final class Constants {
 
         public static final double SOFT_LIMIT_RPM = 9000; // TODO
 
-        public static final AngularVelocity DEFAULT_VELOCITY_RPM = RPM.of(5000); // TODO
-        public static final AngularVelocity SHOOTING_VELOCITY_RPM = RPM.of(6700); // TODO
+        public static final AngularVelocity SHOOTING_VELOCITY = RPM.of(2330); // TODO
+        public static final AngularVelocity DEFAULT_VELOCITY = RPM.of(SHOOTING_VELOCITY.times(0.8).in(RPM)); // TODO
 
-        public static final AngularVelocity RPM_TARGET_ERROR = RPM.of(100); // TODO
+        public static final AngularVelocity RPM_TARGET_ERROR = RPM.of(150); // TODO
         public static final double AT_RPM_DEBOUNCE_TIME = 0.2; // TODO
 
         public static final Translation3d RELATIVE_POSITION = new Translation3d(Inches.of(-5.087),
@@ -206,25 +207,25 @@ public final class Constants {
         public static final double PID_kI = 0.0; // TODO
         public static final double PID_kD = 0.0; // TODO
 
-        public static final double SIM_PID_kP = 20; // TODO
-        public static final double SIM_PID_kI = 0.0; // TODO
-        public static final double SIM_PID_kD = 0.0; // TODO
+        public static final double SIM_PID_kP = 16; // TODO
+        public static final double SIM_PID_kI = 7; // TODO
+        public static final double SIM_PID_kD = 1; // TODO
 
         public static final SimpleMotorFeedforward FEEDFORWARD = new SimpleMotorFeedforward(0.27937, 0.089836,
                 0.014557); // TODO
-        public static final SimpleMotorFeedforward SIM_FEEDFORWARD = new SimpleMotorFeedforward(0.27937, 0.089836,
-                0.014557); // TODO
+        public static final SimpleMotorFeedforward SIM_FEEDFORWARD = new SimpleMotorFeedforward(0, 0,
+                0); // TODO
 
         public static final Time CLOSED_LOOP_RAMP_RATE_SEC = Seconds.of(0.25); // TODO
         public static final Time OPEN_LOOP_RAMP_RATE_SEC = Seconds.of(0.25); // TODO
 
-        public static final AngularVelocity MAX_VELOCITY_RPM = RPM.of(5000); // TODO
-        public static final AngularAcceleration MAX_ACCELERATION_RPS2 = RotationsPerSecondPerSecond.of(2500); // TODO
+        public static final AngularVelocity MAX_VELOCITY_RPM = RPM.of(45); // TODO
+        public static final AngularAcceleration MAX_ACCELERATION_RPS2 = RotationsPerSecondPerSecond.of(2); // TODO
 
-        public static final Angle SOFT_LIMIT_MIN = Degrees.of(90 - 79); // TODO
-        public static final Angle SOFT_LIMIT_MAX = Degrees.of(90 - 46); // TODO
-        public static final Angle HARD_LIMIT_MIN = Degrees.of(90 - 79);
-        public static final Angle HARD_LIMIT_MAX = Degrees.of(90 - 46);
+        public static final Angle SOFT_LIMIT_MIN = Degrees.of(3); // TODO
+        public static final Angle SOFT_LIMIT_MAX = Degrees.of(40); // TODO
+        public static final Angle HARD_LIMIT_MIN = Degrees.of(3); // TODO
+        public static final Angle HARD_LIMIT_MAX = Degrees.of(40); // TODO
 
         public static final Distance LENGTH = Inches.of(8.5);
         public static final Mass MASS = Pounds.of(4.39);
@@ -233,24 +234,42 @@ public final class Constants {
         public static final double EXTERNAL_ENCODER_GEARING = 17;
         public static final Angle EXTERNAL_ENCODER_ZERO_OFFSET = Degrees.of(0); // TODO
 
-        public static final Angle ANGLE_TARGET_ERROR = Degrees.of(7); // TODO
+        public static final Angle ANGLE_TARGET_ERROR = Degrees.of(5); // TODO
         public static final double AT_ANGLE_DEBOUNCE_TIME = 0.2; // TODO
 
-        public static final Angle DEFAULT_ANGLE = Degrees.of(90 - 79); // TODO
+        public static final Angle DEFAULT_ANGLE = Degrees.of(13); // TODO
 
         public static final Translation3d RELATIVE_POSITION = new Translation3d(Inches.of(-5.087),
                 Inches.of(9.017),
                 Inches.of(17.912 / 2));
 
         public static final Map<Double, Double> SHOOTER_DISTANCE_TO_HOOD_ANGLE = Map.ofEntries(
-                Map.entry(1.0, 90 - 79.0),
-                Map.entry(2.0, 90 - 67.0),
-                Map.entry(3.0, 90 - 61.0),
-                Map.entry(4.0, 90 - 56.0),
-                Map.entry(5.0, 90 - 52.0),
-                Map.entry(6.0, 90 - 49.0),
-                Map.entry(7.0, 90 - 47.0),
-                Map.entry(8.0, 90 - 46.0));
+                Map.entry(Inch.of(35).in(Meters), 90 - 87.0),
+                Map.entry(Inch.of(45).in(Meters), 90 - 86.0),
+                Map.entry(Inch.of(55).in(Meters), 90 - 85.0),
+                Map.entry(Inch.of(65).in(Meters), 90 - 84.0),
+                Map.entry(Inch.of(75).in(Meters), 90 - 83.0),
+                Map.entry(Inch.of(85).in(Meters), 90 - 82.0),
+                Map.entry(Inch.of(95).in(Meters), 90 - 81.0),
+                Map.entry(Inch.of(105).in(Meters), 90 - 80.0),
+                Map.entry(Inch.of(115).in(Meters), 90 - 79.0),
+                Map.entry(Inch.of(125).in(Meters), 90 - 78.0),
+                Map.entry(Inch.of(135).in(Meters), 90 - 77.0),
+                Map.entry(Inch.of(145).in(Meters), 90 - 76.0),
+                Map.entry(Inch.of(155).in(Meters), 90 - 75.0),
+                Map.entry(Inch.of(165).in(Meters), 90 - 73.5),
+                Map.entry(Inch.of(175).in(Meters), 90 - 72.5),
+                Map.entry(Inch.of(185).in(Meters), 90 - 71.5),
+                Map.entry(Inch.of(195).in(Meters), 90 - 70.0),
+                Map.entry(Inch.of(205).in(Meters), 90 - 69.0),
+                Map.entry(Inch.of(215).in(Meters), 90 - 67.5),
+                Map.entry(Inch.of(225).in(Meters), 90 - 65.5),
+                Map.entry(Inch.of(235).in(Meters), 90 - 64.0),
+                Map.entry(Inch.of(245).in(Meters), 90 - 62.0),
+                Map.entry(Inch.of(255).in(Meters), 90 - 60.0),
+                Map.entry(Inch.of(265).in(Meters), 90 - 57.0),
+                Map.entry(Inch.of(275).in(Meters), 90 - 54.0),
+                Map.entry(Inch.of(280).in(Meters), 90 - 50.0));
     }
 
     public static final class FeederConstants {

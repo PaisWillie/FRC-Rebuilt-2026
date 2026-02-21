@@ -6,7 +6,10 @@ package frc.robot.subsystems;
 
 import java.util.function.Supplier;
 
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -58,14 +61,20 @@ public class ShooterSubsystem extends SubsystemBase {
                         () -> {
                             return m_hoodSubsystem.getAngleToTarget(getDistanceToTarget.get());
                         }),
-                m_flywheelSubsystem.shoot(),
-                new ConditionalCommand(m_feederSubsystem.feed(), m_feederSubsystem.stop(),
-                        () -> isAutoAimReady.get() && isShooterReady()).repeatedly()) // TODO: Find a way to remove the
-                                                                                      // repeatedly(), and instead only
-                                                                                      // switch between feed and stop
-                                                                                      // once the shooter is ready/not
-                                                                                      // ready, instead of constantly
-                                                                                      // running feed/stop commands
+                m_flywheelSubsystem.shoot().andThen(
+                        new ConditionalCommand(m_feederSubsystem.feed(), m_feederSubsystem.stop(),
+                                () -> isAutoAimReady.get() && isShooterReady()).repeatedly())) // TODO: Find a way to
+                                                                                               // remove the
+                                                                                               // repeatedly(), and
+                                                                                               // instead only
+                                                                                               // switch between feed
+                                                                                               // and stop
+                                                                                               // once the shooter is
+                                                                                               // ready/not
+                                                                                               // ready, instead of
+                                                                                               // constantly
+                                                                                               // running feed/stop
+                                                                                               // commands
                 .withName("SHTR - Aim and Shoot");
     }
     // TODO: What if we get pushed while we're auto-aiming? This may 'cause
@@ -142,6 +151,15 @@ public class ShooterSubsystem extends SubsystemBase {
     }
 
     // TODO: isShooterAlmostEmpty()
+
+    // Simulation
+    public LinearVelocity getFlywheelLinearVelocity() {
+        return m_flywheelSubsystem.getLinearVelocity();
+    }
+
+    public Angle getHoodAngle() {
+        return m_hoodSubsystem.getAngle();
+    }
 
     @Override
     public void periodic() {
