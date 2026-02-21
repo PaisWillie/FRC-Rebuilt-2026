@@ -4,10 +4,11 @@
 
 package frc.robot.subsystems;
 
+import static edu.wpi.first.units.Units.Degrees;
+
 import java.util.function.Supplier;
 
 import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -38,7 +39,11 @@ public class ShooterSubsystem extends SubsystemBase {
      * @return true if the shooter is ready to shoot, false otherwise
      */
     public boolean isShooterReady() {
-        return m_hoodSubsystem.isAtTargetAngle() && m_flywheelSubsystem.isAtTargetRPM();
+        return m_flywheelSubsystem.isAtTargetRPM();
+
+        // TODO: Uncomment this
+        // return m_hoodSubsystem.isAtTargetAngle() &&
+        // m_flywheelSubsystem.isAtTargetRPM();
     }
 
     /**
@@ -159,6 +164,11 @@ public class ShooterSubsystem extends SubsystemBase {
 
     public Angle getHoodAngle() {
         return m_hoodSubsystem.getAngle();
+    }
+
+    public Angle getHoodSetpointAngle() {
+        // TODO: Change `orElse()` statement default
+        return m_hoodSubsystem.getAngleSetpoint().orElse(Degrees.of(0));
     }
 
     @Override

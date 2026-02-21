@@ -14,6 +14,9 @@ public final class FieldConstants {
 
     public static final Translation2d RED_HUB_CENTER = new Translation2d(11.9087646, 4.0345);
 
+    public static final double HUB_HEIGHT = Units.inchesToMeters(72.0);
+    public static final double HUB_WIDTH = Units.inchesToMeters(47.0);
+
     public static final double BLUE_STARTING_LINE_X = 4.0218614;
     public static final double RED_STARTING_LINE_X = 12.519177399999998;
 

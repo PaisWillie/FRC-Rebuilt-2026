@@ -7,6 +7,7 @@ package frc.robot.subsystems;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.MetersPerSecond;
 
 import java.util.function.Supplier;
 
@@ -65,7 +66,7 @@ public class SimSubsystem extends SubsystemBase {
 
     public Command shootFuel(Supplier<LinearVelocity> flywheelLinearVelocity, Supplier<Pose2d> robotPose,
             Supplier<ChassisSpeeds> chassisSpeedsFieldRelative, Supplier<Rotation2d> heading,
-            Supplier<Angle> hoodAngle) {
+            Supplier<Angle> hoodAngle, Supplier<Boolean> isRedAlliance) {
 
         return Commands.runOnce(
                 () -> {
@@ -79,18 +80,22 @@ public class SimSubsystem extends SubsystemBase {
                     RebuiltFuelOnFly fuelOnFly = new RebuiltFuelOnFly(
                             // Specify the position of the chassis when the note is launched
                             robotPose.get().getTranslation(),
-                            // Specify the translation of the shooter from the robot center (in the
+                            // Specify the translation of the shooter from the robot center
+                            // (in the
                             // shooter’s reference frame)
                             new Translation2d(Inches.of(-5.087),
                                     Inches.of(0)),
-                            // Specify the field-relative speed of the chassis, adding it to the initial
+                            // Specify the field-relative speed of the chassis, adding it to
+                            // the initial
                             // velocity of the projectile
                             chassisSpeedsFieldRelative.get(),
-                            // The shooter facing direction is the same as the robot’s facing direction
+                            // The shooter facing direction is the same as the robot’s
+                            // facing direction
                             heading.get(),
                             // Initial height of the flying fuel
                             Inches.of(21.75),
-                            // The launch speed is proportional to the RPM; assumed to be 20 meters/second
+                            // The launch speed is proportional to the RPM; assumed to be 20
+                            // meters/second
                             // at 6000 RPM
                             flywheelLinearVelocity.get(),
                             // MetersPerSecond.of(5),
@@ -98,21 +103,49 @@ public class SimSubsystem extends SubsystemBase {
                             Degrees.of(90).plus(hoodAngle.get()));
 
                     fuelOnFly
-                            // Set the target center to the Rebbuilt Hub of the current alliance
+                            // Set the target center to the ReBuilt Hub of the current alliance
                             .withTargetPosition(
-                                    () -> FieldMirroringUtils
-                                            .toCurrentAllianceTranslation(new Translation3d(0.25, 5.56, 2.3)))
-                            // Set the tolerance: x: ±0.5m, y: ±1.2m, z: ±0.3m (this is the size of the
-                            // speaker's "mouth")
-                            .withTargetTolerance(new Translation3d(0.5, 1.2, 0.3));
+                                    () -> {
+                                        Translation2d target = isRedAlliance.get() ? FieldConstants.RED_HUB_CENTER
+                                                : FieldConstants.BLUE_HUB_CENTER;
+                                        return new Translation3d(target.getX(), target.getY(),
+                                                FieldConstants.HUB_HEIGHT);
+                                    })
+                            // Set the taraget tolerance
+                            .withTargetTolerance(
+                                    new Translation3d(FieldConstants.HUB_WIDTH, FieldConstants.HUB_WIDTH, 0.5))
+                            .withHitTargetCallBack(() -> {
+                                outputFuelFromHub(isRedAlliance);
+                                System.out.println("Hit target!");
+                            });
 
                     SimulatedArena.getInstance().addGamePieceProjectile(
                             fuelOnFly);
                 });
     }
 
+    private void outputFuelFromHub(Supplier<Boolean> isRedAlliance) {
+
+        Translation2d hubLocation = isRedAlliance.get() ? FieldConstants.RED_HUB_CENTER
+                : FieldConstants.BLUE_HUB_CENTER;
+
+        Translation2d hubOutput = hubLocation.minus(new Translation2d(FieldConstants.HUB_WIDTH / 2, 0));
+
+        Rotation2d hubOutputRotation = isRedAlliance.get() ? Rotation2d.fromDegrees(180) : Rotation2d.fromDegrees(0);
+
+        SimulatedArena.getInstance().addGamePieceProjectile(
+                new RebuiltFuelOnFly(
+                        hubOutput,
+                        new Translation2d(0, 0),
+                        new ChassisSpeeds(0, 0, 0),
+                        hubOutputRotation,
+                        Meters.of(FieldConstants.HUB_HEIGHT / 2),
+                        MetersPerSecond.of(3),
+                        Degrees.of(-30)));
+    }
+
     StructArrayPublisher<Pose3d> fuelPoses = NetworkTableInstance.getDefault()
-            .getStructArrayTopic("MyPoseArray", Pose3d.struct)
+            .getStructArrayTopic("Fuel", Pose3d.struct)
             .publish();
 
     @Override
