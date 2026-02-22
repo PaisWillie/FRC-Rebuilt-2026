@@ -195,8 +195,8 @@ public final class Constants {
     }
 
     public static final class HoodConstants {
-        public static final int MOTOR_CAN_ID = 21; // TODO
-        public static final int ENCODER_CAN_ID = 22; // TODO
+        public static final int MOTOR_CAN_ID = 22; // TODO
+        public static final int ENCODER_CAN_ID = 6; // TODO
 
         public static final DCMotor MOTOR = DCMotor.getKrakenX44Foc(1);
         public static final GearBox GEARBOX = GearBox.fromReductionStages(8);
@@ -232,7 +232,7 @@ public final class Constants {
 
         public static final boolean EXTERNAL_ENCODER_INVERTED = false; // TODO
         public static final double EXTERNAL_ENCODER_GEARING = 17;
-        public static final Angle EXTERNAL_ENCODER_ZERO_OFFSET = Degrees.of(0); // TODO
+        public static final Angle EXTERNAL_ENCODER_ZERO_OFFSET = Degrees.of(163.8); // TODO
 
         public static final Angle ANGLE_TARGET_ERROR = Degrees.of(5); // TODO
         public static final double AT_ANGLE_DEBOUNCE_TIME = 0.2; // TODO
