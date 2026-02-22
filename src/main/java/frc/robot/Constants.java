@@ -199,7 +199,7 @@ public final class Constants {
         public static final int ENCODER_CAN_ID = 6; // TODO
 
         public static final DCMotor MOTOR = DCMotor.getKrakenX44Foc(1);
-        public static final GearBox GEARBOX = GearBox.fromReductionStages(8);
+        public static final GearBox GEARBOX = GearBox.fromReductionStages(129.523809524);
 
         public static final Current STATOR_CURRENT_LIMIT_AMPS = Amps.of(40); // TODO
 
@@ -230,7 +230,7 @@ public final class Constants {
         public static final Distance LENGTH = Inches.of(8.5);
         public static final Mass MASS = Pounds.of(4.39);
 
-        public static final boolean EXTERNAL_ENCODER_INVERTED = false; // TODO
+        public static final boolean EXTERNAL_ENCODER_INVERTED = true; // TODO
         public static final double EXTERNAL_ENCODER_GEARING = 17;
         public static final Angle EXTERNAL_ENCODER_ZERO_OFFSET = Degrees.of(163.8); // TODO
 
