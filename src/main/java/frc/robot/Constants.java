@@ -195,10 +195,10 @@ public final class Constants {
     }
 
     public static final class HoodConstants {
-        public static final int MOTOR_CAN_ID = 4; // TODO
-        public static final int ENCODER_CAN_ID = 5; // TODO
+        public static final int MOTOR_CAN_ID = 21; // TODO
+        public static final int ENCODER_CAN_ID = 22; // TODO
 
-        public static final DCMotor MOTOR = DCMotor.getKrakenX60Foc(1);
+        public static final DCMotor MOTOR = DCMotor.getKrakenX44Foc(1);
         public static final GearBox GEARBOX = GearBox.fromReductionStages(8);
 
         public static final Current STATOR_CURRENT_LIMIT_AMPS = Amps.of(40); // TODO
@@ -211,21 +211,21 @@ public final class Constants {
         public static final double SIM_PID_kI = 7; // TODO
         public static final double SIM_PID_kD = 1; // TODO
 
-        public static final SimpleMotorFeedforward FEEDFORWARD = new SimpleMotorFeedforward(0.27937, 0.089836,
-                0.014557); // TODO
+        public static final SimpleMotorFeedforward FEEDFORWARD = new SimpleMotorFeedforward(0, 0,
+                0); // TODO
         public static final SimpleMotorFeedforward SIM_FEEDFORWARD = new SimpleMotorFeedforward(0, 0,
                 0); // TODO
 
         public static final Time CLOSED_LOOP_RAMP_RATE_SEC = Seconds.of(0.25); // TODO
         public static final Time OPEN_LOOP_RAMP_RATE_SEC = Seconds.of(0.25); // TODO
 
-        public static final AngularVelocity MAX_VELOCITY_RPM = RPM.of(45); // TODO
-        public static final AngularAcceleration MAX_ACCELERATION_RPS2 = RotationsPerSecondPerSecond.of(2); // TODO
+        public static final AngularVelocity MAX_VELOCITY_RPM = RPM.of(6000); // TODO
+        public static final AngularAcceleration MAX_ACCELERATION_RPS2 = RotationsPerSecondPerSecond.of(0.314); // TODO
 
-        public static final Angle SOFT_LIMIT_MIN = Degrees.of(3); // TODO
-        public static final Angle SOFT_LIMIT_MAX = Degrees.of(40); // TODO
-        public static final Angle HARD_LIMIT_MIN = Degrees.of(3); // TODO
-        public static final Angle HARD_LIMIT_MAX = Degrees.of(40); // TODO
+        public static final Angle SOFT_LIMIT_MIN = Degrees.of(5.5); // TODO
+        public static final Angle SOFT_LIMIT_MAX = Degrees.of(43); // TODO
+        public static final Angle HARD_LIMIT_MIN = Degrees.of(5.5);
+        public static final Angle HARD_LIMIT_MAX = Degrees.of(43);
 
         public static final Distance LENGTH = Inches.of(8.5);
         public static final Mass MASS = Pounds.of(4.39);
@@ -244,9 +244,6 @@ public final class Constants {
                 Inches.of(17.912 / 2));
 
         public static final Map<Double, Double> SHOOTER_DISTANCE_TO_HOOD_ANGLE = Map.ofEntries(
-                Map.entry(Inch.of(35).in(Meters), 90 - 87.0),
-                Map.entry(Inch.of(45).in(Meters), 90 - 86.0),
-                Map.entry(Inch.of(55).in(Meters), 90 - 85.0),
                 Map.entry(Inch.of(65).in(Meters), 90 - 84.0),
                 Map.entry(Inch.of(75).in(Meters), 90 - 83.0),
                 Map.entry(Inch.of(85).in(Meters), 90 - 82.0),
@@ -269,7 +266,7 @@ public final class Constants {
                 Map.entry(Inch.of(255).in(Meters), 90 - 60.0),
                 Map.entry(Inch.of(265).in(Meters), 90 - 57.0),
                 Map.entry(Inch.of(275).in(Meters), 90 - 54.0),
-                Map.entry(Inch.of(280).in(Meters), 90 - 50.0));
+                Map.entry(Inch.of(280).in(Meters), 90 - 50.0)); // TODO
     }
 
     public static final class FeederConstants {
