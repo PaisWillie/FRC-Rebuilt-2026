@@ -199,7 +199,7 @@ public final class Constants {
         public static final int ENCODER_CAN_ID = 6; // TODO
 
         public static final DCMotor MOTOR = DCMotor.getKrakenX44Foc(1);
-        public static final GearBox GEARBOX = GearBox.fromReductionStages(129.523809524);
+        public static final GearBox GEARBOX = GearBox.fromReductionStages(80.0 / 14.0, 24.0 / 18.0, 170.0 / 10.0);
 
         public static final Current STATOR_CURRENT_LIMIT_AMPS = Amps.of(40); // TODO
 

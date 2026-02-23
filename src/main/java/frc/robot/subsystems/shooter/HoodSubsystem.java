@@ -40,7 +40,7 @@ import yams.motorcontrollers.remote.TalonFXWrapper;
 public class HoodSubsystem extends SubsystemBase {
 
     private final TalonFX m_motor;
-    private final CANcoder m_encoder;
+    // private final CANcoder m_encoder;
 
     private final SmartMotorController m_smartMotorController;
 
@@ -53,7 +53,7 @@ public class HoodSubsystem extends SubsystemBase {
 
     public HoodSubsystem() {
         m_motor = new TalonFX(HoodConstants.MOTOR_CAN_ID);
-        m_encoder = new CANcoder(HoodConstants.ENCODER_CAN_ID);
+        // m_encoder = new CANcoder(HoodConstants.ENCODER_CAN_ID);
 
         SmartMotorControllerConfig m_smcConfig = new SmartMotorControllerConfig(this)
                 .withClosedLoopController(
@@ -78,11 +78,12 @@ public class HoodSubsystem extends SubsystemBase {
                 .withFeedforward(HoodConstants.FEEDFORWARD)
                 .withSimFeedforward(HoodConstants.SIM_FEEDFORWARD)
                 .withControlMode(ControlMode.CLOSED_LOOP)
-                .withExternalEncoder(m_encoder)
-                .withExternalEncoderInverted(HoodConstants.EXTERNAL_ENCODER_INVERTED)
-                .withExternalEncoderGearing(HoodConstants.EXTERNAL_ENCODER_GEARING)
-                .withExternalEncoderZeroOffset(HoodConstants.EXTERNAL_ENCODER_ZERO_OFFSET)
-                .withUseExternalFeedbackEncoder(true);
+                .withStartingPosition(HoodConstants.SOFT_LIMIT_MIN);
+        // .withExternalEncoder(m_encoder)
+        // .withExternalEncoderInverted(HoodConstants.EXTERNAL_ENCODER_INVERTED)
+        // .withExternalEncoderGearing(HoodConstants.EXTERNAL_ENCODER_GEARING)
+        // .withExternalEncoderZeroOffset(HoodConstants.EXTERNAL_ENCODER_ZERO_OFFSET)
+        // .withUseExternalFeedbackEncoder(true);
 
         if (Robot.isSimulation()) {
             m_smcConfig.withStartingPosition(HoodConstants.SOFT_LIMIT_MIN);
@@ -106,7 +107,8 @@ public class HoodSubsystem extends SubsystemBase {
                 .withSoftLimits(HoodConstants.SOFT_LIMIT_MIN, HoodConstants.SOFT_LIMIT_MAX)
                 .withHardLimit(HoodConstants.HARD_LIMIT_MIN, HoodConstants.HARD_LIMIT_MAX)
                 .withLength(HoodConstants.LENGTH)
-                .withMass(HoodConstants.MASS);
+                .withMass(HoodConstants.MASS)
+                .withStartingPosition(HoodConstants.SOFT_LIMIT_MIN);
 
         if (Robot.isSimulation()) {
             m_hoodConfig.withStartingPosition(HoodConstants.SOFT_LIMIT_MIN);
