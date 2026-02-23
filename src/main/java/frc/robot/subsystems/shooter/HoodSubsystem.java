@@ -13,7 +13,6 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 import com.ctre.phoenix6.SignalLogger;
-import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 
 import edu.wpi.first.math.filter.Debouncer;
@@ -24,9 +23,9 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
-import frc.robot.Robot;
 import frc.robot.Constants.HoodConstants;
 import frc.robot.Constants.MechanismPositionConstants;
+import frc.robot.Robot;
 import yams.gearing.MechanismGearing;
 import yams.mechanisms.config.ArmConfig;
 import yams.mechanisms.config.MechanismPositionConfig;
@@ -129,7 +128,7 @@ public class HoodSubsystem extends SubsystemBase {
      */
     public Command sysId() {
         return m_hood.sysId(
-                Volts.of(4), Volts.of(0.5).per(Second), Second.of(8))
+                Volts.of(2), Volts.of(0.5).per(Second), Second.of(8))
                 .beforeStarting(
                         () -> SignalLogger.start())
                 .finallyDo(() -> SignalLogger.stop());

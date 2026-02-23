@@ -195,24 +195,24 @@ public final class Constants {
     }
 
     public static final class HoodConstants {
-        public static final int MOTOR_CAN_ID = 22; // TODO
-        public static final int ENCODER_CAN_ID = 6; // TODO
+        public static final int MOTOR_CAN_ID = 22;
+        public static final int ENCODER_CAN_ID = 6;
 
         public static final DCMotor MOTOR = DCMotor.getKrakenX44Foc(1);
         public static final GearBox GEARBOX = GearBox.fromReductionStages(80.0 / 14.0, 24.0 / 18.0, 170.0 / 10.0);
 
         public static final Current STATOR_CURRENT_LIMIT_AMPS = Amps.of(40); // TODO
 
-        public static final double PID_kP = 1; // TODO
+        public static final double PID_kP = 30.865; // TODO
         public static final double PID_kI = 0.0; // TODO
-        public static final double PID_kD = 0.0; // TODO
+        public static final double PID_kD = 3.0998; // TODO
 
         public static final double SIM_PID_kP = 16; // TODO
         public static final double SIM_PID_kI = 7; // TODO
         public static final double SIM_PID_kD = 1; // TODO
 
-        public static final SimpleMotorFeedforward FEEDFORWARD = new SimpleMotorFeedforward(0, 0,
-                0); // TODO
+        public static final SimpleMotorFeedforward FEEDFORWARD = new SimpleMotorFeedforward(0.2417, 11.922,
+                0.37754); // TODO
         public static final SimpleMotorFeedforward SIM_FEEDFORWARD = new SimpleMotorFeedforward(0, 0,
                 0); // TODO
 
@@ -227,6 +227,8 @@ public final class Constants {
         public static final Angle HARD_LIMIT_MIN = Degrees.of(5.5);
         public static final Angle HARD_LIMIT_MAX = Degrees.of(43);
 
+        public static final Angle DEFAULT_ANGLE = Degrees.of(13); // TODO
+
         public static final Distance LENGTH = Inches.of(8.5);
         public static final Mass MASS = Pounds.of(4.39);
 
@@ -236,8 +238,6 @@ public final class Constants {
 
         public static final Angle ANGLE_TARGET_ERROR = Degrees.of(5); // TODO
         public static final double AT_ANGLE_DEBOUNCE_TIME = 0.2; // TODO
-
-        public static final Angle DEFAULT_ANGLE = Degrees.of(13); // TODO
 
         public static final Translation3d RELATIVE_POSITION = new Translation3d(Inches.of(-5.087),
                 Inches.of(9.017),
