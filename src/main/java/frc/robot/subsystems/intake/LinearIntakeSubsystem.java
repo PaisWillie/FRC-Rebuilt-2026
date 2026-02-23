@@ -44,7 +44,10 @@ public class LinearIntakeSubsystem extends SubsystemBase {
 
     public LinearIntakeSubsystem() {
         m_motor = new TalonFX(LinearIntakeConstants.MOTOR_CAN_ID);
+<<<<<<< HEAD
         m_motor.getConfigurator().apply(new TalonFXConfiguration());
+=======
+>>>>>>> 82f1061 (fix: refactor vars)
 
         m_smcConfig = new SmartMotorControllerConfig(this)
                 .withMechanismCircumference(LinearIntakeConstants.MOTOR_CIRCUMFERENCE)
