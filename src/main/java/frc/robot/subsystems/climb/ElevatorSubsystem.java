@@ -99,10 +99,8 @@ public class ElevatorSubsystem extends SubsystemBase {
                  */
                 .withMass(ElevatorConstants.MASS)
                 .withStartingHeight(ElevatorConstants.STARTING_HEIGHT) // The starting position should ONLY be
-                                                                       // defined if you are
-                // NOT using
-                // an
-                // absolute encoder.
+                                                                       // defined if you are NOT using an absolute
+                                                                       // encoder.
                 .withTelemetry("ExponentiallyProfiledElevator", Constants.TELEMETRY_VERBOSITY)
                 /*
                  * Simulation configuration options for the arm.
