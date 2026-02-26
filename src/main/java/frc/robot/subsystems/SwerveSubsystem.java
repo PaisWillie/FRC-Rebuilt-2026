@@ -633,6 +633,27 @@ public class SwerveSubsystem extends SubsystemBase {
         return Meters.of(position.getDistance(getAutoAimTarget()));
     }
 
+    private Translation2d getFutureTranslation() {
+        Translation2d robotTranslation = getPose().getTranslation();
+
+        ChassisSpeeds fieldRelativeChassisSpeeds = getFieldVelocity();
+
+        Translation2d deltaPos = new Translation2d(fieldRelativeChassisSpeeds.vxMetersPerSecond,
+                fieldRelativeChassisSpeeds.vyMetersPerSecond);
+
+        return robotTranslation.plus(deltaPos.times(SwerveConstants.AUTO_AIM_VELOCITY_COMPENSATION_FACTOR));
+    }
+
+    /**
+     * Gets the distance to the hub.
+     *
+     * @return the distance to the hub to the center of the robot in meters
+     */
+    public Distance getDistanceToTarget(boolean useVelocityCompensation) {
+        Translation2d position = useVelocityCompensation ? getFutureTranslation() : getPose().getTranslation();
+        return Meters.of(position.getDistance(getAutoAimTarget()));
+    }
+
     /**
      * Gets the target translation for auto-aiming based on the current zone and
      * alliance.
@@ -682,19 +703,8 @@ public class SwerveSubsystem extends SubsystemBase {
      * velocity of the robot, and the target translation for auto-aiming.
      */
     private void calculateAutoAimHeading() {
-        Translation2d robotTranslation = getPose().getTranslation();
+        Translation2d delta = getAutoAimTarget().minus(getFutureTranslation());
 
-        ChassisSpeeds fieldRelativeChassisSpeeds = getFieldVelocity();
-
-        Translation2d deltaPos = new Translation2d(fieldRelativeChassisSpeeds.vxMetersPerSecond,
-                fieldRelativeChassisSpeeds.vyMetersPerSecond);
-
-        Translation2d futureTranslation = robotTranslation
-                .plus(deltaPos.times(SwerveConstants.AUTO_AIM_VELOCITY_COMPENSATION_FACTOR));
-
-        Translation2d target = getAutoAimTarget();
-
-        Translation2d delta = target.minus(futureTranslation);
         autoAimTargetRotation = delta.getAngle().plus(Rotation2d.fromDegrees(90));
     }
 

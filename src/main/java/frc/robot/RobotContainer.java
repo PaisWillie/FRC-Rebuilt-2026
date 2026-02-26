@@ -157,34 +157,50 @@ public class RobotContainer {
 
     private final Command selectRedLeftTrenchTraversal = new SelectCommand<>(
             Map.ofEntries(
-                    Map.entry(Zone.RED_ALLIANCE_LEFT, autoFactory.trajectoryCmd("TrenchLeftFromAlliance")),
-                    Map.entry(Zone.NEUTRAL_ZONE_RED_LEFT, autoFactory.trajectoryCmd("TrenchLeftToAlliance")),
-                    Map.entry(Zone.NEUTRAL_ZONE_BLUE_RIGHT, autoFactory.trajectoryCmd("TrenchLeftToOpponent")),
-                    Map.entry(Zone.BLUE_ALLIANCE_RIGHT, autoFactory.trajectoryCmd("TrenchLeftFromOpponent"))),
+                    Map.entry(Zone.RED_ALLIANCE_LEFT,
+                            autoFactory.trajectoryCmd("TrenchLeftFromAlliance")),
+                    Map.entry(Zone.NEUTRAL_ZONE_RED_LEFT,
+                            autoFactory.trajectoryCmd("TrenchLeftToAlliance")),
+                    Map.entry(Zone.NEUTRAL_ZONE_BLUE_RIGHT,
+                            autoFactory.trajectoryCmd("TrenchLeftToOpponent")),
+                    Map.entry(Zone.BLUE_ALLIANCE_RIGHT,
+                            autoFactory.trajectoryCmd("TrenchLeftFromOpponent"))),
             m_swerveSubsystem::getCurrentZone);
 
     private final Command selectRedRightTrenchTraversal = new SelectCommand<>(
             Map.ofEntries(
-                    Map.entry(Zone.RED_ALLIANCE_RIGHT, autoFactory.trajectoryCmd("TrenchRightFromAlliance")),
-                    Map.entry(Zone.NEUTRAL_ZONE_RED_RIGHT, autoFactory.trajectoryCmd("TrenchRightToAlliance")),
-                    Map.entry(Zone.NEUTRAL_ZONE_BLUE_LEFT, autoFactory.trajectoryCmd("TrenchRightToOpponent")),
-                    Map.entry(Zone.BLUE_ALLIANCE_LEFT, autoFactory.trajectoryCmd("TrenchRightFromOpponent"))),
+                    Map.entry(Zone.RED_ALLIANCE_RIGHT,
+                            autoFactory.trajectoryCmd("TrenchRightFromAlliance")),
+                    Map.entry(Zone.NEUTRAL_ZONE_RED_RIGHT,
+                            autoFactory.trajectoryCmd("TrenchRightToAlliance")),
+                    Map.entry(Zone.NEUTRAL_ZONE_BLUE_LEFT,
+                            autoFactory.trajectoryCmd("TrenchRightToOpponent")),
+                    Map.entry(Zone.BLUE_ALLIANCE_LEFT,
+                            autoFactory.trajectoryCmd("TrenchRightFromOpponent"))),
             m_swerveSubsystem::getCurrentZone);
 
     private final Command selectBlueLeftTrenchTraversal = new SelectCommand<>(
             Map.ofEntries(
-                    Map.entry(Zone.BLUE_ALLIANCE_LEFT, autoFactory.trajectoryCmd("TrenchLeftFromAlliance")),
-                    Map.entry(Zone.NEUTRAL_ZONE_BLUE_LEFT, autoFactory.trajectoryCmd("TrenchLeftToAlliance")),
-                    Map.entry(Zone.NEUTRAL_ZONE_RED_RIGHT, autoFactory.trajectoryCmd("TrenchLeftToOpponent")),
-                    Map.entry(Zone.RED_ALLIANCE_RIGHT, autoFactory.trajectoryCmd("TrenchLeftFromOpponent"))),
+                    Map.entry(Zone.BLUE_ALLIANCE_LEFT,
+                            autoFactory.trajectoryCmd("TrenchLeftFromAlliance")),
+                    Map.entry(Zone.NEUTRAL_ZONE_BLUE_LEFT,
+                            autoFactory.trajectoryCmd("TrenchLeftToAlliance")),
+                    Map.entry(Zone.NEUTRAL_ZONE_RED_RIGHT,
+                            autoFactory.trajectoryCmd("TrenchLeftToOpponent")),
+                    Map.entry(Zone.RED_ALLIANCE_RIGHT,
+                            autoFactory.trajectoryCmd("TrenchLeftFromOpponent"))),
             m_swerveSubsystem::getCurrentZone);
 
     private final Command selectBlueRightTrenchTraversal = new SelectCommand<>(
             Map.ofEntries(
-                    Map.entry(Zone.BLUE_ALLIANCE_RIGHT, autoFactory.trajectoryCmd("TrenchRightFromAlliance")),
-                    Map.entry(Zone.NEUTRAL_ZONE_BLUE_RIGHT, autoFactory.trajectoryCmd("TrenchRightToAlliance")),
-                    Map.entry(Zone.NEUTRAL_ZONE_RED_LEFT, autoFactory.trajectoryCmd("TrenchRightToOpponent")),
-                    Map.entry(Zone.RED_ALLIANCE_LEFT, autoFactory.trajectoryCmd("TrenchRightFromOpponent"))),
+                    Map.entry(Zone.BLUE_ALLIANCE_RIGHT,
+                            autoFactory.trajectoryCmd("TrenchRightFromAlliance")),
+                    Map.entry(Zone.NEUTRAL_ZONE_BLUE_RIGHT,
+                            autoFactory.trajectoryCmd("TrenchRightToAlliance")),
+                    Map.entry(Zone.NEUTRAL_ZONE_RED_LEFT,
+                            autoFactory.trajectoryCmd("TrenchRightToOpponent")),
+                    Map.entry(Zone.RED_ALLIANCE_LEFT,
+                            autoFactory.trajectoryCmd("TrenchRightFromOpponent"))),
             m_swerveSubsystem::getCurrentZone);
 
     private void configureBindings() {
@@ -199,7 +215,8 @@ public class RobotContainer {
         // Auto-aim (swerve heading with calculated hood angle) and shoot
         m_driverController.R2().whileTrue(driveFieldOrientedAutoAim);
         m_driverController.R2()
-                .onTrue(m_shooterSubsystem.aimAndShoot(m_swerveSubsystem::getDistanceToTarget,
+                .onTrue(m_shooterSubsystem.aimAndShoot(
+                        () -> m_swerveSubsystem.getDistanceToTarget(true),
                         m_swerveSubsystem::isAutoAimOnTarget))
                 .onFalse(new ConditionalCommand(
                         Commands.sequence(
@@ -224,13 +241,16 @@ public class RobotContainer {
                                             m_swerveSubsystem::getHeading,
                                             m_shooterSubsystem::getHoodSetpointAngle),
                                     Commands.waitTime(Seconds.of(0.1)))
-                                    .onlyIf(() -> m_shooterSubsystem.isShooterReady()
-                                            && m_swerveSubsystem.isAutoAimOnTarget())
+                                    .onlyIf(() -> m_shooterSubsystem
+                                            .isShooterReady()
+                                            && m_swerveSubsystem
+                                                    .isAutoAimOnTarget())
                                     .repeatedly());
 
             m_driverController.L2()
                     .onTrue(
-                            new ConditionalCommand(m_simSubsystem.startIntake(), m_simSubsystem.stopIntake(),
+                            new ConditionalCommand(m_simSubsystem.startIntake(),
+                                    m_simSubsystem.stopIntake(),
                                     () -> m_linearIntakeSubsystem
                                             .getCurrentPositionEnum() == LinearIntakePosition.EXTENDED)
                                     .repeatedly())
