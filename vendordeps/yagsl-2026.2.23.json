@@ -1,13 +1,7 @@
 {
-<<<<<<<< HEAD:vendordeps/yagsl-2026.2.21.json
-    "fileName": "yagsl-2026.2.21.json",
+    "fileName": "yagsl-2026.2.23.json",
     "name": "YAGSL",
-    "version": "2026.2.21",
-========
-    "fileName": "yagsl-2026.1.30.json",
-    "name": "YAGSL",
-    "version": "2026.1.30",
->>>>>>>> 8e7ab8b (feat: update vendor deps):vendordeps/yagsl-2026.1.30.json
+    "version": "2026.2.23",
     "frcYear": "2026",
     "uuid": "1ccce5a4-acd2-4d18-bca3-4b8047188400",
     "mavenUrls": [
@@ -19,11 +13,7 @@
         {
             "groupId": "swervelib",
             "artifactId": "YAGSL-java",
-<<<<<<<< HEAD:vendordeps/yagsl-2026.2.21.json
-            "version": "2026.2.21"
-========
-            "version": "2026.1.30"
->>>>>>>> 8e7ab8b (feat: update vendor deps):vendordeps/yagsl-2026.1.30.json
+            "version": "2026.2.23"
         },
         {
             "groupId": "org.dyn4j",
