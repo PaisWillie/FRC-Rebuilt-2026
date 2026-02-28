@@ -719,7 +719,7 @@ public class SwerveSubsystem extends SubsystemBase {
     public boolean isAutoAimOnTarget() {
         Rotation2d currentHeading = getHeading();
         double angleError = Math
-                .abs(currentHeading.minus(autoAimTargetRotation.minus(Rotation2d.fromDegrees(90))).getDegrees());
+                .abs(currentHeading.minus(autoAimTargetRotation.plus(Rotation2d.fromDegrees(90))).getDegrees());
         return angleError < SwerveConstants.AUTO_AIM_ANGLE_TARGET_ERROR.in(Degrees);
     }
 
@@ -749,6 +749,10 @@ public class SwerveSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
+        if (Constants.TELEMETRY) {
+            SmartDashboard.putNumber("autoAimHeading", getAutoAimHeading().getDegrees());
+            SmartDashboard.putNumber("currentHeading", getHeading().getDegrees());
+        }
     }
 
     @Override
