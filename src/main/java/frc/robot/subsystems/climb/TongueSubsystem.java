@@ -8,7 +8,6 @@ import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Volts;
 
 import com.ctre.phoenix6.SignalLogger;
-import com.revrobotics.spark.SparkLowLevel;
 import com.thethriftybot.devices.ThriftyNova;
 import com.thethriftybot.devices.ThriftyNova.MotorType;
 
@@ -28,7 +27,6 @@ import yams.motorcontrollers.SmartMotorControllerConfig.ControlMode;
 import yams.motorcontrollers.SmartMotorControllerConfig.MotorMode;
 import yams.motorcontrollers.SmartMotorControllerConfig.TelemetryVerbosity;
 import yams.motorcontrollers.local.NovaWrapper;
-import yams.motorcontrollers.local.SparkWrapper;
 
 public class TongueSubsystem extends SubsystemBase {
 
