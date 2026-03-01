@@ -801,6 +801,12 @@ public class SwerveSubsystem extends SubsystemBase {
         }
 
         // Required for megatag2
+        limelightC.getSettings()
+                .withRobotOrientation(new Orientation3d(swerveDrive.getGyroRotation3d(),
+                        new AngularVelocity3d(DegreesPerSecond.of(0),
+                                DegreesPerSecond.of(0),
+                                DegreesPerSecond.of(0))))
+                .save();
         limelightA.getSettings()
                 .withRobotOrientation(new Orientation3d(swerveDrive.getGyroRotation3d(),
                         new AngularVelocity3d(DegreesPerSecond.of(0),
