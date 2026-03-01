@@ -57,9 +57,9 @@ public class SwerveSubsystem extends SubsystemBase {
     private final SwerveDrive swerveDrive;
 
     Limelight limelightA;
-    Limelight limelightC;
+    // Limelight limelightC;
     LimelightPoseEstimator poseEstimatorA;
-    LimelightPoseEstimator poseEstimatorC;
+    // LimelightPoseEstimator poseEstimatorC;
 
     private Rotation2d autoAimTargetRotation = new Rotation2d();
 
@@ -126,13 +126,13 @@ public class SwerveSubsystem extends SubsystemBase {
                 .withLimelightLEDMode(LEDMode.PipelineControl)
                 .save();
 
-        limelightC = new Limelight("limelight-c");
-        limelightC.getSettings()
-                .withLimelightLEDMode(LEDMode.PipelineControl)
-                .save();
+        // limelightC = new Limelight("limelight-c");
+        // limelightC.getSettings()
+        // .withLimelightLEDMode(LEDMode.PipelineControl)
+        // .save();
 
         poseEstimatorA = limelightA.createPoseEstimator(EstimationMode.MEGATAG2);
-        poseEstimatorC = limelightC.createPoseEstimator(EstimationMode.MEGATAG2);
+        // poseEstimatorC = limelightC.createPoseEstimator(EstimationMode.MEGATAG2);
     }
 
     /**
@@ -784,22 +784,22 @@ public class SwerveSubsystem extends SubsystemBase {
         }
 
         // Required for megatag2
-        limelightC.getSettings()
-                .withRobotOrientation(new Orientation3d(swerveDrive.getGyroRotation3d(),
-                        new AngularVelocity3d(DegreesPerSecond.of(0),
-                                DegreesPerSecond.of(0),
-                                DegreesPerSecond.of(0))))
-                .save();
         limelightA.getSettings()
                 .withRobotOrientation(new Orientation3d(swerveDrive.getGyroRotation3d(),
                         new AngularVelocity3d(DegreesPerSecond.of(0),
                                 DegreesPerSecond.of(0),
                                 DegreesPerSecond.of(0))))
                 .save();
+        // limelightC.getSettings()
+        // .withRobotOrientation(new Orientation3d(swerveDrive.getGyroRotation3d(),
+        // new AngularVelocity3d(DegreesPerSecond.of(0),
+        // DegreesPerSecond.of(0),
+        // DegreesPerSecond.of(0))))
+        // .save();
 
         // Get the vision estimate.
         addVisionMeasurement(poseEstimatorA);
-        addVisionMeasurement(poseEstimatorC);
+        // addVisionMeasurement(poseEstimatorC);
     }
 
     @Override
