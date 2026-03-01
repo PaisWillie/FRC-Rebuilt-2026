@@ -182,16 +182,16 @@ public final class Constants {
 
         public static final Current STATOR_CURRENT_LIMIT_AMPS = Amps.of(50);
 
-        public static final double PID_kP = 0.85; // TODO
+        public static final double PID_kP = 0.8; // TODO
         public static final double PID_kI = 0.0; // TODO
-        public static final double PID_kD = 0.0; // TODO
+        public static final double PID_kD = 0.5; // TODO
 
         public static final double SIM_PID_kP = 0.075; // TODO
         public static final double SIM_PID_kI = 0.0; // TODO
         public static final double SIM_PID_kD = 0.0; // TODO
 
-        public static final SimpleMotorFeedforward FEEDFORWARD = new SimpleMotorFeedforward(0.52872, 0.062754,
-                0.013174);
+        public static final SimpleMotorFeedforward FEEDFORWARD = new SimpleMotorFeedforward(0.42811, 0.09177,
+                0.0093253);
         public static final SimpleMotorFeedforward SIM_FEEDFORWARD = new SimpleMotorFeedforward(2.25,
                 0.0, 0.0); // TODO
 

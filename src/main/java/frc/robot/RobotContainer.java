@@ -23,6 +23,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SelectCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
+import frc.robot.Constants.FlywheelConstants;
 import frc.robot.Constants.HoodConstants;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.Constants.SwerveConstants;
@@ -407,7 +408,7 @@ public class RobotContainer {
         SmartDashboard.putNumber(
                 "Hood Angle", HoodConstants.SOFT_LIMIT_MIN.in(Degrees));
         SmartDashboard.putNumber(
-                "RPM", HoodConstants.SOFT_LIMIT_MIN.in(Degrees));
+                "RPM", 0);
 
         m_driverController.R2().onTrue(
                 Commands.parallel(
@@ -434,6 +435,8 @@ public class RobotContainer {
                         Commands.parallel(
                                 m_feederSubsystem.stop(),
                                 m_indexerSubsystem.stop()));
+
+        m_driverController.cross().whileTrue(m_flywheelSubsystem.sysId());
     }
 
     /**
