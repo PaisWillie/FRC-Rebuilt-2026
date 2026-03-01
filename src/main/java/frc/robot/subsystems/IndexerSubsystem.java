@@ -79,14 +79,14 @@ public class IndexerSubsystem extends SubsystemBase {
     public Command run() {
         return new ConditionalCommand(
                 this.runOnce(() -> setSpeed(IndexerConstants.INDEXER_FULL_SPEED)),
-                this.runOnce(() -> setSpeed(0)),
+                this.runOnce(() -> setSpeed(IndexerConstants.INDEXER_HALF_SPEED)),
                 this::useFullSpeed).repeatedly();
     }
 
     public Command reverse() {
         return new ConditionalCommand(
                 this.runOnce(() -> setSpeed(-IndexerConstants.INDEXER_FULL_SPEED)),
-                this.runOnce(() -> setSpeed(0)),
+                this.runOnce(() -> setSpeed(-IndexerConstants.INDEXER_HALF_SPEED)),
                 this::useFullSpeed).repeatedly();
     }
 

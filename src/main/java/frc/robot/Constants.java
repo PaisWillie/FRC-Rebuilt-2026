@@ -95,11 +95,11 @@ public final class Constants {
     public static class IndexerConstants {
         public static final int MOTOR_CAN_ID = 19;
 
-        public static final int MOTOR_STATOR_CURRENT_LIMIT = -1; // TODO
-        public static final int MOTOR_SUPPLY_CURRENT_LIMIT = -1; // TODO
+        public static final int MOTOR_STATOR_CURRENT_LIMIT = 40; // TODO
+        public static final int MOTOR_SUPPLY_CURRENT_LIMIT = 70; // TODO
 
         public static final double INDEXER_FULL_SPEED = 1; // TODO
-        public static final double INDEXER_HALF_SPEED = 0.1; // TODO
+        public static final double INDEXER_HALF_SPEED = 0; // TODO
     }
 
     public static class IntakeConstants {
@@ -174,14 +174,14 @@ public final class Constants {
         public static final double PID_kI = 0.0; // TODO
         public static final double PID_kD = 0.0; // TODO
 
-        public static final double SIM_PID_kP = 5; // TODO
+        public static final double SIM_PID_kP = 0.075; // TODO
         public static final double SIM_PID_kI = 0.0; // TODO
         public static final double SIM_PID_kD = 0.0; // TODO
 
         public static final SimpleMotorFeedforward FEEDFORWARD = new SimpleMotorFeedforward(0.52872, 0.062754,
                 0.013174);
-        public static final SimpleMotorFeedforward SIM_FEEDFORWARD = new SimpleMotorFeedforward(0.27937, 0.089836,
-                0.014557); // TODO
+        public static final SimpleMotorFeedforward SIM_FEEDFORWARD = new SimpleMotorFeedforward(2.25,
+                0.0, 0.0); // TODO
 
         public static final Time CLOSED_LOOP_RAMP_RATE_SEC = Seconds.of(0.25);
         public static final Time OPEN_LOOP_RAMP_RATE_SEC = Seconds.of(0.25);
