@@ -236,7 +236,6 @@ public class RobotContainer {
 
         // Auto-aim (swerve heading with calculated hood angle) and shoot
         m_driverController.R2().whileTrue(driveFieldOrientedAutoAim);
-
         // m_driverController.R2()
         // .onTrue(m_shooterSubsystem.aimAndShoot(
         // () -> m_swerveSubsystem.getDistanceToTarget(true),
