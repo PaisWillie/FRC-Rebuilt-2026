@@ -6,7 +6,6 @@ package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.DegreesPerSecond;
-import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meter;
 import static edu.wpi.first.units.Units.Meters;
 
@@ -21,9 +20,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -62,8 +59,10 @@ public class SwerveSubsystem extends SubsystemBase {
     private final SwerveDrive swerveDrive;
     SwerveDrivePoseEstimator swerveDrivePoseEstimator;
 
-    Limelight limelight;
-    LimelightPoseEstimator poseEstimator;
+    Limelight limelightA;
+    Limelight limelightC;
+    LimelightPoseEstimator poseEstimatorA;
+    LimelightPoseEstimator poseEstimatorC;
 
     private Rotation2d autoAimTargetRotation = new Rotation2d();
 
@@ -125,11 +124,18 @@ public class SwerveSubsystem extends SubsystemBase {
     }
 
     public void setupLimeLight() {
-        limelight = new Limelight("limelight-a");
-        limelight.getSettings()
+        limelightA = new Limelight("limelight-a");
+        limelightA.getSettings()
                 .withLimelightLEDMode(LEDMode.PipelineControl)
                 .save();
-        poseEstimator = limelight.createPoseEstimator(EstimationMode.MEGATAG2);
+
+        limelightC = new Limelight("limelight-c");
+        limelightC.getSettings()
+                .withLimelightLEDMode(LEDMode.PipelineControl)
+                .save();
+
+        poseEstimatorA = limelightA.createPoseEstimator(EstimationMode.MEGATAG2);
+        poseEstimatorC = limelightC.createPoseEstimator(EstimationMode.MEGATAG2);
     }
 
     /**
@@ -774,6 +780,19 @@ public class SwerveSubsystem extends SubsystemBase {
         return m_selectedClimbPose;
     }
 
+    private void addVisionMeasurement(LimelightPoseEstimator poseEstimator) {
+        Optional<PoseEstimate> visionEstimate = poseEstimator.getPoseEstimate();
+        visionEstimate.ifPresent((PoseEstimate poseEstimate) -> {
+            // If the average tag distance is less than 4 meters, there are more than 0 tags
+            // in view, and the average ambiguity between tags is less than 30% then we
+            // update the pose estimation.
+            if (poseEstimate.avgTagDist < 4 && poseEstimate.tagCount > 0 && poseEstimate.getMinTagAmbiguity() < 0.3) {
+                swerveDrive.addVisionMeasurement(poseEstimate.pose.toPose2d(),
+                        poseEstimate.timestampSeconds);
+            }
+        });
+    }
+
     @Override
     public void periodic() {
         if (Constants.TELEMETRY) {
@@ -782,7 +801,7 @@ public class SwerveSubsystem extends SubsystemBase {
         }
 
         // Required for megatag2
-        limelight.getSettings()
+        limelightA.getSettings()
                 .withRobotOrientation(new Orientation3d(swerveDrive.getGyroRotation3d(),
                         new AngularVelocity3d(DegreesPerSecond.of(0),
                                 DegreesPerSecond.of(0),
@@ -790,17 +809,8 @@ public class SwerveSubsystem extends SubsystemBase {
                 .save();
 
         // Get the vision estimate.
-        Optional<PoseEstimate> visionEstimate = poseEstimator.getPoseEstimate(); // BotPose.BLUE_MEGATAG2.get(limelight);
-        visionEstimate.ifPresent((PoseEstimate poseEstimate) -> {
-            // If the average tag distance is less than 4 meters,
-            // there are more than 0 tags in view,
-            // and the average ambiguity between tags is less than 30% then we update the
-            // pose estimation.
-            if (poseEstimate.avgTagDist < 4 && poseEstimate.tagCount > 0 && poseEstimate.getMinTagAmbiguity() < 0.3) {
-                swerveDrive.addVisionMeasurement(poseEstimate.pose.toPose2d(),
-                        poseEstimate.timestampSeconds);
-            }
-        });
+        addVisionMeasurement(poseEstimatorA);
+        addVisionMeasurement(poseEstimatorC);
     }
 
     @Override
