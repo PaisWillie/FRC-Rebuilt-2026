@@ -50,6 +50,14 @@ public class SwerveSubsystem extends SubsystemBase {
      */
     private final SwerveDrive swerveDrive;
 
+<<<<<<< HEAD
+=======
+    // Limelight limelightA;
+    // Limelight limelightC;
+    // LimelightPoseEstimator poseEstimatorA;
+    // LimelightPoseEstimator poseEstimatorC;
+
+>>>>>>> ce357cc (fix: temp disable limelights)
     private Rotation2d autoAimTargetRotation = new Rotation2d();
 
     private Pose2d m_selectedClimbPose;
@@ -105,6 +113,26 @@ public class SwerveSubsystem extends SubsystemBase {
         }
 
         m_choreoControllerHeading.enableContinuousInput(-Math.PI, Math.PI);
+<<<<<<< HEAD
+=======
+
+        setupLimelight();
+    }
+
+    public void setupLimelight() {
+        // limelightA = new Limelight("limelight-a");
+        // limelightA.getSettings()
+        // .withLimelightLEDMode(LEDMode.PipelineControl)
+        // .save();
+
+        // limelightC = new Limelight("limelight-c");
+        // limelightC.getSettings()
+        // .withLimelightLEDMode(LEDMode.PipelineControl)
+        // .save();
+
+        // poseEstimatorA = limelightA.createPoseEstimator(EstimationMode.MEGATAG2);
+        // poseEstimatorC = limelightC.createPoseEstimator(EstimationMode.MEGATAG2);
+>>>>>>> ce357cc (fix: temp disable limelights)
     }
 
     /**
