@@ -21,9 +21,6 @@ import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.Constants.SwerveConstants;
-import frc.robot.subsystems.HopperSubsystem;
-import frc.robot.subsystems.IndexerSubsystem;
-import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.SimSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.SwerveSubsystem.Zone;
@@ -201,6 +198,14 @@ public class RobotContainer {
 
         m_driverController.options().onTrue((Commands.runOnce(m_swerveSubsystem::zeroGyroWithAlliance)));
         m_driverController.create().whileTrue(m_swerveSubsystem.centerModulesCommand());
+
+        m_driverController.square().whileTrue(m_swerveSubsystem.sysIdDriveMotorCommand());
+        m_driverController.triangle().whileTrue(m_swerveSubsystem.sysIdAngleMotorCommand());
+
+        m_driverController.povUp().whileTrue(m_swerveSubsystem.driveForward());
+        m_driverController.povDown().whileTrue(m_swerveSubsystem.driveBackward());
+        m_driverController.povLeft().whileTrue(m_swerveSubsystem.driveLeft());
+        m_driverController.povRight().whileTrue(m_swerveSubsystem.driveRight());
 
         // TODO: Maybe run indexer while intaking?
         // m_driverController.L2().whileTrue(

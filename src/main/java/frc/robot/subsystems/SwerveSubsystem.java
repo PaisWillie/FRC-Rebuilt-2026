@@ -14,6 +14,8 @@ import java.util.Optional;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
+import com.ctre.phoenix6.SignalLogger;
+
 import choreo.trajectory.SwerveSample;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
@@ -115,7 +117,10 @@ public class SwerveSubsystem extends SubsystemBase {
                 SwerveDriveTest.setDriveSysIdRoutine(
                         new Config(),
                         this, swerveDrive, 12, true),
-                3.0, 5.0, 3.0);
+                3.0, 5.0, 3.0)
+                .beforeStarting(
+                        () -> SignalLogger.start())
+                .finallyDo(() -> SignalLogger.stop());
     }
 
     /**
@@ -128,7 +133,10 @@ public class SwerveSubsystem extends SubsystemBase {
                 SwerveDriveTest.setAngleSysIdRoutine(
                         new Config(),
                         this, swerveDrive),
-                3.0, 5.0, 3.0);
+                3.0, 5.0, 3.0)
+                .beforeStarting(
+                        () -> SignalLogger.start())
+                .finallyDo(() -> SignalLogger.stop());
     }
 
     /**
