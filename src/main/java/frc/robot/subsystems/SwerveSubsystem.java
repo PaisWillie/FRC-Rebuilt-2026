@@ -64,10 +64,6 @@ public class SwerveSubsystem extends SubsystemBase {
 
     Limelight limelight;
     LimelightPoseEstimator poseEstimator;
-    Pose3d cameraOffset = new Pose3d(Inches.of(5).in(Meters),
-            Inches.of(5).in(Meters),
-            Inches.of(5).in(Meters),
-            Rotation3d.kZero); // TODO: Set camera offset
 
     private Rotation2d autoAimTargetRotation = new Rotation2d();
 
@@ -132,7 +128,6 @@ public class SwerveSubsystem extends SubsystemBase {
         limelight = new Limelight("limelight-a");
         limelight.getSettings()
                 .withLimelightLEDMode(LEDMode.PipelineControl)
-                .withCameraOffset(cameraOffset)
                 .save();
         poseEstimator = limelight.createPoseEstimator(EstimationMode.MEGATAG2);
     }
