@@ -180,9 +180,9 @@ public final class Constants {
         public static final Distance DIAMETER_INCHES = Inches.of(3);
         public static final MomentOfInertia MOI = KilogramSquareMeters.of(0.0006438072);
 
-        public static final Current STATOR_CURRENT_LIMIT_AMPS = Amps.of(50);
+        public static final Current STATOR_CURRENT_LIMIT_AMPS = Amps.of(80);
 
-        public static final double PID_kP = 0.8; // TODO
+        public static final double PID_kP = 0.7; // TODO
         public static final double PID_kI = 0.0; // TODO
         public static final double PID_kD = 0.5; // TODO
 
@@ -226,7 +226,7 @@ public final class Constants {
 
         public static final Current STATOR_CURRENT_LIMIT_AMPS = Amps.of(40); // TODO
 
-        public static final double PID_kP = 30.865; // TODO
+        public static final double PID_kP = 1700; // TODO
         public static final double PID_kI = 0.0; // TODO
         public static final double PID_kD = 3.0998; // TODO
 
