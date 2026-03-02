@@ -23,7 +23,6 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SelectCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
-import frc.robot.Constants.FlywheelConstants;
 import frc.robot.Constants.HoodConstants;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.Constants.SwerveConstants;
@@ -32,17 +31,11 @@ import frc.robot.subsystems.SimSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.SwerveSubsystem.Zone;
 import frc.robot.subsystems.intake.IntakeRollerSubsystem;
-import frc.robot.subsystems.intake.LinearIntakeSubsystem;
-import frc.robot.subsystems.intake.LinearIntakeSubsystem.LinearIntakePosition;
-import limelight.Limelight;
-import limelight.networktables.LimelightSettings.ImuMode;
-import swervelib.SwerveInputStream;
-import swervelib.simulation.ironmaple.simulation.SimulatedArena;
-import swervelib.simulation.ironmaple.simulation.seasonspecific.rebuilt2026.RebuiltFuelOnField;
-import frc.robot.utils.LimelightWrapper;
 import frc.robot.subsystems.shooter.FeederSubsystem;
 import frc.robot.subsystems.shooter.FlywheelSubsystem;
 import frc.robot.subsystems.shooter.HoodSubsystem;
+import frc.robot.utils.LimelightWrapper;
+import limelight.networktables.LimelightSettings.ImuMode;
 import swervelib.SwerveInputStream;
 
 public class RobotContainer {
@@ -61,6 +54,7 @@ public class RobotContainer {
     private final FlywheelSubsystem m_flywheelSubsystem = new FlywheelSubsystem();
     private final FeederSubsystem m_feederSubsystem = new FeederSubsystem();
     private final IndexerSubsystem m_indexerSubsystem = new IndexerSubsystem();
+    private final IntakeRollerSubsystem m_intakeRollerSubsystem = new IntakeRollerSubsystem();
 
     private final SwerveSubsystem m_swerveSubsystem = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
             "swerve"));
@@ -435,6 +429,8 @@ public class RobotContainer {
                         Commands.parallel(
                                 m_feederSubsystem.stop(),
                                 m_indexerSubsystem.stop()));
+
+        m_driverController.L2().onTrue(m_intakeRollerSubsystem.intake()).onFalse(m_intakeRollerSubsystem.stop());
 
         m_driverController.cross().whileTrue(m_flywheelSubsystem.sysId());
     }
