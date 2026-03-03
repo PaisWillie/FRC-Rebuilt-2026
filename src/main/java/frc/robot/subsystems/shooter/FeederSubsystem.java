@@ -95,7 +95,7 @@ public class FeederSubsystem extends SubsystemBase {
      */
     public Command sysId() {
         return m_feeder.sysId(
-                Volts.of(10), Volts.of(1).per(Second), Second.of(20))
+                Volts.of(12), Volts.of(1).per(Second), Second.of(15))
                 .beforeStarting(
                         () -> SignalLogger.start())
                 .finallyDo(() -> SignalLogger.stop());
