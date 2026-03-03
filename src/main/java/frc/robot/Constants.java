@@ -113,39 +113,44 @@ public final class Constants {
             public static final int MOTOR_CAN_ID = 18;
             public static final DCMotor MOTOR = DCMotor.getKrakenX60Foc(1);
 
-            public static final Distance MOTOR_CIRCUMFERENCE = Inches.of(0.8).times(Math.PI);
-            public static final GearBox GEARBOX = GearBox.fromReductionStages(5.0625);
+            public static final int EXTENDED_LIMIT_SWITCH_DIO = 0; // TODO
+            public static final int RETRACTED_LIMIT_SWITCH_DIO = 1; // TODO
+
+            public static final boolean INVERT_MOTOR = true;
+
+            public static final Distance MOTOR_CIRCUMFERENCE = Inches.of(1).times(Math.PI);
+            public static final GearBox GEARBOX = GearBox.fromStages("54:16", "18:12");
             public static final Mass MECHANISM_MASS = Pounds.of(6.825);
             public static final Angle MECHANISM_ANGLE = Degrees.of(-24.159);
 
-            public static final double PID_kP = 1.0; // TODO
-            public static final double PID_kI = 0.0; // TODO
-            public static final double PID_kD = 0.0; // TODO
+            public static final double PID_kP = 34.935;
+            public static final double PID_kI = 0.0;
+            public static final double PID_kD = 0.9684;
 
             public static final double SIM_PID_kP = 10.0; // TODO
             public static final double SIM_PID_kI = 0.0; // TODO
             public static final double SIM_PID_kD = 0.0; // TODO
 
-            public static final SimpleMotorFeedforward FEEDFORWARD = new SimpleMotorFeedforward(0, 0, 0, 0.1); // TODO
+            public static final ElevatorFeedforward FEEDFORWARD = new ElevatorFeedforward(0.28669, 0.04,
+                    0.60431, 0.021882); // TODO: Set kg to negative?
 
-            public static final LinearVelocity MAX_VELOCITY = MetersPerSecond.of(0.5); // TODO
-            public static final LinearAcceleration MAX_ACCELERATION = MetersPerSecondPerSecond.of(0.5); // TODO
+            public static final LinearVelocity MAX_VELOCITY = MetersPerSecond.of(2); // TODO
+            public static final LinearAcceleration MAX_ACCELERATION = MetersPerSecondPerSecond.of(6.5); // TODO
 
             public static final Time CLOSED_LOOP_RAMP_RATE = Seconds.of(0.25);
             public static final Time OPEN_LOOP_RAMP_RATE = Seconds.of(0.25);
 
-            public static final Current STATOR_CURRENT_LIMIT = Amps.of(40); // TODO
+            public static final Current STATOR_CURRENT_LIMIT = Amps.of(40);
 
-            public static final Distance SOFT_LIMIT_MIN = Inches.of(0);
-            public static final Distance SOFT_LIMIT_MAX = Inches.of(16.7); // TODO
-            public static final Distance HARD_LIMIT_MIN = Inches.of(0);
-            public static final Distance HARD_LIMIT_MAX = Inches.of(16.7); // TODO
+            public static final Distance SOFT_LIMIT_MIN = Meters.of(0);
+            public static final Distance SOFT_LIMIT_MAX = Meters.of(0.33);
+            public static final Distance HARD_LIMIT_MIN = Meters.of(0);
+            public static final Distance HARD_LIMIT_MAX = Meters.of(0.33); // TODO
 
-            public static final Distance STARTING_HEIGHT = Inches.of(0);
-            public static final Distance EXTENDED_POSITION = Inches.of(16.7); // TODO
-            public static final Distance RETRACTED_POSITION = Inches.of(10.0); // TODO
+            public static final Distance EXTENDED_POSITION = SOFT_LIMIT_MAX;
+            public static final Distance MIDPOINT_POSITION = Meters.of(0.154995);
             public static final Distance POSITION_TARGET_ERROR = Inches.of(0.5); // TODO
-            public static final Distance FULLY_RETRACTED_POSITION = Inches.of(0);
+            public static final Distance RETRACTED_POSITION = SOFT_LIMIT_MIN;
 
             public static final Translation3d RELATIVE_POSITION = new Translation3d(Inches.of(0),
                     Inches.of(10.682),

@@ -11,10 +11,12 @@ import static edu.wpi.first.units.Units.Volts;
 import java.util.Optional;
 
 import com.ctre.phoenix6.SignalLogger;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
 
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -32,17 +34,19 @@ import yams.motorcontrollers.SmartMotorControllerConfig.MotorMode;
 import yams.motorcontrollers.remote.TalonFXWrapper;
 
 public class LinearIntakeSubsystem extends SubsystemBase {
-    private final TalonFX m_linearMotor;
-    private final SmartMotorController m_linearMotorSMC;
-    private final SmartMotorControllerConfig m_linearMotorSMCConfig;
+    private final TalonFX m_motor;
+    private final SmartMotorController m_smartMotorController;
+    private final SmartMotorControllerConfig m_smcConfig;
     private final Elevator m_linearIntake;
 
-    // TODO: Add limit switches
+    private final DigitalInput m_extendedLimitSwitch;
+    private final DigitalInput m_retractedLimitSwitch;
 
     public LinearIntakeSubsystem() {
-        m_linearMotor = new TalonFX(LinearIntakeConstants.MOTOR_CAN_ID);
+        m_motor = new TalonFX(LinearIntakeConstants.MOTOR_CAN_ID);
+        m_motor.getConfigurator().apply(new TalonFXConfiguration());
 
-        m_linearMotorSMCConfig = new SmartMotorControllerConfig(this)
+        m_smcConfig = new SmartMotorControllerConfig(this)
                 .withMechanismCircumference(LinearIntakeConstants.MOTOR_CIRCUMFERENCE)
                 .withClosedLoopController(
                         LinearIntakeConstants.PID_kP,
@@ -63,38 +67,41 @@ public class LinearIntakeSubsystem extends SubsystemBase {
                 .withIdleMode(MotorMode.BRAKE)
                 .withTelemetry("LinearIntakeMotor", Constants.TELEMETRY_VERBOSITY)
                 .withStatorCurrentLimit(LinearIntakeConstants.STATOR_CURRENT_LIMIT)
-                .withMotorInverted(false)
+                .withMotorInverted(LinearIntakeConstants.INVERT_MOTOR)
                 .withClosedLoopRampRate(LinearIntakeConstants.CLOSED_LOOP_RAMP_RATE)
                 .withOpenLoopRampRate(LinearIntakeConstants.OPEN_LOOP_RAMP_RATE)
                 .withFeedforward(LinearIntakeConstants.FEEDFORWARD)
                 .withControlMode(ControlMode.CLOSED_LOOP);
 
-        m_linearMotorSMC = new TalonFXWrapper(
-                m_linearMotor,
+        m_smartMotorController = new TalonFXWrapper(
+                m_motor,
                 LinearIntakeConstants.MOTOR,
-                m_linearMotorSMCConfig);
+                m_smcConfig);
 
         MechanismPositionConfig m_robotToMechanism = new MechanismPositionConfig()
                 .withMaxRobotHeight(MechanismPositionConstants.ROBOT_MAX_HEIGHT)
                 .withMaxRobotLength(MechanismPositionConstants.ROBOT_MAX_LENGTH)
                 .withRelativePosition(LinearIntakeConstants.RELATIVE_POSITION);
 
-        ElevatorConfig m_linearConfig = new ElevatorConfig(m_linearMotorSMC)
-                .withStartingHeight(LinearIntakeConstants.STARTING_HEIGHT)
+        ElevatorConfig m_linearConfig = new ElevatorConfig(m_smartMotorController)
+                .withStartingHeight(LinearIntakeConstants.RETRACTED_POSITION)
                 .withHardLimits(
                         LinearIntakeConstants.HARD_LIMIT_MIN,
                         LinearIntakeConstants.HARD_LIMIT_MAX)
                 .withTelemetry("LinearIntakeMech", Constants.TELEMETRY_VERBOSITY)
                 .withMechanismPositionConfig(m_robotToMechanism)
                 .withMass(LinearIntakeConstants.MECHANISM_MASS)
-                .withAngle(LinearIntakeConstants.MECHANISM_ANGLE);
+                .withHorizontalElevator();
 
         m_linearIntake = new Elevator(m_linearConfig);
+
+        m_extendedLimitSwitch = new DigitalInput(LinearIntakeConstants.EXTENDED_LIMIT_SWITCH_DIO);
+        m_retractedLimitSwitch = new DigitalInput(LinearIntakeConstants.RETRACTED_LIMIT_SWITCH_DIO);
     }
 
     public Command sysId() {
         return m_linearIntake.sysId(
-                Volts.of(12), Volts.of(12).per(Second), Second.of(30))
+                Volts.of(3), Volts.of(3).per(Second), Second.of(10))
                 .beforeStarting(SignalLogger::start)
                 .finallyDo(SignalLogger::stop);
     }
@@ -112,7 +119,7 @@ public class LinearIntakeSubsystem extends SubsystemBase {
         if (!angle_setpoint.isPresent()) {
             return Optional.empty();
         }
-        return Optional.of(m_linearMotorSMCConfig.convertFromMechanism(angle_setpoint.get()));
+        return Optional.of(m_smcConfig.convertFromMechanism(angle_setpoint.get()));
     }
 
     public boolean isAtTargetPosition() {
@@ -136,11 +143,11 @@ public class LinearIntakeSubsystem extends SubsystemBase {
     }
 
     public Command retract() {
-        return setPosition(LinearIntakeConstants.RETRACTED_POSITION).until(this::isAtTargetPosition);
+        return setPosition(LinearIntakeConstants.MIDPOINT_POSITION).until(this::isAtTargetPosition);
     }
 
     public Command fullyRetract() {
-        return setPosition(LinearIntakeConstants.FULLY_RETRACTED_POSITION).until(this::isAtTargetPosition);
+        return setPosition(LinearIntakeConstants.RETRACTED_POSITION).until(this::isAtTargetPosition);
     }
 
     public Command set(double dutycycle) {
@@ -157,10 +164,10 @@ public class LinearIntakeSubsystem extends SubsystemBase {
         if (currentPosition.isNear(LinearIntakeConstants.EXTENDED_POSITION,
                 LinearIntakeConstants.POSITION_TARGET_ERROR)) {
             return LinearIntakePosition.EXTENDED;
-        } else if (currentPosition.isNear(LinearIntakeConstants.RETRACTED_POSITION,
+        } else if (currentPosition.isNear(LinearIntakeConstants.MIDPOINT_POSITION,
                 LinearIntakeConstants.POSITION_TARGET_ERROR)) {
             return LinearIntakePosition.RETRACTED;
-        } else if (currentPosition.isNear(LinearIntakeConstants.FULLY_RETRACTED_POSITION,
+        } else if (currentPosition.isNear(LinearIntakeConstants.RETRACTED_POSITION,
                 LinearIntakeConstants.POSITION_TARGET_ERROR)) {
             return LinearIntakePosition.FULLY_RETRACTED;
         } else {
@@ -168,9 +175,27 @@ public class LinearIntakeSubsystem extends SubsystemBase {
         }
     }
 
+    public boolean getExtendedLimitSwitch() {
+        return m_extendedLimitSwitch.get();
+    }
+
+    public boolean getRetractedLimitSwitch() {
+        return m_retractedLimitSwitch.get();
+    }
+
+    private void handleLimitSwitches() {
+        if (getExtendedLimitSwitch()) {
+            m_smartMotorController.setEncoderPosition(LinearIntakeConstants.EXTENDED_POSITION);
+        } else if (getRetractedLimitSwitch()) {
+            m_smartMotorController.setEncoderPosition(LinearIntakeConstants.MIDPOINT_POSITION);
+        }
+    }
+
     @Override
     public void periodic() {
         m_linearIntake.updateTelemetry();
+
+        handleLimitSwitches();
 
         if (Constants.TELEMETRY) {
             SmartDashboard.putNumber("LinearIntakeMech/position (m)", getPosition().in(Meters));
@@ -184,4 +209,5 @@ public class LinearIntakeSubsystem extends SubsystemBase {
     public void simulationPeriodic() {
         m_linearIntake.simIterate();
     }
+
 }
