@@ -53,7 +53,7 @@ public class Robot extends TimedRobot {
         }
 
         // Start the flywheel at the default RPM when teleop starts
-        CommandScheduler.getInstance().schedule(m_robotContainer.startFlywheelDefaultRPM());
+        // CommandScheduler.getInstance().schedule(m_robotContainer.startFlywheelDefaultRPM());
     }
 
     @Override
