@@ -240,9 +240,9 @@ public final class Constants {
         public static final AngularAcceleration MAX_ACCELERATION_RPS2 = RotationsPerSecondPerSecond.of(0.314); // TODO
 
         public static final Angle SOFT_LIMIT_MIN = Degrees.of(5.5); // TODO
-        public static final Angle SOFT_LIMIT_MAX = Degrees.of(43); // TODO
+        public static final Angle SOFT_LIMIT_MAX = Degrees.of(47); // TODO
         public static final Angle HARD_LIMIT_MIN = Degrees.of(5.5);
-        public static final Angle HARD_LIMIT_MAX = Degrees.of(43);
+        public static final Angle HARD_LIMIT_MAX = Degrees.of(47);
 
         public static final Angle DEFAULT_ANGLE = Degrees.of(13); // TODO
 
