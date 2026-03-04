@@ -182,27 +182,27 @@ public final class Constants {
 
         public static final Current STATOR_CURRENT_LIMIT_AMPS = Amps.of(80);
 
-        public static final double PID_kP = 0.7; // TODO
+        public static final double PID_kP = 0.0026828; // TODO
         public static final double PID_kI = 0.0; // TODO
-        public static final double PID_kD = 0.5; // TODO
+        public static final double PID_kD = 0.0; // TODO
 
         public static final double SIM_PID_kP = 0.075; // TODO
         public static final double SIM_PID_kI = 0.0; // TODO
         public static final double SIM_PID_kD = 0.0; // TODO
 
-        public static final SimpleMotorFeedforward FEEDFORWARD = new SimpleMotorFeedforward(0.42811, 0.09177,
-                0.0093253);
+        public static final SimpleMotorFeedforward FEEDFORWARD = new SimpleMotorFeedforward(0.24, 0.09,
+                0.007553);
         public static final SimpleMotorFeedforward SIM_FEEDFORWARD = new SimpleMotorFeedforward(2.25,
                 0.0, 0.0); // TODO
 
         public static final Time CLOSED_LOOP_RAMP_RATE_SEC = Seconds.of(0.25);
         public static final Time OPEN_LOOP_RAMP_RATE_SEC = Seconds.of(0.25);
 
-        public static final AngularVelocity MAX_VELOCITY_RPM = RPM.of(11568);
-        public static final AngularVelocity SIM_MAX_VELOCITY_RPM = RPM.of(11568);
+        public static final AngularVelocity MAX_VELOCITY_RPM = RPM.of(8000);
+        public static final AngularVelocity SIM_MAX_VELOCITY_RPM = RPM.of(8000);
         public static final AngularAcceleration MAX_ACCELERATION_RPS2 = RotationsPerSecondPerSecond.of(173);
 
-        public static final AngularVelocity SOFT_LIMIT_RPM = RPM.of(11568); // TODO
+        public static final AngularVelocity SOFT_LIMIT_RPM = RPM.of(8000); // TODO
 
         public static final AngularVelocity ALLIANCE_SHOOTING_VELOCITY = RPM.of(2216);
         public static final AngularVelocity NEUTRAL_SHOOTING_VELOCITY = RPM.of(2674);
@@ -228,7 +228,7 @@ public final class Constants {
 
         public static final double PID_kP = 1700; // TODO
         public static final double PID_kI = 0.0; // TODO
-        public static final double PID_kD = 3.0998; // TODO
+        public static final double PID_kD = 3.0998;  // TODO
 
         public static final double SIM_PID_kP = 16; // TODO
         public static final double SIM_PID_kI = 7; // TODO
