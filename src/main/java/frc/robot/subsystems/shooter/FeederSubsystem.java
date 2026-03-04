@@ -66,7 +66,7 @@ public class FeederSubsystem extends SubsystemBase {
                 .withIdleMode(FeederConstants.IDLE_MODE) // Keep spinning even if not powered
                 .withTelemetry("FlywheelMotor", Constants.TELEMETRY_VERBOSITY)
                 .withStatorCurrentLimit(FeederConstants.STATOR_CURRENT_LIMIT_AMPS)
-                .withMotorInverted(FeederConstants.LEADER_MOTOR_INVERTED)
+                .withMotorInverted(FeederConstants.MOTOR_INVERTED)
                 .withClosedLoopRampRate(FeederConstants.CLOSED_LOOP_RAMP_RATE_SEC)
                 .withOpenLoopRampRate(FeederConstants.OPEN_LOOP_RAMP_RATE_SEC)
                 .withFeedforward(FeederConstants.FEEDFORWARD)

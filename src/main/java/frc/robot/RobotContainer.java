@@ -432,7 +432,7 @@ public class RobotContainer {
 
         m_driverController.L2().onTrue(m_intakeRollerSubsystem.intake()).onFalse(m_intakeRollerSubsystem.stop());
 
-        m_driverController.cross().whileTrue(m_flywheelSubsystem.sysId());
+        m_driverController.cross().whileTrue(m_hoodSubsystem.sysId());
     }
 
     /**

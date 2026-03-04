@@ -304,17 +304,16 @@ public final class Constants {
 
         public static final MotorMode IDLE_MODE = MotorMode.BRAKE;
 
-        public static final boolean LEADER_MOTOR_INVERTED = false; // TODO
-        public static final boolean FOLLOWER_MOTOR_INVERTED = true;
+        public static final boolean MOTOR_INVERTED = true;
 
-        public static final Distance DIAMETER_INCHES = Inches.of(3);
+        public static final Distance DIAMETER_INCHES = Inches.of(4);
         public static final MomentOfInertia MOI = KilogramSquareMeters.of(
                 0.0009446408);
 
         public static final Current STATOR_CURRENT_LIMIT_AMPS = Amps.of(60);
         public static final Current SUPPLY_CURRENT_LIMIT_AMPS = Amps.of(70);
 
-        public static final double PID_kP = 0.0; // TODO
+        public static final double PID_kP = 1.0; // TODO
         public static final double PID_kI = 0.0; // TODO
         public static final double PID_kD = 0.0; // TODO
 

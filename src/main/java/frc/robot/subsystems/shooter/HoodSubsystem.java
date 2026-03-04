@@ -129,7 +129,7 @@ public class HoodSubsystem extends SubsystemBase {
      */
     public Command sysId() {
         return m_hood.sysId(
-                Volts.of(2), Volts.of(0.5).per(Second), Second.of(8))
+                Volts.of(7), Volts.of(1).per(Second), Second.of(8))
                 .beforeStarting(
                         () -> SignalLogger.start())
                 .finallyDo(() -> SignalLogger.stop());
