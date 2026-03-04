@@ -42,6 +42,7 @@ import limelight.networktables.LimelightSettings.ImuMode;
 import swervelib.SwerveInputStream;
 import swervelib.simulation.ironmaple.simulation.SimulatedArena;
 import swervelib.simulation.ironmaple.simulation.seasonspecific.rebuilt2026.RebuiltFuelOnField;
+import frc.robot.utils.LimelightWrapper;
 
 public class RobotContainer {
     final CommandPS5Controller m_driverController = new CommandPS5Controller(Constants.DRIVER_CONTROLLER_PORT);
@@ -57,8 +58,8 @@ public class RobotContainer {
 
     private final SimSubsystem m_simSubsystem;
 
-    private final Limelight limelightA;
-    private final Limelight limelightC;
+    private final LimelightWrapper m_limelightA;
+    private final LimelightWrapper m_limelightC;
 
     // Choreo
     private final AutoFactory autoFactory = new AutoFactory(
@@ -159,11 +160,11 @@ public class RobotContainer {
         SmartDashboard.putData("Auto Chooser", autoChooser);
         RobotModeTriggers.autonomous().whileTrue(autoChooser.selectedCommandScheduler());
 
-        limelightA = new Limelight("limelight-a");
-        limelightC = new Limelight("limelight-c");
+        m_limelightA = new LimelightWrapper("limelight-a", true);
+        m_limelightC = new LimelightWrapper("limelight-c", false);
 
         // Only do this for LL4, so we use heading readings from MT1 from 3G?
-        limelightA.getSettings().withImuMode(ImuMode.ExternalImu).save();
+        m_limelightA.getSettings().withImuMode(ImuMode.ExternalImu).save();
 
         configureBindings();
     }
@@ -408,7 +409,7 @@ public class RobotContainer {
     }
 
     public void updateLocalization() {
-        m_swerveSubsystem.updateLocalization(limelightA, true);
-        m_swerveSubsystem.updateLocalization(limelightC, false);
+        m_limelightA.updateLocalization(m_swerveSubsystem.getSwerveDrive());
+        m_limelightC.updateLocalization(m_swerveSubsystem.getSwerveDrive());
     }
 }
