@@ -211,7 +211,7 @@ public class RobotContainer {
 
         m_swerveSubsystem.setDefaultCommand(driveFieldOrientedAnglularVelocity);
 
-        m_driverController.options().onTrue((Commands.runOnce(m_swerveSubsystem::zeroGyro)));
+        m_driverController.options().onTrue((Commands.runOnce(m_swerveSubsystem::zeroGyroWithAlliance)));
         m_driverController.create().whileTrue(m_swerveSubsystem.centerModulesCommand());
 
         // Auto-aim (swerve heading with calculated hood angle) and shoot
