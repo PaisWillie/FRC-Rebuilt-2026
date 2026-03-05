@@ -225,6 +225,7 @@ public class RobotContainer {
         Command driveFieldOrientedAutoAim = m_swerveSubsystem.driveFieldOriented(driveAutoAim);
 
         m_swerveSubsystem.setDefaultCommand(driveFieldOrientedAngularVelocity);
+        m_driverController.R2().whileTrue(driveFieldOrientedAutoAim);
 
         m_driverController.options().onTrue((Commands.runOnce(m_swerveSubsystem::zeroGyro)));
         m_driverController.create().whileTrue(m_swerveSubsystem.centerModulesCommand());
