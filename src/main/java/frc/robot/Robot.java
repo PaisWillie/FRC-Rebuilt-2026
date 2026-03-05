@@ -38,7 +38,7 @@ public class Robot extends TimedRobot {
     @Override
     public void autonomousInit() {
         // Check the linear intake position and set the encoder position accordingly
-        m_robotContainer.checkLinearIntakePosition();
+        m_robotContainer.calibrateLinearIntakePosition();
     }
 
     @Override
@@ -59,7 +59,7 @@ public class Robot extends TimedRobot {
         CommandScheduler.getInstance().schedule(m_robotContainer.startFlywheelDefaultRPM());
 
         // Check the linear intake position and set the encoder position accordingly
-        m_robotContainer.checkLinearIntakePosition();
+        m_robotContainer.calibrateLinearIntakePosition();
     }
 
     @Override
