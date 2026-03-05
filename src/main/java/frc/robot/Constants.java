@@ -222,7 +222,10 @@ public final class Constants {
         public static final int ENCODER_CAN_ID = 6;
 
         public static final DCMotor MOTOR = DCMotor.getKrakenX44Foc(1);
-        public static final GearBox GEARBOX = GearBox.fromReductionStages(80.0 / 14.0, 24.0 / 18.0, 170.0 / 10.0);
+        public static final MechanismGearing FROM_MOTOR_GEARING = new MechanismGearing(
+                GearBox.fromReductionStages(80.0 / 14.0, 24.0 / 18.0, 170.0 / 10.0));
+        public static final MechanismGearing FROM_ENCODER_GEARING = new MechanismGearing(
+                GearBox.fromReductionStages(170.0 / 10.0));
 
         public static final Current STATOR_CURRENT_LIMIT_AMPS = Amps.of(40); // TODO
 

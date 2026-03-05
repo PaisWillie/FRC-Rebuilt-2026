@@ -14,6 +14,7 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 import com.ctre.phoenix6.SignalLogger;
+import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 
 import edu.wpi.first.math.filter.Debouncer;
@@ -42,7 +43,7 @@ import yams.motorcontrollers.remote.TalonFXWrapper;
 public class HoodSubsystem extends SubsystemBase {
 
     private final TalonFX m_motor;
-    // private final CANcoder m_encoder;
+    private final CANcoder m_encoder;
 
     private final SmartMotorController m_smartMotorController;
 
@@ -57,7 +58,7 @@ public class HoodSubsystem extends SubsystemBase {
 
     public HoodSubsystem() {
         m_motor = new TalonFX(HoodConstants.MOTOR_CAN_ID);
-        // m_encoder = new CANcoder(HoodConstants.ENCODER_CAN_ID);
+        m_encoder = new CANcoder(HoodConstants.ENCODER_CAN_ID);
 
         SmartMotorControllerConfig m_smcConfig = new SmartMotorControllerConfig(this)
                 .withClosedLoopController(
@@ -72,7 +73,7 @@ public class HoodSubsystem extends SubsystemBase {
                         HoodConstants.SIM_PID_kD,
                         HoodConstants.MAX_VELOCITY_RPM,
                         HoodConstants.MAX_ACCELERATION_RPS2)
-                .withGearing(new MechanismGearing(HoodConstants.GEARBOX))
+                .withGearing(HoodConstants.FROM_MOTOR_GEARING)
                 .withIdleMode(MotorMode.COAST)
                 .withTelemetry("HoodMotor", Constants.TELEMETRY_VERBOSITY)
                 .withStatorCurrentLimit(HoodConstants.STATOR_CURRENT_LIMIT_AMPS)
@@ -82,11 +83,6 @@ public class HoodSubsystem extends SubsystemBase {
                 .withFeedforward(HoodConstants.FEEDFORWARD)
                 .withSimFeedforward(HoodConstants.SIM_FEEDFORWARD)
                 .withControlMode(ControlMode.CLOSED_LOOP);
-        // .withExternalEncoder(m_encoder)
-        // .withExternalEncoderInverted(HoodConstants.EXTERNAL_ENCODER_INVERTED)
-        // .withExternalEncoderGearing(HoodConstants.EXTERNAL_ENCODER_GEARING)
-        // .withExternalEncoderZeroOffset(HoodConstants.EXTERNAL_ENCODER_ZERO_OFFSET)
-        // .withUseExternalFeedbackEncoder(true);
 
         m_smartMotorController = new TalonFXWrapper(
                 m_motor,
@@ -118,8 +114,14 @@ public class HoodSubsystem extends SubsystemBase {
 
         m_distanceToHoodAngleMap = null;
         m_activeSpeedZone = null;
-        // TODO
-        // HoodConstants.SHOOTER_DISTANCE_TO_HOOD_ANGLE.forEach(m_distanceToHoodAngleMap::put);
+
+        // Set the initial position of the hood to the absolute encoder position, to
+        // avoid any issues with the encoder position being out of sync with the actual
+        // hood position on robot startup.
+        // TODO: See if putting this in periodic works
+        Angle absPosition = m_encoder.getAbsolutePosition().getValue();
+        m_smartMotorController.setEncoderPosition(
+                absPosition.times(HoodConstants.FROM_ENCODER_GEARING.getRotorToMechanismRatio()));
     }
 
     /**
