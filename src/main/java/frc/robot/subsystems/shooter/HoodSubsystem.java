@@ -246,6 +246,13 @@ public class HoodSubsystem extends SubsystemBase {
     public void periodic() {
         m_hood.updateTelemetry();
 
+        // Set the initial position of the hood to the absolute encoder position, to
+        // avoid any issues with the encoder position being out of sync with the actual
+        // hood position on robot startup.
+        Angle absPosition = m_encoder.getAbsolutePosition().getValue();
+        m_smartMotorController.setEncoderPosition(
+                absPosition.times(HoodConstants.FROM_ENCODER_GEARING.getRotorToMechanismRatio()));
+
         if (Constants.TELEMETRY && !DriverStation.isFMSAttached()) {
             SmartDashboard.putNumber("HoodMech/angle (deg)", getAngle().in(Degrees));
             SmartDashboard.putNumber("HoodMech/setpoint (deg)",
