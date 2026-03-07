@@ -133,11 +133,11 @@ public class RobotContainer {
                         .translationHeadingOffset(Rotation2d.fromDegrees(
                                         0));
 
-        private DoubleSupplier autoAimHeadingX() {
+        public DoubleSupplier autoAimHeadingX() {
                 return () -> m_swerveSubsystem.getAutoAimHeading().getCos();
         }
 
-        private DoubleSupplier autoAimHeadingY() {
+        public DoubleSupplier autoAimHeadingY() {
                 return () -> -m_swerveSubsystem.getAutoAimHeading().getSin();
         }
 
@@ -157,7 +157,8 @@ public class RobotContainer {
 
                 m_autoChooser = new AutoChooser();
                 m_autos = new Autos(m_autoFactory, m_intakeRollerSubsystem, m_linearIntakeSubsystem, m_shooterSubsystem,
-                                m_indexerSubsystem, m_hopperSubsystem, m_swerveSubsystem);
+                                m_indexerSubsystem, m_hopperSubsystem, m_swerveSubsystem, autoAimHeadingX(),
+                                autoAimHeadingY());
 
                 m_autoChooser.addCmd("Right Auto", m_autos::rightAuto);
 

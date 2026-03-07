@@ -1,19 +1,21 @@
 package frc.robot;
 
 import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.Seconds;
+
+import java.util.function.DoubleSupplier;
 
 import choreo.auto.AutoFactory;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
+import frc.robot.Constants.OperatorConstants;
+import frc.robot.Constants.SwerveConstants;
 import frc.robot.subsystems.HopperSubsystem;
 import frc.robot.subsystems.IndexerSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.intake.IntakeRollerSubsystem;
 import frc.robot.subsystems.intake.LinearIntakeSubsystem;
+import swervelib.SwerveInputStream;
 
 public class Autos {
 
@@ -26,6 +28,9 @@ public class Autos {
     private final IndexerSubsystem m_indexerSubsystem;
     private final HopperSubsystem m_hopperSubsystem;
 
+    private final DoubleSupplier m_autoAimHeadingX;
+    private final DoubleSupplier m_autoAimHeadingY;
+
     public Autos(
             AutoFactory autoFactory,
             IntakeRollerSubsystem intakeRollerSubsystem,
@@ -33,7 +38,9 @@ public class Autos {
             ShooterSubsystem shooterSubsystem,
             IndexerSubsystem indexerSubsystem,
             HopperSubsystem hopperSubsystem,
-            SwerveSubsystem swerveSubsystem) {
+            SwerveSubsystem swerveSubsystem,
+            DoubleSupplier autoAimHeadingX,
+            DoubleSupplier autoAimHeadingY) {
         m_autoFactory = autoFactory;
         m_intakeRollerSubsystem = intakeRollerSubsystem;
         m_linearIntakeSubsystem = linearIntakeSubsystem;
@@ -41,22 +48,58 @@ public class Autos {
         m_indexerSubsystem = indexerSubsystem;
         m_hopperSubsystem = hopperSubsystem;
         m_swerveSubsystem = swerveSubsystem;
+
+        this.m_autoAimHeadingX = autoAimHeadingX;
+        this.m_autoAimHeadingY = autoAimHeadingY;
     }
 
     public Command rightAuto() {
+        SwerveInputStream driveBackWithAutoAim = SwerveInputStream.of(m_swerveSubsystem.getSwerveDrive(),
+                () -> -0.4,
+                () -> 0.17)
+                .deadband(OperatorConstants.DEADBAND)
+                .scaleTranslation(1.0)
+                .allianceRelativeControl(true)
+                .withControllerHeadingAxis(m_autoAimHeadingX, m_autoAimHeadingY)
+                .headingWhile(true)
+                .scaleTranslation(SwerveConstants.AUTO_AIM_SCALE_TRANSLATION);
+        ;
+
+        Command driveBackWithAutoAimCmd = m_swerveSubsystem.driveFieldOriented(driveBackWithAutoAim);
+
         return Commands.sequence(
                 m_autoFactory.resetOdometry("RightAuto_1"),
                 m_autoFactory.trajectoryCmd("RightAuto_1"),
                 Commands.deadline(
                         m_autoFactory.trajectoryCmd("RightAuto_2"),
+                        m_hopperSubsystem.expand(),
                         m_intakeRollerSubsystem.intake(),
                         m_linearIntakeSubsystem.extend()),
                 m_autoFactory.trajectoryCmd("RightAuto_3"),
                 Commands.deadline(
                         m_autoFactory.trajectoryCmd("TrenchRightToAlliance"),
                         m_linearIntakeSubsystem.retract()),
-                Commands.deadline(Commands.waitTime(Seconds.of(3)),
+                Commands.deadline(
+                        Commands.waitSeconds(3),
                         m_swerveSubsystem.stop(),
-                        m_shooterSubsystem.shootWithHoodAngle(Degrees.of(35))));
+                        m_indexerSubsystem.run(),
+                        m_shooterSubsystem.shootWithHoodAngle(Degrees.of(35))),
+                Commands.deadline(
+                        m_autoFactory.trajectoryCmd("RightAuto_4"),
+                        m_indexerSubsystem.stop(),
+                        m_shooterSubsystem.stopShooting()),
+                Commands.deadline(
+                        m_autoFactory.trajectoryCmd("RightAuto_5"),
+                        m_linearIntakeSubsystem.extend()),
+                Commands.deadline(
+                        m_autoFactory.trajectoryCmd("TrenchRightToAlliance"),
+                        m_linearIntakeSubsystem.retract()),
+                Commands.deadline(
+                        Commands.waitSeconds(5),
+                        driveBackWithAutoAimCmd,
+                        m_indexerSubsystem.run(),
+                        m_shooterSubsystem.aimAndShoot(
+                                () -> m_swerveSubsystem.getDistanceToTarget(true),
+                                m_swerveSubsystem::isAutoAimOnTarget)));
     }
 }
