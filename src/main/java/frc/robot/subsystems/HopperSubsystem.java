@@ -13,46 +13,46 @@ import frc.robot.Constants.HopperConstants;
 
 public class HopperSubsystem extends SubsystemBase {
 
-  private final Servo m_leftMotor;
-  private final Servo m_rightMotor;
+    private final Servo m_leftMotor;
+    private final Servo m_rightMotor;
 
-  public HopperSubsystem() {
-    m_leftMotor = new Servo(HopperConstants.MOTOR_PWM_ID_LEFT);
-    m_rightMotor = new Servo(HopperConstants.MOTOR_PWM_ID_RIGHT);
-  }
+    public HopperSubsystem() {
+        m_leftMotor = new Servo(HopperConstants.MOTOR_PWM_ID_LEFT);
+        m_rightMotor = new Servo(HopperConstants.MOTOR_PWM_ID_RIGHT);
+    }
 
-  /**
-   * Sets the hopper servo position in degrees.
-   *
-   * @param degrees the target angle
-   */
-  public void setAngle(double degrees) {
-    m_leftMotor.setAngle(degrees);
-    m_rightMotor.setAngle(180.0 - degrees);
-  }
+    /**
+     * Sets the hopper servo position in degrees.
+     *
+     * @param degrees the target angle
+     */
+    public void setAngle(double degrees) {
+        m_leftMotor.setAngle(degrees);
+        m_rightMotor.setAngle(180.0 - degrees);
+    }
 
-  /**
-   * Gets the current angle of the hopper servo in degrees.
-   * 
-   * @return the current angle of the servo
-   */
-  public double getAngle() {
-    return m_leftMotor.getAngle();
-  }
+    /**
+     * Gets the current angle of the hopper servo in degrees.
+     * 
+     * @return the current angle of the servo
+     */
+    public double getAngle() {
+        return m_leftMotor.getAngle();
+    }
 
-  public Command expand() {
-    return this.runOnce(() -> {
-      setAngle(HopperConstants.EXPANDED_ANGLE.in(Degrees));
-    });
-  }
+    public Command expand() {
+        return this.runOnce(() -> {
+            setAngle(HopperConstants.EXPANDED_ANGLE.in(Degrees));
+        });
+    }
 
-  public Command retract() {
-    return this.runOnce(() -> {
-      setAngle(HopperConstants.RETRACT_ANGLE.in(Degrees));
-    });
-  }
+    public Command retract() {
+        return this.runOnce(() -> {
+            setAngle(HopperConstants.RETRACT_ANGLE.in(Degrees));
+        });
+    }
 
-  @Override
-  public void periodic() {
-  }
+    @Override
+    public void periodic() {
+    }
 }
