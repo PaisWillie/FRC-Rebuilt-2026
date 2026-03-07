@@ -39,6 +39,20 @@
      "val":4.0345
     }
    },
+   "fieldLength":{
+    "dimension":"Number",
+    "var":{
+     "exp":"16.541",
+     "val":16.541
+    }
+   },
+   "fieldWidth":{
+    "dimension":"Number",
+    "var":{
+     "exp":"8.069",
+     "val":8.069
+    }
+   },
    "trenchAllianceEntranceCloseNeutralX":{
     "dimension":"Number",
     "var":{
@@ -100,6 +114,41 @@
     "var":{
      "exp":"7.44",
      "val":7.44
+    }
+   },
+   "wallSweepDistanceOffsetX":{
+    "dimension":"Number",
+    "var":{
+     "exp":"0.7564828991889954",
+     "val":0.7564828991889954
+    }
+   },
+   "wallSweepEndDistanceOffsetY":{
+    "dimension":"Number",
+    "var":{
+     "exp":"0.9063095211982727",
+     "val":0.9063095211982728
+    }
+   },
+   "wallSweepStartDepotDistanceOffsetY":{
+    "dimension":"Number",
+    "var":{
+     "exp":"2.83389877701",
+     "val":2.83389877701
+    }
+   },
+   "wallSweepStartDistanceOffsetX":{
+    "dimension":"Number",
+    "var":{
+     "exp":"2.0502872467041016",
+     "val":2.0502872467041016
+    }
+   },
+   "wallSweepStartTowerDistanceOffsetY":{
+    "dimension":"Number",
+    "var":{
+     "exp":"2.249399185180664",
+     "val":2.249399185180664
     }
    }
   },
