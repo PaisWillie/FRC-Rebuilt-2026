@@ -449,13 +449,13 @@ public class RobotContainer {
     //     return m_shooterSubsystem.startFlywheelDefaultRPM();
     // }
 
-    public void calibrateLinearIntakePosition() {
-        if (m_linearIntakeSubsystem.getExtendedLimitSwitch()) {
-            CommandScheduler.getInstance().schedule(m_linearIntakeSubsystem.setEncoderPositionExtended());
-        } else if (m_linearIntakeSubsystem.getRetractedLimitSwitch()) {
-            CommandScheduler.getInstance().schedule(m_linearIntakeSubsystem.setEncoderPositionRetracted());
-        }
-    }
+//     public void calibrateLinearIntakePosition() {
+//         if (m_linearIntakeSubsystem.getExtendedLimitSwitch()) {
+//             CommandScheduler.getInstance().schedule(m_linearIntakeSubsystem.setEncoderPositionExtended());
+//         } else if (m_linearIntakeSubsystem.getRetractedLimitSwitch()) {
+//             CommandScheduler.getInstance().schedule(m_linearIntakeSubsystem.setEncoderPositionRetracted());
+//         }
+//     }
 
     public void updateLocalization() {
         m_limelightA.updateLocalization(m_swerveSubsystem.getSwerveDrive());
