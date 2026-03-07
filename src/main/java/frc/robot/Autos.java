@@ -118,4 +118,13 @@ public class Autos {
                                 () -> m_swerveSubsystem.getDistanceToTarget(true),
                                 m_swerveSubsystem::isAutoAimOnTarget)));
     }
+
+    public Command shootPreloadAuto() {
+        return Commands.sequence(
+                m_autoFactory.trajectoryCmd("ShootPreloadAuto"),
+                Commands.waitSeconds(3),
+                Commands.parallel(
+                        m_indexerSubsystem.run(),
+                        m_shooterSubsystem.shootWithHoodAngle(Degrees.of(7))));
+    }
 }

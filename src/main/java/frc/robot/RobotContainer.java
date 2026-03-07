@@ -160,7 +160,8 @@ public class RobotContainer {
                                 m_indexerSubsystem, m_hopperSubsystem, m_swerveSubsystem, autoAimHeadingX(),
                                 autoAimHeadingY());
 
-                m_autoChooser.addCmd("Right Auto", m_autos::rightAuto);
+                m_autoChooser.addCmd("Right Neutral Zone Auto", m_autos::rightAuto);
+                m_autoChooser.addCmd("Center Shoot Preload Auto", m_autos::shootPreloadAuto);
 
                 SmartDashboard.putData("Auto Chooser", m_autoChooser);
                 RobotModeTriggers.autonomous().whileTrue(m_autoChooser.selectedCommandScheduler());
