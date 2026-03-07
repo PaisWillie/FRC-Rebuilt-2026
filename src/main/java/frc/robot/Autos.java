@@ -97,6 +97,7 @@ public class Autos {
                         m_swerveSubsystem.stop(),
                         m_indexerSubsystem.run(),
                         stationaryAutoAimCmd,
+                        // TODO: Retract hopper and intake halfway through shooting
                         m_shooterSubsystem.aimAndShoot(
                                 () -> m_swerveSubsystem.getDistanceToTarget(true),
                                 m_swerveSubsystem::isAutoAimOnTarget)),
@@ -106,6 +107,7 @@ public class Autos {
                         m_shooterSubsystem.stopShooting()),
                 Commands.deadline(
                         m_autoFactory.trajectoryCmd("RightAuto_5"),
+                        // TODO: Extend hopper
                         m_linearIntakeSubsystem.extend()),
                 Commands.deadline(
                         m_autoFactory.trajectoryCmd("TrenchRightToAlliance"),
@@ -114,6 +116,7 @@ public class Autos {
                         Commands.waitSeconds(5),
                         driveBackWithAutoAimCmd,
                         m_indexerSubsystem.run(),
+                        // TODO: Retract hopper and intake halfway through shooting
                         m_shooterSubsystem.aimAndShoot(
                                 () -> m_swerveSubsystem.getDistanceToTarget(true),
                                 m_swerveSubsystem::isAutoAimOnTarget)));
