@@ -130,16 +130,16 @@ public final class Constants {
             public static final Mass MECHANISM_MASS = Pounds.of(6.825);
             public static final Angle MECHANISM_ANGLE = Degrees.of(-24.159);
 
-            public static final double PID_kP = 34.935;
+            public static final double PID_kP = 5.5;
             public static final double PID_kI = 0.0;
-            public static final double PID_kD = 0.9684;
+            public static final double PID_kD = 0.0;
 
             public static final double SIM_PID_kP = 10.0; // TODO
             public static final double SIM_PID_kI = 0.0; // TODO
             public static final double SIM_PID_kD = 0.0; // TODO
 
-            public static final ElevatorFeedforward FEEDFORWARD = new ElevatorFeedforward(0.28669, 0.04,
-                    0.60431, 0.021882); // TODO: Set kg to negative?
+            public static final ElevatorFeedforward FEEDFORWARD = new ElevatorFeedforward(0.32176, -0.04,
+                    0.6148, 0.021608); // TODO: Set kg to negative?
 
             public static final LinearVelocity MAX_VELOCITY = MetersPerSecond.of(2); // TODO
             public static final LinearAcceleration MAX_ACCELERATION = MetersPerSecondPerSecond.of(6.5); // TODO
@@ -147,7 +147,7 @@ public final class Constants {
             public static final Time CLOSED_LOOP_RAMP_RATE = Seconds.of(0.25);
             public static final Time OPEN_LOOP_RAMP_RATE = Seconds.of(0.25);
 
-            public static final Current STATOR_CURRENT_LIMIT = Amps.of(40);
+            public static final Current STATOR_CURRENT_LIMIT = Amps.of(20);
 
             public static final Distance SOFT_LIMIT_MIN = Meters.of(0);
             public static final Distance SOFT_LIMIT_MAX = Meters.of(0.33);
@@ -447,7 +447,7 @@ public final class Constants {
 
     // Consider setting to LOW or MEDIUM for competition to reduce network traffic
     // Set the telemetry verbosity for YAMS subsystems
-    public static final SmartMotorControllerConfig.TelemetryVerbosity TELEMETRY_VERBOSITY = SmartMotorControllerConfig.TelemetryVerbosity.LOW; // TODO:
+    public static final SmartMotorControllerConfig.TelemetryVerbosity TELEMETRY_VERBOSITY = SmartMotorControllerConfig.TelemetryVerbosity.HIGH; // TODO:
 
     public static final SwerveDriveTelemetry.TelemetryVerbosity SWERVE_TELEMETRY_VERBOSITY = SwerveDriveTelemetry.TelemetryVerbosity.POSE;
     public static final boolean TELEMETRY = true; // TODO: Set to false for competition to reduce network traffic
