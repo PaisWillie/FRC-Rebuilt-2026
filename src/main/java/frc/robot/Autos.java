@@ -54,6 +54,19 @@ public class Autos {
     }
 
     public Command rightAuto() {
+
+        SwerveInputStream stationaryAutoAim = SwerveInputStream.of(m_swerveSubsystem.getSwerveDrive(),
+                () -> 0.0,
+                () -> 0.0)
+                .deadband(OperatorConstants.DEADBAND)
+                .scaleTranslation(1.0)
+                .allianceRelativeControl(true)
+                .withControllerHeadingAxis(m_autoAimHeadingX, m_autoAimHeadingY)
+                .headingWhile(true)
+                .scaleTranslation(SwerveConstants.AUTO_AIM_SCALE_TRANSLATION);
+
+        Command stationaryAutoAimCmd = m_swerveSubsystem.driveFieldOriented(stationaryAutoAim);
+
         SwerveInputStream driveBackWithAutoAim = SwerveInputStream.of(m_swerveSubsystem.getSwerveDrive(),
                 () -> -0.4,
                 () -> 0.17)
@@ -83,7 +96,10 @@ public class Autos {
                         Commands.waitSeconds(3),
                         m_swerveSubsystem.stop(),
                         m_indexerSubsystem.run(),
-                        m_shooterSubsystem.shootWithHoodAngle(Degrees.of(35))),
+                        stationaryAutoAimCmd,
+                        m_shooterSubsystem.aimAndShoot(
+                                () -> m_swerveSubsystem.getDistanceToTarget(true),
+                                m_swerveSubsystem::isAutoAimOnTarget)),
                 Commands.deadline(
                         m_autoFactory.trajectoryCmd("RightAuto_4"),
                         m_indexerSubsystem.stop(),
