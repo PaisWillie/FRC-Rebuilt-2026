@@ -81,11 +81,13 @@ public class Autos {
         Command driveBackWithAutoAimCmd = m_swerveSubsystem.driveFieldOriented(driveBackWithAutoAim);
 
         return Commands.sequence(
+
                 m_autoFactory.resetOdometry("RightAuto_1"),
                 m_autoFactory.trajectoryCmd("RightAuto_1"),
                 Commands.deadline(
                         m_autoFactory.trajectoryCmd("RightAuto_2"),
                         m_hopperSubsystem.expand(),
+                        // Note: Intake rollers never turn off in this auto
                         m_intakeRollerSubsystem.intake(),
                         m_linearIntakeSubsystem.extend()),
                 m_autoFactory.trajectoryCmd("RightAuto_3"),
@@ -93,11 +95,21 @@ public class Autos {
                         m_autoFactory.trajectoryCmd("TrenchRightToAlliance"),
                         m_linearIntakeSubsystem.retract()),
                 Commands.deadline(
-                        Commands.waitSeconds(3),
+                        Commands.waitSeconds(2),
                         m_swerveSubsystem.stop(),
                         m_indexerSubsystem.run(),
                         stationaryAutoAimCmd,
-                        // TODO: Retract hopper and intake halfway through shooting
+                        m_shooterSubsystem.aimAndShoot(
+                                () -> m_swerveSubsystem.getDistanceToTarget(true),
+                                m_swerveSubsystem::isAutoAimOnTarget)),
+                // After shooting partially, retract hopper and linear intake while continuing
+                // to shoot
+                Commands.deadline(
+                        Commands.waitSeconds(1),
+                        m_indexerSubsystem.run(),
+                        m_hopperSubsystem.retract(),
+                        m_linearIntakeSubsystem.fullyRetract(),
+                        stationaryAutoAimCmd,
                         m_shooterSubsystem.aimAndShoot(
                                 () -> m_swerveSubsystem.getDistanceToTarget(true),
                                 m_swerveSubsystem::isAutoAimOnTarget)),
@@ -107,16 +119,26 @@ public class Autos {
                         m_shooterSubsystem.stopShooting()),
                 Commands.deadline(
                         m_autoFactory.trajectoryCmd("RightAuto_5"),
-                        // TODO: Extend hopper
+                        m_hopperSubsystem.expand(),
                         m_linearIntakeSubsystem.extend()),
                 Commands.deadline(
                         m_autoFactory.trajectoryCmd("TrenchRightToAlliance"),
                         m_linearIntakeSubsystem.retract()),
                 Commands.deadline(
-                        Commands.waitSeconds(5),
+                        Commands.waitSeconds(3),
                         driveBackWithAutoAimCmd,
                         m_indexerSubsystem.run(),
-                        // TODO: Retract hopper and intake halfway through shooting
+                        m_linearIntakeSubsystem.extend(),
+                        m_shooterSubsystem.aimAndShoot(
+                                () -> m_swerveSubsystem.getDistanceToTarget(true),
+                                m_swerveSubsystem::isAutoAimOnTarget)),
+                // After shooting partially, retract hopper and linear intake while continuing
+                // to shoot
+                Commands.deadline(
+                        Commands.waitSeconds(2),
+                        driveBackWithAutoAimCmd,
+                        m_indexerSubsystem.run(),
+                        m_hopperSubsystem.retract(),
                         m_shooterSubsystem.aimAndShoot(
                                 () -> m_swerveSubsystem.getDistanceToTarget(true),
                                 m_swerveSubsystem::isAutoAimOnTarget)));
@@ -128,6 +150,7 @@ public class Autos {
                 Commands.waitSeconds(3),
                 Commands.parallel(
                         m_indexerSubsystem.run(),
+                        m_intakeRollerSubsystem.intake(),
                         m_shooterSubsystem.shootWithHoodAngle(Degrees.of(7))));
     }
 }
