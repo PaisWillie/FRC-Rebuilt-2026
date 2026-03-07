@@ -28,6 +28,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.Constants.SwerveConstants;
+import frc.robot.subsystems.ClimbSubsystem;
 import frc.robot.subsystems.HopperSubsystem;
 import frc.robot.subsystems.IndexerSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
@@ -47,7 +48,7 @@ import frc.robot.utils.LimelightWrapper;
 public class RobotContainer {
     final CommandPS5Controller m_driverController = new CommandPS5Controller(Constants.DRIVER_CONTROLLER_PORT);
 
-    // private final ClimbSubsystem m_climbSubsystem = new ClimbSubsystem();
+    private final ClimbSubsystem m_climbSubsystem = new ClimbSubsystem();
     private final HopperSubsystem m_hopperSubsystem = new HopperSubsystem();
     private final IndexerSubsystem m_indexerSubsystem = new IndexerSubsystem();
     private final IntakeRollerSubsystem m_intakeRollerSubsystem = new IntakeRollerSubsystem();
@@ -217,6 +218,46 @@ public class RobotContainer {
                             autoFactory.trajectoryCmd("TrenchRightFromOpponent"))),
             m_swerveSubsystem::getCurrentZone);
 
+    private final Command selectBlueSweepLeft = new SelectCommand<>(
+            Map.ofEntries(
+                    Map.entry(Zone.BLUE_ALLIANCE_LEFT,
+                            autoFactory.trajectoryCmd("SweepLeftAllianceWall"))
+            // TODO: Add opponent wall sweep
+            // Map.entry(Zone.RED_ALLIANCE_RIGHT,
+            // autoFactory.trajectoryCmd("SweepLeftOpponentWall"))
+            ),
+            m_swerveSubsystem::getCurrentZone);
+
+    private final Command selectRedSweepLeft = new SelectCommand<>(
+            Map.ofEntries(
+                    Map.entry(Zone.RED_ALLIANCE_LEFT,
+                            autoFactory.trajectoryCmd("SweepLeftAllianceWall"))
+            // TODO: Add opponent wall sweep
+            // Map.entry(Zone.BLUE_ALLIANCE_RIGHT,
+            // autoFactory.trajectoryCmd("SweepLeftOpponentWall")
+            ),
+            m_swerveSubsystem::getCurrentZone);
+
+    private final Command selectBlueSweepRight = new SelectCommand<>(
+            Map.ofEntries(
+                    Map.entry(Zone.BLUE_ALLIANCE_RIGHT,
+                            autoFactory.trajectoryCmd("SweepRightAllianceWall"))
+            // TODO: Add opponent wall sweep
+            // Map.entry(Zone.RED_ALLIANCE_LEFT,
+            // autoFactory.trajectoryCmd("SweepRightOpponentWall")
+            ),
+            m_swerveSubsystem::getCurrentZone);
+
+    private final Command selectRedSweepRight = new SelectCommand<>(
+            Map.ofEntries(
+                    Map.entry(Zone.RED_ALLIANCE_RIGHT,
+                            autoFactory.trajectoryCmd("SweepRightAllianceWall"))
+            // TODO: Add opponent wall sweep
+            // Map.entry(Zone.BLUE_ALLIANCE_LEFT,
+            // autoFactory.trajectoryCmd("SweepRightOpponentWall")
+            ),
+            m_swerveSubsystem::getCurrentZone);
+
     private void configureBindings() {
         Command driveFieldOrientedAngularVelocity = m_swerveSubsystem.driveFieldOriented(driveAngularVelocity);
         Command driveFieldOrientedAutoAim = m_swerveSubsystem.driveFieldOriented(driveAutoAim);
@@ -357,7 +398,14 @@ public class RobotContainer {
                                 () -> m_swerveSubsystem.setSelectedClimbPose(true)),
                         Commands.runEnd(
                                 () -> driveAngularVelocity.driveToPoseEnabled(true),
-                                () -> driveAngularVelocity.driveToPoseEnabled(false))));
+                                () -> driveAngularVelocity.driveToPoseEnabled(false)))
+                        .onlyIf(
+                                m_climbSubsystem::isClimbAttempted));
+        m_driverController.povLeft().whileTrue(
+                new ConditionalCommand(
+                        selectRedSweepLeft,
+                        selectBlueSweepLeft,
+                        m_swerveSubsystem::isRedAlliance).onlyIf(() -> !m_climbSubsystem.isClimbAttempted()));
 
         // Auto-align to right side tower for climbing
         m_driverController.povRight().whileTrue(
@@ -366,7 +414,14 @@ public class RobotContainer {
                                 () -> m_swerveSubsystem.setSelectedClimbPose(false)),
                         Commands.runEnd(
                                 () -> driveAngularVelocity.driveToPoseEnabled(true),
-                                () -> driveAngularVelocity.driveToPoseEnabled(false))));
+                                () -> driveAngularVelocity.driveToPoseEnabled(false)))
+                        .onlyIf(
+                                m_climbSubsystem::isClimbAttempted));
+        m_driverController.povRight().whileTrue(
+                new ConditionalCommand(
+                        selectRedSweepRight,
+                        selectBlueSweepRight,
+                        m_swerveSubsystem::isRedAlliance).onlyIf(() -> !m_climbSubsystem.isClimbAttempted()));
 
         // Auto-traverse the trench through left side
         m_driverController.L3().whileTrue(
