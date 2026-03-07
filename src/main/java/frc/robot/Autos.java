@@ -57,7 +57,6 @@ public class Autos {
                         m_linearIntakeSubsystem.retract()),
                 Commands.deadline(Commands.waitTime(Seconds.of(3)),
                         m_swerveSubsystem.stop(),
-                        m_shooterSubsystem.shootWithHoodAngle(Degrees.of(35))),
-                m_autoFactory.trajectoryCmd("RightAuto_1"));
+                        m_shooterSubsystem.shootWithHoodAngle(Degrees.of(35))));
     }
 }
