@@ -4,6 +4,13 @@
  "type":"Swerve",
  "variables":{
   "expressions":{
+   "BLUE_STARTING_LINE_X":{
+    "dimension":"Number",
+    "var":{
+     "exp":"4.0218614",
+     "val":4.0218614
+    }
+   },
    "allianceStartOffsetX":{
     "dimension":"Number",
     "var":{
