@@ -11,12 +11,15 @@ import java.util.function.Supplier;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearVelocity;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
+import frc.robot.Constants;
+import frc.robot.Constants.HoodConstants.FlywheelSpeedZone;
 import frc.robot.subsystems.shooter.FeederSubsystem;
 import frc.robot.subsystems.shooter.FlywheelSubsystem;
 import frc.robot.subsystems.shooter.HoodSubsystem;
@@ -64,24 +67,16 @@ public class ShooterSubsystem extends SubsystemBase {
      */
     public Command aimAndShoot(Supplier<Distance> getDistanceToTarget, Supplier<Boolean> isAutoAimReady) {
         return Commands.parallel(
-                m_hoodSubsystem.setAngle(
-                        () -> m_hoodSubsystem.getAngleToTarget(getDistanceToTarget.get())),
-                m_flywheelSubsystem.shoot(),
+                m_hoodSubsystem.setAngle(() -> {
+                    Distance distance = getDistanceToTarget.get();
+                    FlywheelSpeedZone zone = m_hoodSubsystem.getSpeedZone(distance);
+                    return m_hoodSubsystem.getAngleToTarget(distance, zone);
+                }),
+                m_flywheelSubsystem.setSpeed(() -> m_flywheelSubsystem.getTargetVelocity(getDistanceToTarget.get())),
                 new ConditionalCommand(
                         m_feederSubsystem.feed(),
                         m_feederSubsystem.stop(),
-                        () -> isAutoAimReady.get() && isShooterReady()).repeatedly()) // TODO: Find a way to
-                                                                                      // remove the
-                                                                                      // repeatedly(), and
-                                                                                      // instead only
-                                                                                      // switch between feed
-                                                                                      // and stop
-                                                                                      // once the shooter is
-                                                                                      // ready/not
-                                                                                      // ready, instead of
-                                                                                      // constantly
-                                                                                      // running feed/stop
-                                                                                      // commands
+                        () -> isAutoAimReady.get() && isShooterReady()).repeatedly())
                 .withName("SHTR - Aim and Shoot");
     }
     // TODO: What if we get pushed while we're auto-aiming? This may 'cause
@@ -90,7 +85,7 @@ public class ShooterSubsystem extends SubsystemBase {
     public Command shootNoAutoAim() {
         return Commands.parallel(
                 m_hoodSubsystem.setDefaultAngle(),
-                m_flywheelSubsystem.shoot(),
+                m_flywheelSubsystem.setDefaultRPM(),
                 new ConditionalCommand(m_feederSubsystem.feed(), m_feederSubsystem.stop(), this::isShooterReady)
                         .repeatedly());
     }
@@ -175,6 +170,10 @@ public class ShooterSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
+        if (Constants.TELEMETRY && !DriverStation.isFMSAttached()) {
+            SmartDashboard.putBoolean("isHoodReady", m_hoodSubsystem.isAtTargetAngle());
+            SmartDashboard.putBoolean("isFlywheelReady", m_flywheelSubsystem.isAtTargetRPM());
+        }
     }
 
     @Override

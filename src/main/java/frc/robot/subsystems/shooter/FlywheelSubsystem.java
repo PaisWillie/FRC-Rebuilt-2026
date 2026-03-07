@@ -12,6 +12,7 @@ import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -21,6 +22,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -28,7 +30,9 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.FlywheelConstants;
+import frc.robot.Constants.HoodConstants;
 import frc.robot.Constants.MechanismPositionConstants;
+import frc.robot.Constants.HoodConstants.FlywheelSpeedZone;
 import yams.gearing.MechanismGearing;
 import yams.mechanisms.config.FlyWheelConfig;
 import yams.mechanisms.config.MechanismPositionConfig;
@@ -235,5 +239,15 @@ public class FlywheelSubsystem extends SubsystemBase {
     public void simulationPeriodic() {
         // Run the flywheel simulation step
         m_flywheel.simIterate();
+    }
+
+    public AngularVelocity getTargetVelocity(Distance distanceToTarget) {
+        FlywheelSpeedZone zone = HoodConstants.MIN_DISTANCE_TO_FLYWHEEL_SPEED_ZONE.entrySet().stream()
+                .filter(entry -> distanceToTarget.in(Meters) >= entry.getKey().in(Meters))
+                .max((a, b) -> Double.compare(a.getKey().in(Meters), b.getKey().in(Meters)))
+                .map(Map.Entry::getValue)
+                .orElse(FlywheelSpeedZone.ZONE_1);
+        return HoodConstants.SHOOTER_MIN_DISTANCE_TO_FLYWHEEL_RPM.getOrDefault(zone,
+                FlywheelConstants.DEFAULT_VELOCITY);
     }
 }

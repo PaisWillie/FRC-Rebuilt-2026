@@ -9,6 +9,7 @@ import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Volts;
 
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -26,6 +27,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.HoodConstants;
 import frc.robot.Constants.MechanismPositionConstants;
+import frc.robot.Constants.HoodConstants.FlywheelSpeedZone;
 import frc.robot.Robot;
 import yams.gearing.MechanismGearing;
 import yams.mechanisms.config.ArmConfig;
@@ -50,6 +52,8 @@ public class HoodSubsystem extends SubsystemBase {
             Debouncer.DebounceType.kRising);
 
     private final InterpolatingDoubleTreeMap m_distanceToHoodAngleMap;
+
+    private FlywheelSpeedZone m_activeSpeedZone;
 
     public HoodSubsystem() {
         m_motor = new TalonFX(HoodConstants.MOTOR_CAN_ID);
@@ -118,8 +122,10 @@ public class HoodSubsystem extends SubsystemBase {
 
         m_hood = new Arm(m_hoodConfig);
 
-        m_distanceToHoodAngleMap = new InterpolatingDoubleTreeMap();
-        HoodConstants.SHOOTER_DISTANCE_TO_HOOD_ANGLE.forEach(m_distanceToHoodAngleMap::put);
+        m_distanceToHoodAngleMap = null;
+        m_activeSpeedZone = null;
+        // TODO
+        // HoodConstants.SHOOTER_DISTANCE_TO_HOOD_ANGLE.forEach(m_distanceToHoodAngleMap::put);
     }
 
     /**
@@ -188,15 +194,18 @@ public class HoodSubsystem extends SubsystemBase {
                 getAngleSetpoint().get().isNear(m_hood.getAngle(), HoodConstants.ANGLE_TARGET_ERROR));
     }
 
-    /**
-     * Gets the target hood angle based on the distance to the target using
-     * interpolation.
-     * 
-     * @param distanceToTarget the distance from the robot to the target
-     * @return the target hood angle
-     */
-    public Angle getAngleToTarget(Distance distanceToTarget) {
-        return Degrees.of(m_distanceToHoodAngleMap.get(distanceToTarget.in(Meters)));
+    public FlywheelSpeedZone getSpeedZone(Distance distanceToTarget) {
+        return HoodConstants.MIN_DISTANCE_TO_FLYWHEEL_SPEED_ZONE.entrySet().stream()
+                .filter(entry -> distanceToTarget.in(Meters) >= entry.getKey().in(Meters))
+                .max((a, b) -> Double.compare(a.getKey().in(Meters), b.getKey().in(Meters)))
+                .map(Map.Entry::getValue)
+                .orElse(FlywheelSpeedZone.ZONE_1);
+    }
+
+    public Angle getAngleToTarget(Distance distanceToTarget, FlywheelSpeedZone zone) {
+        InterpolatingDoubleTreeMap map = HoodConstants.SHOOTER_DISTANCE_TO_HOOD_ANGLE_INTERPOLATION.get(zone);
+        Double angleDeg = map != null ? map.get(distanceToTarget.in(Meters)) : null;
+        return Degrees.of(angleDeg != null ? angleDeg : HoodConstants.DEFAULT_ANGLE.in(Degrees));
     }
 
     /**

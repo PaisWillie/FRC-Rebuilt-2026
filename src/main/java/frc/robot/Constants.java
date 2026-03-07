@@ -9,6 +9,7 @@ import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.InchesPerSecond;
 import static edu.wpi.first.units.Units.InchesPerSecondPerSecond;
 import static edu.wpi.first.units.Units.KilogramSquareMeters;
+import static edu.wpi.first.units.Units.Meter;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
@@ -21,6 +22,7 @@ import static edu.wpi.first.units.Units.Volts;
 import java.util.Map;
 
 import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
@@ -28,6 +30,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.system.plant.DCMotor;
@@ -182,7 +185,7 @@ public final class Constants {
 
         public static final Current STATOR_CURRENT_LIMIT_AMPS = Amps.of(50);
 
-        public static final double PID_kP = 0.85; // TODO
+        public static final double PID_kP = 0.003; // TODO
         public static final double PID_kI = 0.0; // TODO
         public static final double PID_kD = 0.0; // TODO
 
@@ -190,8 +193,8 @@ public final class Constants {
         public static final double SIM_PID_kI = 0.0; // TODO
         public static final double SIM_PID_kD = 0.0; // TODO
 
-        public static final SimpleMotorFeedforward FEEDFORWARD = new SimpleMotorFeedforward(0.52872, 0.062754,
-                0.013174);
+        public static final SimpleMotorFeedforward FEEDFORWARD = new SimpleMotorFeedforward(0.24, 0.09,
+                0.007553);
         public static final SimpleMotorFeedforward SIM_FEEDFORWARD = new SimpleMotorFeedforward(2.25,
                 0.0, 0.0); // TODO
 
@@ -207,7 +210,8 @@ public final class Constants {
         public static final AngularVelocity ALLIANCE_SHOOTING_VELOCITY = RPM.of(2216);
         public static final AngularVelocity NEUTRAL_SHOOTING_VELOCITY = RPM.of(2674);
         public static final AngularVelocity OPPONENT_SHOOTING_VELOCITY = RPM.of(2900);
-        public static final AngularVelocity DEFAULT_VELOCITY = ALLIANCE_SHOOTING_VELOCITY; // TODO
+
+        public static final AngularVelocity DEFAULT_VELOCITY = RPM.of(3500);
 
         public static final AngularVelocity RPM_TARGET_ERROR = RPM.of(50); // ~2% of ALLIANCE_SHOOTING_VELOCITY
         public static final Time AT_RPM_DEBOUNCE_TIME = Seconds.of(0.2); // TODO
@@ -250,7 +254,7 @@ public final class Constants {
         public static final Angle HARD_LIMIT_MIN = Degrees.of(5.5);
         public static final Angle HARD_LIMIT_MAX = Degrees.of(43);
 
-        public static final Angle DEFAULT_ANGLE = Degrees.of(13); // TODO
+        public static final Angle DEFAULT_ANGLE = Degrees.of(8);
 
         public static final Distance LENGTH = Inches.of(8.5);
         public static final Mass MASS = Pounds.of(4.39);
@@ -266,30 +270,53 @@ public final class Constants {
                 Inches.of(9.017),
                 Inches.of(17.912 / 2));
 
-        public static final Map<Double, Double> SHOOTER_DISTANCE_TO_HOOD_ANGLE = Map.ofEntries(
-                Map.entry(Inch.of(65).in(Meters), 90 - 84.0),
-                Map.entry(Inch.of(75).in(Meters), 90 - 83.0),
-                Map.entry(Inch.of(85).in(Meters), 90 - 82.0),
-                Map.entry(Inch.of(95).in(Meters), 90 - 81.0),
-                Map.entry(Inch.of(105).in(Meters), 90 - 80.0),
-                Map.entry(Inch.of(115).in(Meters), 90 - 79.0),
-                Map.entry(Inch.of(125).in(Meters), 90 - 78.0),
-                Map.entry(Inch.of(135).in(Meters), 90 - 77.0),
-                Map.entry(Inch.of(145).in(Meters), 90 - 76.0),
-                Map.entry(Inch.of(155).in(Meters), 90 - 75.0),
-                Map.entry(Inch.of(165).in(Meters), 90 - 73.5),
-                Map.entry(Inch.of(175).in(Meters), 90 - 72.5),
-                Map.entry(Inch.of(185).in(Meters), 90 - 71.5),
-                Map.entry(Inch.of(195).in(Meters), 90 - 70.0),
-                Map.entry(Inch.of(205).in(Meters), 90 - 69.0),
-                Map.entry(Inch.of(215).in(Meters), 90 - 67.5),
-                Map.entry(Inch.of(225).in(Meters), 90 - 65.5),
-                Map.entry(Inch.of(235).in(Meters), 90 - 64.0),
-                Map.entry(Inch.of(245).in(Meters), 90 - 62.0),
-                Map.entry(Inch.of(255).in(Meters), 90 - 60.0),
-                Map.entry(Inch.of(265).in(Meters), 90 - 57.0),
-                Map.entry(Inch.of(275).in(Meters), 90 - 54.0),
-                Map.entry(Inch.of(280).in(Meters), 90 - 50.0)); // TODO
+        public static enum FlywheelSpeedZone {
+            ZONE_1,
+            ZONE_2,
+        }
+
+        public static final Map<FlywheelSpeedZone, Map<Distance, Angle>> SHOOTER_DISTANCE_TO_HOOD_ANGLE = Map
+                .ofEntries(
+                        // 4000 RPM
+                        Map.entry(FlywheelSpeedZone.ZONE_1, Map.ofEntries(
+                                Map.entry(Meter.of(1.6698), Degrees.of(14.0)),
+                                Map.entry(Meter.of(1.9717), Degrees.of(17.5)),
+                                Map.entry(Meter.of(2.19499), Degrees.of(20.0)),
+                                Map.entry(Meter.of(2.4258), Degrees.of(22.5)),
+                                Map.entry(Meter.of(2.62955), Degrees.of(24.0)),
+                                Map.entry(Meter.of(2.802), Degrees.of(27.5)),
+                                Map.entry(Meter.of(2.9945), Degrees.of(30.0)),
+                                Map.entry(Meter.of(3.531), Degrees.of(36.0)),
+                                Map.entry(Meter.of(3.2396), Degrees.of(33.0))
+
+                        )),
+                        // 4775 RPM
+                        Map.entry(FlywheelSpeedZone.ZONE_2, Map.ofEntries(
+                                Map.entry(Meter.of(3.6212), Degrees.of(24.5)),
+                                Map.entry(Meter.of(4.0396), Degrees.of(27.2)),
+                                Map.entry(Meter.of(4.3405), Degrees.of(30.0)),
+                                Map.entry(Meter.of(4.660), Degrees.of(34.0)))));
+
+        public static final Map<FlywheelSpeedZone, AngularVelocity> SHOOTER_MIN_DISTANCE_TO_FLYWHEEL_RPM = Map
+                .ofEntries(
+                        Map.entry(FlywheelSpeedZone.ZONE_1, RPM.of(4000)),
+                        Map.entry(FlywheelSpeedZone.ZONE_2, RPM.of(4775)));
+
+        public static final Map<Distance, FlywheelSpeedZone> MIN_DISTANCE_TO_FLYWHEEL_SPEED_ZONE = Map.ofEntries(
+                Map.entry(Meters.of(0), FlywheelSpeedZone.ZONE_1),
+                Map.entry(Meters.of(3.6212), FlywheelSpeedZone.ZONE_2));
+
+        public static final Map<FlywheelSpeedZone, InterpolatingDoubleTreeMap> SHOOTER_DISTANCE_TO_HOOD_ANGLE_INTERPOLATION = Map
+                .ofEntries(
+                        Map.entry(FlywheelSpeedZone.ZONE_1, createHoodInterpolationMap(FlywheelSpeedZone.ZONE_1)),
+                        Map.entry(FlywheelSpeedZone.ZONE_2, createHoodInterpolationMap(FlywheelSpeedZone.ZONE_2)));
+
+        private static InterpolatingDoubleTreeMap createHoodInterpolationMap(FlywheelSpeedZone zone) {
+            InterpolatingDoubleTreeMap map = new InterpolatingDoubleTreeMap();
+            SHOOTER_DISTANCE_TO_HOOD_ANGLE.get(zone).forEach(
+                    (distance, angle) -> map.put(distance.in(Meters), angle.in(Degrees)));
+            return map;
+        }
     }
 
     public static final class FeederConstants {
@@ -450,5 +477,5 @@ public final class Constants {
     public static final SmartMotorControllerConfig.TelemetryVerbosity TELEMETRY_VERBOSITY = SmartMotorControllerConfig.TelemetryVerbosity.LOW; // TODO:
 
     public static final SwerveDriveTelemetry.TelemetryVerbosity SWERVE_TELEMETRY_VERBOSITY = SwerveDriveTelemetry.TelemetryVerbosity.POSE;
-    public static final boolean TELEMETRY = false; // TODO: Set to false for competition to reduce network traffic
+    public static final boolean TELEMETRY = true; // TODO: Set to false for competition to reduce network traffic
 }
