@@ -705,6 +705,15 @@ public class SwerveSubsystem extends SubsystemBase {
      * velocity of the robot, and the target translation for auto-aiming.
      */
     private void calculateAutoAimHeading() {
+
+        Translation2d target = getAutoAimTarget();
+
+        if (isRedAlliance()) {
+            target.minus(FieldConstants.AUTO_AIM_OFFSET);
+        } else {
+            target.plus(FieldConstants.AUTO_AIM_OFFSET);
+        }
+
         Translation2d delta = getAutoAimTarget().minus(getFutureTranslation());
 
         autoAimTargetRotation = delta.getAngle().minus(Rotation2d.fromDegrees(90));
