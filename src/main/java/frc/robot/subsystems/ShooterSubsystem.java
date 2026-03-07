@@ -95,6 +95,14 @@ public class ShooterSubsystem extends SubsystemBase {
                         .repeatedly());
     }
 
+    public Command shootWithHoodAngle(Angle angle) {
+        return Commands.parallel(
+                m_hoodSubsystem.setAngle(angle),
+                m_flywheelSubsystem.shoot(),
+                new ConditionalCommand(m_feederSubsystem.feed(), m_feederSubsystem.stop(), this::isShooterReady)
+                        .repeatedly());
+    }
+
     /**
      * Stops the shooting process by lowering the hood, setting the flywheel to its
      * default RPM, and stopping the feeder.

@@ -1,8 +1,13 @@
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Seconds;
+
 import choreo.auto.AutoFactory;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.subsystems.HopperSubsystem;
 import frc.robot.subsystems.IndexerSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
@@ -49,10 +54,10 @@ public class Autos {
                 m_autoFactory.trajectoryCmd("RightAuto_3"),
                 Commands.deadline(
                         m_autoFactory.trajectoryCmd("TrenchRightToAlliance"),
-                        m_linearIntakeSubsystem.retract())
-        // m_shooterSubsystem.aimAndShoot(() ->
-        // m_swerveSubsystem.getDistanceToTarget(true),
-        // m_swerveSubsystem::isAutoAimOnTarget)
-        );
+                        m_linearIntakeSubsystem.retract()),
+                Commands.deadline(Commands.waitTime(Seconds.of(3)),
+                        m_swerveSubsystem.stop(),
+                        m_shooterSubsystem.shootWithHoodAngle(Degrees.of(35))),
+                m_autoFactory.trajectoryCmd("RightAuto_1"));
     }
 }

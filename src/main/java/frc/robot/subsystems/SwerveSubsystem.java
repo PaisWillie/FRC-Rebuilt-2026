@@ -36,6 +36,7 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import frc.robot.Constants;
@@ -203,6 +204,10 @@ public class SwerveSubsystem extends SubsystemBase {
         return run(() -> {
             swerveDrive.drive(new Translation2d(0, -1), 0, false, false);
         }).finallyDo(() -> swerveDrive.drive(new Translation2d(0, 0), 0, false, false));
+    }
+
+    public Command stop() {
+        return new InstantCommand(() -> drive(new ChassisSpeeds(0, 0, 0)));
     }
 
     /**
