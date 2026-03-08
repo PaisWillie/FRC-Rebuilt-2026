@@ -81,7 +81,6 @@ public class Autos {
         Command driveBackWithAutoAimCmd = m_swerveSubsystem.driveFieldOriented(driveBackWithAutoAim);
 
         return Commands.sequence(
-
                 m_autoFactory.resetOdometry("RightAuto_1"),
                 m_autoFactory.trajectoryCmd("RightAuto_1"),
                 Commands.deadline(
@@ -146,11 +145,12 @@ public class Autos {
 
     public Command shootPreloadAuto() {
         return Commands.sequence(
+                m_autoFactory.resetOdometry("ShootPreloadAuto"),
                 m_autoFactory.trajectoryCmd("ShootPreloadAuto"),
                 Commands.waitSeconds(3),
                 Commands.parallel(
                         m_indexerSubsystem.run(),
                         m_intakeRollerSubsystem.intake(),
-                        m_shooterSubsystem.shootWithHoodAngle(Degrees.of(7))));
+                        m_shooterSubsystem.shootWithHoodAngle(Degrees.of(1.5))));
     }
 }
