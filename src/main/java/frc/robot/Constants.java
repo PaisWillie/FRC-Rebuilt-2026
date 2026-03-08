@@ -375,6 +375,9 @@ public final class Constants {
             public static final DCMotor LEADER_MOTOR = DCMotor.getFalcon500Foc(1);
             public static final DCMotor FOLLOWER_MOTOR = DCMotor.getFalcon500Foc(1);
 
+            public static final boolean LEADER_MOTOR_INVERTED = false;
+            public static final boolean FOLLOWER_MOTOR_INVERTED = true;
+
             public static final MechanismGearing GEARBOX = new MechanismGearing(GearBox.fromReductionStages(12));
 
             public static final Distance CHAIN_PITCH = Inches.of(0.25);
@@ -411,6 +414,7 @@ public final class Constants {
             public static final Distance STARTING_HEIGHT = SOFT_LOWER_LIMIT;
             public static final Distance FIRST_LEVEL_HEIGHT = Meters.of(0.20); // TODO
             public static final Distance SECOND_LEVEL_HEIGHT = Meters.of(0.30); // TODO
+            public static final Distance MAX_HEIGHT = SOFT_UPPER_LIMIT;
 
             public static final Time HOMING_DEBOUNCE_TIME = Seconds.of(0.4); // TODO
             public static final Voltage HOMING_RUN_VOLTS = Volts.of(-2); // TODO

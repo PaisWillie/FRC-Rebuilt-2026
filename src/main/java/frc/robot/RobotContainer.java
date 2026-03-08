@@ -29,12 +29,14 @@ import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.Constants.SwerveConstants;
+import frc.robot.Constants.ClimbConstants.ElevatorConstants;
 import frc.robot.subsystems.HopperSubsystem;
 import frc.robot.subsystems.IndexerSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.SimSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.SwerveSubsystem.Zone;
+import frc.robot.subsystems.climb.ElevatorSubsystem;
 import frc.robot.subsystems.intake.IntakeRollerSubsystem;
 import frc.robot.subsystems.intake.LinearIntakeSubsystem;
 import frc.robot.subsystems.intake.LinearIntakeSubsystem.LinearIntakePosition;
@@ -47,6 +49,8 @@ import frc.robot.utils.LimelightWrapper;
 
 public class RobotContainer {
     final CommandPS5Controller m_driverController = new CommandPS5Controller(Constants.DRIVER_CONTROLLER_PORT);
+
+    private final ElevatorSubsystem m_elevatorSubsystem = new ElevatorSubsystem();
 
     // private final ClimbSubsystem m_climbSubsystem = new ClimbSubsystem();
     private final HopperSubsystem m_hopperSubsystem = new HopperSubsystem();
@@ -403,6 +407,11 @@ public class RobotContainer {
                                 m_shooterSubsystem.storeFuel()),
                         m_shooterSubsystem.stopShooting(),
                         m_driverController.L2()::getAsBoolean));
+
+        m_driverController.cross().onTrue(m_elevatorSubsystem.setHeight(ElevatorConstants.STARTING_HEIGHT));
+        m_driverController.square().onTrue(m_elevatorSubsystem.setHeight(ElevatorConstants.FIRST_LEVEL_HEIGHT));
+        m_driverController.circle().onTrue(m_elevatorSubsystem.setHeight(ElevatorConstants.SECOND_LEVEL_HEIGHT));
+        m_driverController.triangle().onTrue(m_elevatorSubsystem.setHeight(ElevatorConstants.MAX_HEIGHT));
     }
 
     /**
