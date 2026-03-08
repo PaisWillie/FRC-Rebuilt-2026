@@ -4,7 +4,6 @@ import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Degree;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.DegreesPerSecond;
-import static edu.wpi.first.units.Units.Inch;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.InchesPerSecond;
 import static edu.wpi.first.units.Units.InchesPerSecondPerSecond;
@@ -22,7 +21,6 @@ import static edu.wpi.first.units.Units.Volts;
 import java.util.Map;
 
 import edu.wpi.first.math.Matrix;
-import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
@@ -127,6 +125,7 @@ public final class Constants {
             public static final int RETRACTED_LIMIT_SWITCH_DIO = 4;
 
             public static final boolean INVERT_MOTOR = true;
+            public static final MotorMode IDLE_MODE = MotorMode.COAST;
 
             public static final Distance MOTOR_CIRCUMFERENCE = Inches.of(1).times(Math.PI);
             public static final GearBox GEARBOX = GearBox.fromStages("54:16", "18:12");

@@ -71,7 +71,7 @@ public class LinearIntakeSubsystem extends SubsystemBase {
                         LinearIntakeConstants.SOFT_LIMIT_MIN,
                         LinearIntakeConstants.SOFT_LIMIT_MAX)
                 .withGearing(new MechanismGearing(LinearIntakeConstants.GEARBOX))
-                .withIdleMode(MotorMode.BRAKE)
+                .withIdleMode(LinearIntakeConstants.IDLE_MODE)
                 .withTelemetry("LinearIntakeMotor", Constants.TELEMETRY_VERBOSITY)
                 .withStatorCurrentLimit(LinearIntakeConstants.STATOR_CURRENT_LIMIT)
                 .withMotorInverted(LinearIntakeConstants.INVERT_MOTOR)
