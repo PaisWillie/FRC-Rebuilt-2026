@@ -247,11 +247,6 @@ public class RobotContainer {
                 .onTrue(m_intakeRollerSubsystem.intake())
                 .onFalse(m_intakeRollerSubsystem.stop()
                         .unless(m_driverController.L2()::getAsBoolean));
-        m_driverController.R2()
-                .onTrue(m_linearIntakeSubsystem.shuffle()
-                        .unless(m_driverController.L2()::getAsBoolean))
-                .onFalse(m_linearIntakeSubsystem.retract()
-                        .unless(m_driverController.L2()::getAsBoolean));
 
         if (Robot.isSimulation()) {
             SimulatedArena.getInstance().addGamePiece(new RebuiltFuelOnField(new Translation2d(3, 3)));
@@ -270,15 +265,6 @@ public class RobotContainer {
                                             && m_swerveSubsystem
                                                     .isAutoAimOnTarget())
                                     .repeatedly());
-
-            m_driverController.L2()
-                    .onTrue(
-                            new ConditionalCommand(m_simSubsystem.startIntake(),
-                                    m_simSubsystem.stopIntake(),
-                                    () -> m_linearIntakeSubsystem
-                                            .getCurrentPositionEnum() == LinearIntakePosition.EXTENDED)
-                                    .repeatedly())
-                    .onFalse(m_simSubsystem.stopIntake());
 
             m_driverController.L3().onTrue(m_swerveSubsystem.simulationLocalize());
             m_driverController.R3().onTrue(m_swerveSubsystem.simulationLocalize());
@@ -303,9 +289,6 @@ public class RobotContainer {
 
         // Extend intake, expand hopper, and run intake rollers
         m_driverController.L2()
-                .onTrue(m_linearIntakeSubsystem.extend())
-                .onFalse(m_linearIntakeSubsystem.retract());
-        m_driverController.L2()
                 .onTrue(m_hopperSubsystem.expand());
         m_driverController.L2()
                 .onTrue(m_intakeRollerSubsystem.intake())
@@ -319,25 +302,6 @@ public class RobotContainer {
                         m_indexerSubsystem.stop()
                                 .unless(m_driverController.R2()::getAsBoolean));
 
-        m_driverController.L1()
-                .and(m_driverController.R2().negate()) // Not shooting
-                .and(m_driverController.L2().negate()) // Not intaking
-
-                // Extend intake, reverse indexer and intake rollers at the same time
-                .onTrue(Commands.sequence( // TODO: Check if sequence is needed, or if parallel alone is
-                                           // fine
-                        m_linearIntakeSubsystem.extend(),
-                        Commands.parallel(
-                                m_indexerSubsystem.reverse(),
-                                m_intakeRollerSubsystem.outtake())))
-
-                // Retract intake, then stop indexer and intake rollers
-                .onFalse(
-                        Commands.sequence(
-                                m_linearIntakeSubsystem.retract(),
-                                Commands.parallel(
-                                        m_indexerSubsystem.stop(),
-                                        m_intakeRollerSubsystem.stop())));
 
         // PID-tuned auto-align for climbing start position
         driveAngularVelocity.driveToPose(m_swerveSubsystem::getSelectedClimbPose,
