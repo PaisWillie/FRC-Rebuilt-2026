@@ -42,21 +42,19 @@ public class ElevatorSubsystem extends SubsystemBase {
     private final TalonFX m_leaderMotor;
     private final TalonFX m_followerMotor;
 
-    // Generic Smart Motor Controller with our options and vendor motor.
     private final SmartMotorController m_leaderSmartMotorController;
     private final SmartMotorController m_followerSmartMotorController;
 
-    private final SmartMotorControllerConfig m_leaderMotorSMCConfig;
+    private final SmartMotorControllerConfig m_smcConfig;
 
-    // Arm mechanism
     private final Elevator m_climb;
 
     public ElevatorSubsystem() {
         m_leaderMotor = new TalonFX(ElevatorConstants.LEADER_MOTOR_CAN_ID);
         m_followerMotor = new TalonFX(ElevatorConstants.FOLLOWER_MOTOR_CAN_ID);
 
-        SmartMotorControllerConfig followerMotorSMCConfig = new SmartMotorControllerConfig(this)
-                .withMotorInverted(true)
+        m_smcConfig = new SmartMotorControllerConfig(this)
+                .withMotorInverted(ElevatorConstants.LEADER_MOTOR_INVERTED)
                 .withIdleMode(MotorMode.BRAKE)
                 .withControlMode(ControlMode.CLOSED_LOOP)
                 .withMechanismCircumference(
@@ -66,7 +64,7 @@ public class ElevatorSubsystem extends SubsystemBase {
                 .withSupplyCurrentLimit(ElevatorConstants.SUPPLY_CURRENT_LIMIT)
                 .withClosedLoopRampRate(ElevatorConstants.CLOSED_LOOP_RAMP_RATE)
                 .withOpenLoopRampRate(ElevatorConstants.OPEN_LOOP_RAMP_RATE)
-                .withTelemetry("FollowerElevatorMotor", Constants.TELEMETRY_VERBOSITY)
+                .withTelemetry("ElevatorMotor", Constants.TELEMETRY_VERBOSITY)
                 .withClosedLoopController(
                         ElevatorConstants.PID_kP,
                         ElevatorConstants.PID_kI,
@@ -87,42 +85,10 @@ public class ElevatorSubsystem extends SubsystemBase {
                 .withSoftLimit(ElevatorConstants.SOFT_LOWER_LIMIT, ElevatorConstants.SOFT_UPPER_LIMIT);
 
         m_followerSmartMotorController = new TalonFXWrapper(m_followerMotor, ElevatorConstants.FOLLOWER_MOTOR,
-                followerMotorSMCConfig);
-
-        m_leaderMotorSMCConfig = new SmartMotorControllerConfig(this)
-                .withMotorInverted(false)
-                .withIdleMode(MotorMode.BRAKE)
-                .withControlMode(ControlMode.CLOSED_LOOP)
-                .withMechanismCircumference(
-                        ElevatorConstants.CHAIN_PITCH.times(ElevatorConstants.TOOTH_COUNT))
-                .withGearing(ElevatorConstants.GEARBOX)
-                .withStatorCurrentLimit(ElevatorConstants.STATOR_CURRENT_LIMIT)
-                .withSupplyCurrentLimit(ElevatorConstants.SUPPLY_CURRENT_LIMIT)
-                .withClosedLoopRampRate(ElevatorConstants.CLOSED_LOOP_RAMP_RATE)
-                .withOpenLoopRampRate(ElevatorConstants.OPEN_LOOP_RAMP_RATE)
-                .withTelemetry("LeaderElevatorMotor", Constants.TELEMETRY_VERBOSITY)
-                .withClosedLoopController(
-                        ElevatorConstants.PID_kP,
-                        ElevatorConstants.PID_kI,
-                        ElevatorConstants.PID_kD,
-                        ElevatorConstants.MAX_VELOCITY,
-                        ElevatorConstants.MAX_ACCELERATION)
-                .withSimClosedLoopController(
-                        ElevatorConstants.SIM_PID_kP,
-                        ElevatorConstants.SIM_PID_kI,
-                        ElevatorConstants.SIM_PID_kD,
-                        ElevatorConstants.MAX_VELOCITY,
-                        ElevatorConstants.MAX_ACCELERATION)
-                .withFeedforward(new ElevatorFeedforward(
-                        ElevatorConstants.FEEDFORWARD_kS,
-                        ElevatorConstants.FEEDFORWARD_kG,
-                        ElevatorConstants.FEEDFORWARD_kV,
-                        ElevatorConstants.FEEDFORWARD_kA))
-                .withSoftLimit(ElevatorConstants.SOFT_LOWER_LIMIT, ElevatorConstants.SOFT_UPPER_LIMIT)
-                .withLooselyCoupledFollowers(m_followerSmartMotorController);
+                m_smcConfig.clone().withMotorInverted(ElevatorConstants.FOLLOWER_MOTOR_INVERTED));
 
         m_leaderSmartMotorController = new TalonFXWrapper(m_leaderMotor, ElevatorConstants.LEADER_MOTOR,
-                m_leaderMotorSMCConfig);
+                m_smcConfig.withLooselyCoupledFollowers(m_followerSmartMotorController));
 
         ElevatorConfig climbConfig = new ElevatorConfig(m_leaderSmartMotorController)
                 .withMass(ElevatorConstants.MASS)
@@ -197,7 +163,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         if (!angleSetpoint.isPresent()) {
             return Optional.empty();
         }
-        return Optional.of(m_leaderMotorSMCConfig.convertFromMechanism(angleSetpoint.get()));
+        return Optional.of(m_smcConfig.convertFromMechanism(angleSetpoint.get()));
     }
 
     public Command stop() {
