@@ -146,10 +146,6 @@ public class ElevatorSubsystem extends SubsystemBase {
                 });
     }
 
-    public Command elevCmd(double dutycycle) {
-        return m_climb.set(dutycycle);
-    }
-
     public Command setHeight(Distance height) {
         return m_climb.setHeight(height);
     }
