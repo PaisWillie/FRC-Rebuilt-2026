@@ -34,7 +34,6 @@ import yams.mechanisms.positional.Elevator;
 import yams.motorcontrollers.SmartMotorController;
 import yams.motorcontrollers.SmartMotorControllerConfig;
 import yams.motorcontrollers.SmartMotorControllerConfig.ControlMode;
-import yams.motorcontrollers.SmartMotorControllerConfig.MotorMode;
 import yams.motorcontrollers.remote.TalonFXWrapper;
 
 public class LinearIntakeSubsystem extends SubsystemBase {
@@ -43,8 +42,11 @@ public class LinearIntakeSubsystem extends SubsystemBase {
     private final SmartMotorControllerConfig m_smcConfig;
     private final Elevator m_linearIntake;
 
-    private final DigitalInput m_extendedLimitSwitch;
-    private final DigitalInput m_retractedLimitSwitch;
+    private final DigitalInput m_leftExtendedLimitSwitch;
+    private final DigitalInput m_leftRetractedLimitSwitch;
+
+    private final DigitalInput m_rightExtendedLimitSwitch;
+    private final DigitalInput m_rightRetractedLimitSwitch;
 
     private final Trigger m_extendedTrigger;
     private final Trigger m_retractedTrigger;
@@ -105,8 +107,11 @@ public class LinearIntakeSubsystem extends SubsystemBase {
 
         m_linearIntake = new Elevator(linearConfig);
 
-        m_extendedLimitSwitch = new DigitalInput(LinearIntakeConstants.EXTENDED_LIMIT_SWITCH_DIO);
-        m_retractedLimitSwitch = new DigitalInput(LinearIntakeConstants.RETRACTED_LIMIT_SWITCH_DIO);
+        m_leftExtendedLimitSwitch = new DigitalInput(LinearIntakeConstants.LEFT_EXTENDED_LIMIT_SWITCH_DIO);
+        m_leftRetractedLimitSwitch = new DigitalInput(LinearIntakeConstants.LEFT_RETRACTED_LIMIT_SWITCH_DIO);
+
+        m_rightExtendedLimitSwitch = new DigitalInput(LinearIntakeConstants.RIGHT_EXTENDED_LIMIT_SWITCH_DIO);
+        m_rightRetractedLimitSwitch = new DigitalInput(LinearIntakeConstants.RIGHT_RETRACTED_LIMIT_SWITCH_DIO);
 
         m_extendedTrigger = new Trigger(this::getExtendedLimitSwitch);
         m_retractedTrigger = new Trigger(this::getRetractedLimitSwitch);
@@ -200,11 +205,11 @@ public class LinearIntakeSubsystem extends SubsystemBase {
     }
 
     public boolean getExtendedLimitSwitch() {
-        return m_extendedLimitSwitch.get();
+        return m_leftExtendedLimitSwitch.get() || m_rightExtendedLimitSwitch.get();
     }
 
     public boolean getRetractedLimitSwitch() {
-        return m_retractedLimitSwitch.get();
+        return m_leftRetractedLimitSwitch.get() || m_rightRetractedLimitSwitch.get();
     }
 
     public Command setEncoderPositionExtended() {
