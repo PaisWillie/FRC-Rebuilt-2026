@@ -714,7 +714,7 @@ public class SwerveSubsystem extends SubsystemBase {
             target.plus(FieldConstants.AUTO_AIM_OFFSET);
         }
 
-        Translation2d delta = getAutoAimTarget().minus(getFutureTranslation());
+        Translation2d delta = target.minus(getFutureTranslation());
 
         autoAimTargetRotation = delta.getAngle().minus(Rotation2d.fromDegrees(90));
     }
