@@ -131,16 +131,11 @@ public class ShooterSubsystem extends SubsystemBase {
      * @return a Command that performs the fuel storing sequence when executed
      */
     public Command storeFuel() {
-
-        // TODO: Remove this when beam break sensor is working
-        return Commands.none();
-
-        // return m_feederSubsystem.feed()
-        // .until(m_feederSubsystem::isBeamBroken)
-        // .finallyDo(interrupted -> m_feederSubsystem.reverse() // TODO: Check
-        // behavious if interrupted while
-        // // feeding
-        // .until(() -> !m_feederSubsystem.isBeamBroken()));
+        return m_feederSubsystem.feed()
+                .until(m_feederSubsystem::isBeamBroken)
+                .finallyDo(interrupted -> m_feederSubsystem.reverse() // TODO: Check
+                        // behavious if interrupted while feeding
+                        .until(() -> !m_feederSubsystem.isBeamBroken()));
     }
 
     /**
