@@ -62,10 +62,13 @@ public class RobotContainer {
         m_swerveSubsystem.setDefaultCommand(driveFieldOrientedAngularVelocity);
         m_driverController.options().onTrue((Commands.runOnce(m_swerveSubsystem::zeroGyro)));
 
-        m_driverController.cross().whileTrue(m_elevatorSubsystem.sysId());
         m_driverController.povDown().onTrue(m_elevatorSubsystem.setHeight(ElevatorConstants.STARTING_HEIGHT));
         m_driverController.povLeft().onTrue(m_elevatorSubsystem.setHeight(ElevatorConstants.FIRST_LEVEL_HEIGHT));
         m_driverController.povRight().onTrue(m_elevatorSubsystem.setHeight(ElevatorConstants.SECOND_LEVEL_HEIGHT));
         m_driverController.povUp().onTrue(m_elevatorSubsystem.setHeight(ElevatorConstants.SOFT_UPPER_LIMIT));
+
+        m_driverController.cross().onTrue(m_elevatorSubsystem.elevCmd(-0.5)).onFalse(m_elevatorSubsystem.elevCmd(0.0));
+        m_driverController.triangle().onTrue(m_elevatorSubsystem.elevCmd(0.5))
+                .onFalse(m_elevatorSubsystem.elevCmd(0.0));
     }
 }
