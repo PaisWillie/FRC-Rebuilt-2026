@@ -122,8 +122,16 @@ public class LinearIntakeSubsystem extends SubsystemBase {
                 .finallyDo(SignalLogger::stop);
     }
 
+    public Command stop() {
+        return this.runOnce(() -> {
+            m_smartMotorController.stopClosedLoopController();
+            m_smartMotorController.setDutyCycle(0);
+        });
+    }
+
     public Command setPosition(Distance position) {
-        return m_linearIntake.runTo(position, LinearIntakeConstants.POSITION_TARGET_ERROR);
+        return m_linearIntake.runTo(position, LinearIntakeConstants.POSITION_TARGET_ERROR)
+                .andThen(stop());
     }
 
     public Distance getPosition() {
