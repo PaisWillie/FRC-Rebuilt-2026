@@ -788,19 +788,24 @@ public class SwerveSubsystem extends SubsystemBase {
         Optional<LimelightResults> results = limelight.getLatestResults();
         if (results.isPresent()/* && poseEstimates.isPresent() */) {
             LimelightResults result = results.get();
-            PoseEstimate poseEstimate = poseEstimates.get();
+            // PoseEstimate poseEstimate = poseEstimates.get();
 
-            SmartDashboard.putNumber("Avg Tag Ambiguity", poseEstimate.getAvgTagAmbiguity());
-            SmartDashboard.putNumber("Min Tag Ambiguity", poseEstimate.getMinTagAmbiguity());
-            SmartDashboard.putNumber("Max Tag Ambiguity", poseEstimate.getMaxTagAmbiguity());
-            SmartDashboard.putNumber("Avg Distance", poseEstimate.avgTagDist);
-            SmartDashboard.putNumber("Avg Tag Area", poseEstimate.avgTagArea);
-            SmartDashboard.putNumber("Odom Pose/x", swerveDrive.getPose().getX());
-            SmartDashboard.putNumber("Odom Pose/y", swerveDrive.getPose().getY());
-            SmartDashboard.putNumber("Odom Pose/degrees", swerveDrive.getPose().getRotation().getDegrees());
-            SmartDashboard.putNumber("Limelight Pose/x", poseEstimate.pose.getX());
-            SmartDashboard.putNumber("Limelight Pose/y", poseEstimate.pose.getY());
-            SmartDashboard.putNumber("Limelight Pose/degrees", poseEstimate.pose.toPose2d().getRotation().getDegrees());
+            // SmartDashboard.putNumber("Avg Tag Ambiguity",
+            // poseEstimate.getAvgTagAmbiguity());
+            // SmartDashboard.putNumber("Min Tag Ambiguity",
+            // poseEstimate.getMinTagAmbiguity());
+            // SmartDashboard.putNumber("Max Tag Ambiguity",
+            // poseEstimate.getMaxTagAmbiguity());
+            // SmartDashboard.putNumber("Avg Distance", poseEstimate.avgTagDist);
+            // SmartDashboard.putNumber("Avg Tag Area", poseEstimate.avgTagArea);
+            // SmartDashboard.putNumber("Odom Pose/x", swerveDrive.getPose().getX());
+            // SmartDashboard.putNumber("Odom Pose/y", swerveDrive.getPose().getY());
+            // SmartDashboard.putNumber("Odom Pose/degrees",
+            // swerveDrive.getPose().getRotation().getDegrees());
+            // SmartDashboard.putNumber("Limelight Pose/x", poseEstimate.pose.getX());
+            // SmartDashboard.putNumber("Limelight Pose/y", poseEstimate.pose.getY());
+            // SmartDashboard.putNumber("Limelight Pose/degrees",
+            // poseEstimate.pose.toPose2d().getRotation().getDegrees());
 
             if (result.valid) {
                 Pose2d usefulPose = result.getBotPose2d(Alliance.Blue);
