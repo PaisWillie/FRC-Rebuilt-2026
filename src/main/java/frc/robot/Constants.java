@@ -72,6 +72,15 @@ public final class Constants {
         public static final Translation2d RED_LEFT_FEEDING_TARGET = new Translation2d(14.473375, 2.01725);
         public static final Translation2d RED_RIGHT_FEEDING_TARGET = new Translation2d(14.473375, 6.05175);
 
+        public static final Pose2d BLUE_LEFT_CORNER_AUTO_ALIGN = new Pose2d(new Translation2d(0.500, 7.569),
+                new Rotation2d(Degrees.of(-37.23)));
+        public static final Pose2d BLUE_RIGHT_CORNER_AUTO_ALIGN = new Pose2d(new Translation2d(0.500, 0.500),
+                new Rotation2d(Degrees.of(37.23)));
+        public static final Pose2d RED_LEFT_CORNER_AUTO_ALIGN = new Pose2d(new Translation2d(16.041, 0.500),
+                new Rotation2d(Degrees.of(141.6)));
+        public static final Pose2d RED_RIGHT_CORNER_AUTO_ALIGN = new Pose2d(new Translation2d(16.041, 7.569),
+                new Rotation2d(Degrees.of(-141.6)));
+
         public static final Pose2d RED_LEFT_TOWER_CLIMB_POS = new Pose2d(15.105, 3.885,
                 new Rotation2d(Degree.of(180)));
         public static final Pose2d RED_RIGHT_TOWER_CLIMB_POS = new Pose2d(15.105, 4.764,

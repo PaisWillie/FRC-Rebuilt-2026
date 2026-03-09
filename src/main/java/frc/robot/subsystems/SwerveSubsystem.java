@@ -66,7 +66,7 @@ public class SwerveSubsystem extends SubsystemBase {
 
     private Rotation2d autoAimTargetRotation = new Rotation2d();
 
-    private Pose2d m_selectedClimbPose;
+    private Pose2d m_selectedDriveToPose;
 
     private final PIDController m_choreoControllerX = new PIDController(10.0, 0.0, 0.0);
     private final PIDController m_choreoControllerY = new PIDController(10.0, 0.0, 0.0);
@@ -113,9 +113,9 @@ public class SwerveSubsystem extends SubsystemBase {
         // possible
 
         if (isRedAlliance()) {
-            m_selectedClimbPose = SwerveConstants.RED_LEFT_TOWER_CLIMB_POS;
+            m_selectedDriveToPose = SwerveConstants.RED_LEFT_TOWER_CLIMB_POS;
         } else {
-            m_selectedClimbPose = SwerveConstants.BLUE_LEFT_TOWER_CLIMB_POS;
+            m_selectedDriveToPose = SwerveConstants.BLUE_LEFT_TOWER_CLIMB_POS;
         }
 
         m_choreoControllerHeading.enableContinuousInput(-Math.PI, Math.PI);
@@ -746,16 +746,26 @@ public class SwerveSubsystem extends SubsystemBase {
 
     public void setSelectedClimbPose(boolean isLeft) {
         if (isRedAlliance()) {
-            m_selectedClimbPose = isLeft ? SwerveConstants.RED_LEFT_TOWER_CLIMB_POS
+            m_selectedDriveToPose = isLeft ? SwerveConstants.RED_LEFT_TOWER_CLIMB_POS
                     : SwerveConstants.RED_RIGHT_TOWER_CLIMB_POS;
         } else {
-            m_selectedClimbPose = isLeft ? SwerveConstants.BLUE_LEFT_TOWER_CLIMB_POS
+            m_selectedDriveToPose = isLeft ? SwerveConstants.BLUE_LEFT_TOWER_CLIMB_POS
                     : SwerveConstants.BLUE_RIGHT_TOWER_CLIMB_POS;
         }
     }
 
-    public Pose2d getSelectedClimbPose() {
-        return m_selectedClimbPose;
+    public void setSelectedAutoAimCornerPose(boolean isLeft) {
+        if (isRedAlliance()) {
+            m_selectedDriveToPose = isLeft ? SwerveConstants.RED_LEFT_CORNER_AUTO_ALIGN
+                    : SwerveConstants.RED_RIGHT_CORNER_AUTO_ALIGN;
+        } else {
+            m_selectedDriveToPose = isLeft ? SwerveConstants.BLUE_LEFT_CORNER_AUTO_ALIGN
+                    : SwerveConstants.BLUE_RIGHT_CORNER_AUTO_ALIGN;
+        }
+    }
+
+    public Pose2d getSelectedDriveToPose() {
+        return m_selectedDriveToPose;
     }
 
     @Override
