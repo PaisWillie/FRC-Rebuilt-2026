@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.ClimbConstants.ElevatorConstants;
 import frc.robot.subsystems.climb.ElevatorSubsystem;
 import frc.robot.subsystems.climb.TongueSubsystem;
 
@@ -98,6 +99,17 @@ public class ClimbSubsystem extends SubsystemBase {
             m_elevatorSubsystem.stop();
             m_tongueSubsystem.stop();
         }).withName("CLMB - Interrupt Climb");
+    }
+
+    public Command raiseClimb() {
+        return runOnce(() -> {
+            m_isClimbAttempted = true;
+            m_elevatorSubsystem.setHeight(ElevatorConstants.SOFT_UPPER_LIMIT);
+        });
+    }
+
+    public boolean isClimbAttempted() {
+        return m_isClimbAttempted;
     }
 
     @Override
