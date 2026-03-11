@@ -28,6 +28,7 @@ public class ClimbSubsystem extends SubsystemBase {
         m_elevatorSubsystem = new ElevatorSubsystem();
         m_tongueSubsystem = new TongueSubsystem();
         m_currentClimbPosition = ClimbPosition.NONE;
+        m_isClimbAttempted = false;
         m_isClimbInterrupted = false;
     }
 
@@ -98,6 +99,10 @@ public class ClimbSubsystem extends SubsystemBase {
             m_elevatorSubsystem.stop();
             m_tongueSubsystem.stop();
         }).withName("CLMB - Interrupt Climb");
+    }
+
+    public boolean isClimbAttempted() {
+        return m_isClimbAttempted;
     }
 
     @Override

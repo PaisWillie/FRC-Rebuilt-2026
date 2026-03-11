@@ -29,6 +29,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.Constants.SwerveConstants;
+import frc.robot.subsystems.ClimbSubsystem;
 import frc.robot.subsystems.HopperSubsystem;
 import frc.robot.subsystems.IndexerSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
@@ -48,7 +49,7 @@ import frc.robot.utils.LimelightWrapper;
 public class RobotContainer {
     final CommandPS5Controller m_driverController = new CommandPS5Controller(Constants.DRIVER_CONTROLLER_PORT);
 
-    // private final ClimbSubsystem m_climbSubsystem = new ClimbSubsystem();
+    private final ClimbSubsystem m_climbSubsystem = new ClimbSubsystem();
     private final HopperSubsystem m_hopperSubsystem = new HopperSubsystem();
     private final IndexerSubsystem m_indexerSubsystem = new IndexerSubsystem();
     private final IntakeRollerSubsystem m_intakeRollerSubsystem = new IntakeRollerSubsystem();
@@ -340,7 +341,7 @@ public class RobotContainer {
                                         m_intakeRollerSubsystem.stop())));
 
         // PID-tuned auto-align for climbing start position
-        driveAngularVelocity.driveToPose(m_swerveSubsystem::getSelectedClimbPose,
+        driveAngularVelocity.driveToPose(m_swerveSubsystem::getSelectedDriveToPose,
                 new ProfiledPIDController(
                         SwerveConstants.DRIVE_TO_POSE_TRANSLATION_kP,
                         SwerveConstants.DRIVE_TO_POSE_TRANSLATION_kI,
@@ -363,7 +364,8 @@ public class RobotContainer {
                                 () -> m_swerveSubsystem.setSelectedClimbPose(true)),
                         Commands.runEnd(
                                 () -> driveAngularVelocity.driveToPoseEnabled(true),
-                                () -> driveAngularVelocity.driveToPoseEnabled(false))));
+                                () -> driveAngularVelocity.driveToPoseEnabled(false)))
+                        .onlyIf(m_climbSubsystem::isClimbAttempted));
 
         // Auto-align to right side tower for climbing
         m_driverController.povRight().whileTrue(
@@ -372,7 +374,28 @@ public class RobotContainer {
                                 () -> m_swerveSubsystem.setSelectedClimbPose(false)),
                         Commands.runEnd(
                                 () -> driveAngularVelocity.driveToPoseEnabled(true),
-                                () -> driveAngularVelocity.driveToPoseEnabled(false))));
+                                () -> driveAngularVelocity.driveToPoseEnabled(false)))
+                        .onlyIf(m_climbSubsystem::isClimbAttempted));
+
+        // Auto-align to left side corner for shooting
+        m_driverController.povLeft().whileTrue(
+                Commands.sequence(
+                        new InstantCommand(
+                                () -> m_swerveSubsystem.setSelectedAutoAimCornerPose(true)),
+                        Commands.runEnd(
+                                () -> driveAngularVelocity.driveToPoseEnabled(true),
+                                () -> driveAngularVelocity.driveToPoseEnabled(false)))
+                        .unless(m_climbSubsystem::isClimbAttempted));
+
+        // Auto-align to right side corner for shooting
+        m_driverController.povRight().whileTrue(
+                Commands.sequence(
+                        new InstantCommand(
+                                () -> m_swerveSubsystem.setSelectedAutoAimCornerPose(false)),
+                        Commands.runEnd(
+                                () -> driveAngularVelocity.driveToPoseEnabled(true),
+                                () -> driveAngularVelocity.driveToPoseEnabled(false)))
+                        .unless(m_climbSubsystem::isClimbAttempted));
 
         // Auto-traverse the trench through left side
         m_driverController.L3().whileTrue(
