@@ -27,6 +27,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SelectCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.Constants.SwerveConstants;
 import frc.robot.subsystems.HopperSubsystem;
@@ -165,6 +166,10 @@ public class RobotContainer {
         // autoChooser.addCmd("Right Neutral Zone Auto", m_autos::rightAuto);
         // autoChooser.addCmd("Left Neutral Zone Auto", m_autos::leftAuto);
         autoChooser.addCmd("Center Shoot Preload Auto", m_autos::shootPreloadAuto);
+        autoChooser.addCmd("Depot", m_autos::depotIntakeAuto);
+        autoChooser.addCmd("DepotOnly", m_autos::depotOnlyAuto);
+        autoChooser.addCmd("LeftPreLoadNeutral", m_autos::preLoadAndSweep);
+        autoChooser.addCmd("sweep", m_autos::sweep);
 
         SmartDashboard.putData("Auto Chooser", autoChooser);
         RobotModeTriggers.autonomous().whileTrue(autoChooser.selectedCommandScheduler());
@@ -235,12 +240,27 @@ public class RobotContainer {
         m_driverController.options().onTrue((Commands.runOnce(m_swerveSubsystem::zeroGyroWithAlliance)));
         m_driverController.create().whileTrue(m_swerveSubsystem.centerModulesCommand());
 
+        // Trigger for if driver is controlling the robot
+        Trigger isControllingDriveTrigger = new Trigger(() -> Math
+                .abs(m_driverController.getLeftX()) > OperatorConstants.DEADBAND
+                || Math.abs(m_driverController.getLeftY()) > OperatorConstants.DEADBAND);
+
         // Auto-aim (swerve heading with calculated hood angle) and shoot
         m_driverController.R2().whileTrue(driveFieldOrientedAutoAim);
         m_driverController.R2()
+                .and(isControllingDriveTrigger)
                 .onTrue(m_shooterSubsystem.aimAndShoot(
                         () -> m_swerveSubsystem.getDistanceToTarget(true),
-                        m_swerveSubsystem::isAutoAimOnTarget))
+                        m_swerveSubsystem::isAutoAimOnTarget)
+                        .beforeStarting(m_shooterSubsystem.stopFeeder()));
+        m_driverController.R2()
+                .and(isControllingDriveTrigger.negate())
+                .onTrue(m_shooterSubsystem.aimAndShoot(
+                        () -> m_swerveSubsystem.getDistanceToTarget(true),
+                        m_swerveSubsystem::isAutoAimOnTarget, true)
+                        .beforeStarting(m_shooterSubsystem.stopFeeder()));
+        // Stop shooter subsystem
+        m_driverController.R2()
                 .onFalse(new ConditionalCommand(
                         Commands.sequence(
                                 m_shooterSubsystem.stopShooting(),
@@ -307,6 +327,11 @@ public class RobotContainer {
                 .and(m_driverController.R2().negate())
                 .onTrue(m_indexerSubsystem.run())
                 .onFalse(m_indexerSubsystem.stop()
+                        .unless(m_driverController.L2()::getAsBoolean));
+        m_driverController.R1()
+                .onTrue(m_linearIntakeSubsystem.shuffle()
+                        .unless(m_driverController.L2()::getAsBoolean))
+                .onFalse(m_linearIntakeSubsystem.retract()
                         .unless(m_driverController.L2()::getAsBoolean));
 
         // Extend intake, expand hopper, and run intake rollers

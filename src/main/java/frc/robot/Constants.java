@@ -67,10 +67,12 @@ public final class Constants {
         // still be considered "in the alliance zone" for the purposes of auto-aiming.
         public static final double ALLIANCE_ZONE_TOLERANCE_TO_STARTING_LINE = 0.1281386;
 
-        public static final Translation2d BLUE_LEFT_FEEDING_TARGET = new Translation2d(0.567625, 6.05175);
-        public static final Translation2d BLUE_RIGHT_FEEDING_TARGET = new Translation2d(0.567625, 2.01725);
-        public static final Translation2d RED_LEFT_FEEDING_TARGET = new Translation2d(15.973375, 2.01725);
-        public static final Translation2d RED_RIGHT_FEEDING_TARGET = new Translation2d(15.973375, 6.05175);
+        public static final Translation2d BLUE_LEFT_FEEDING_TARGET = new Translation2d(0.567625 + 0.5, 6.05175);
+        public static final Translation2d BLUE_RIGHT_FEEDING_TARGET = new Translation2d(0.567625 + 0.5,
+                2.01725);
+        public static final Translation2d RED_LEFT_FEEDING_TARGET = new Translation2d(15.973375 - 0.5, 2.01725);
+        public static final Translation2d RED_RIGHT_FEEDING_TARGET = new Translation2d(15.973375 - 0.5,
+                6.05175);
 
         public static final Pose2d RED_LEFT_TOWER_CLIMB_POS = new Pose2d(15.105, 3.885,
                 new Rotation2d(Degree.of(180)));
@@ -164,7 +166,8 @@ public final class Constants {
 
             public static final Distance EXTENDED_POSITION = SOFT_LIMIT_MAX;
             public static final Distance MIDPOINT_POSITION = Meters.of(0.15);
-            public static final Distance SHUFFLE_POSITION = Meters.of(0.025);
+            public static final Distance SHUFFLE_CLOSE_POSITION = Meters.of(0.025);
+            public static final Distance SHUFFLE_FAR_POSITION = Meters.of(0.20);
             public static final Distance POSITION_TARGET_ERROR = Inches.of(0.5); // TODO
             public static final Distance RETRACTED_POSITION = SOFT_LIMIT_MIN;
 
@@ -196,14 +199,14 @@ public final class Constants {
         public static final double PID_kI = 0.0; // TODO
         public static final double PID_kD = 0.0; // TODO
 
-        public static final double SIM_PID_kP = 0.075; // TODO
+        public static final double SIM_PID_kP = 0.001; // TODO
         public static final double SIM_PID_kI = 0.0; // TODO
         public static final double SIM_PID_kD = 0.0; // TODO
 
         public static final SimpleMotorFeedforward FEEDFORWARD = new SimpleMotorFeedforward(0.24, 0.09,
                 0.007553);
-        public static final SimpleMotorFeedforward SIM_FEEDFORWARD = new SimpleMotorFeedforward(2.25,
-                0.0, 0.0); // TODO
+        public static final SimpleMotorFeedforward SIM_FEEDFORWARD = new SimpleMotorFeedforward(0.24,
+                0.09, 0.007553); // TODO
 
         public static final Time CLOSED_LOOP_RAMP_RATE_SEC = Seconds.of(0.25);
         public static final Time OPEN_LOOP_RAMP_RATE_SEC = Seconds.of(0.25);
@@ -268,7 +271,7 @@ public final class Constants {
         public static final double EXTERNAL_ENCODER_GEARING = 17;
         public static final Angle EXTERNAL_ENCODER_ZERO_OFFSET = Degrees.of(163.8); // TODO
 
-        public static final Angle ANGLE_TARGET_ERROR = Degrees.of(1.7);
+        public static final Angle ANGLE_TARGET_ERROR = Degrees.of(2.5);
         public static final double AT_ANGLE_DEBOUNCE_TIME = 0.2; // TODO
 
         public static final Translation3d RELATIVE_POSITION = new Translation3d(Inches.of(-5.087),
@@ -329,8 +332,8 @@ public final class Constants {
                 .ofEntries(
                         Map.entry(Meters.of(0), FlywheelSpeedZone.ZONE_1),
                         Map.entry(Meters.of(3.6212), FlywheelSpeedZone.ZONE_2),
-                        Map.entry(Meters.of(6.6670), FlywheelSpeedZone.ZONE_3),
-                        Map.entry(Meters.of(11), FlywheelSpeedZone.ZONE_4));
+                        Map.entry(Meters.of(8.2705), FlywheelSpeedZone.ZONE_3),
+                        Map.entry(Meters.of(12.40575), FlywheelSpeedZone.ZONE_4));
 
         public static final Map<FlywheelSpeedZone, InterpolatingDoubleTreeMap> SHOOTER_DISTANCE_TO_HOOD_ANGLE_INTERPOLATION = Map
                 .ofEntries(

@@ -94,13 +94,6 @@
      "exp":"12.528",
      "val":12.528
     }
-   },
-   "trenchTopY":{
-    "dimension":"Number",
-    "var":{
-     "exp":"7.44",
-     "val":7.44
-    }
    }
   },
   "poses":{}
@@ -139,8 +132,8 @@
    "val":6.12
   },
   "radius":{
-   "exp":"3.8 in",
-   "val":0.09652
+   "exp":"3.875 in",
+   "val":0.098425
   },
   "vmax":{
    "exp":"5800 RPM",
@@ -175,9 +168,9 @@
  },
  "generationFeatures":[],
  "codegen":{
-  "root":"../../choreo_code_gen",
-  "genVars":true,
-  "genTrajData":true,
-  "useChoreoLib":true
+  "root":"../../java/frc/robot",
+  "genVars":false,
+  "genTrajData":false,
+  "useChoreoLib":false
  }
 }
