@@ -138,7 +138,17 @@ public class LimelightWrapper extends Limelight {
         return estStdDevs;
     }
 
-    public void updateLocalization(SwerveDrive swerveDrive) {
+    /**
+     * Updates the robot's pose estimation using data from the limelight. It
+     * retrieves the latest pose estimates from the limelight, checks the number of
+     * visible tags and the robot's rotation speed, and if the conditions are
+     * favorable, it adds the vision measurements to the swerve drive's pose
+     * estimator with appropriate standard deviations.
+     * 
+     * @param swerveDrive
+     * @return true if the pose was updated with vision data, false otherwise
+     */
+    public boolean updateLocalization(SwerveDrive swerveDrive) {
         getSettings()
                 .withRobotOrientation(new Orientation3d(swerveDrive.getGyroRotation3d(),
                         new AngularVelocity3d(RadiansPerSecond.of(swerveDrive.getRobotVelocity().omegaRadiansPerSecond),
@@ -148,16 +158,21 @@ public class LimelightWrapper extends Limelight {
 
         Optional<PoseEstimate> visionEstimateMt2 = Optional.of(poseEstimateMt2).get().getPoseEstimate();
 
-        // If the pose is present
-        visionEstimateMt2.ifPresent((limelight.networktables.PoseEstimate poseEstimate) -> {
+        boolean updated = false;
+
+        if (visionEstimateMt2.isPresent()) {
+            limelight.networktables.PoseEstimate poseEstimate = visionEstimateMt2.get();
             // If we see >0 tags and robot rotates <2 rotations per second
             if (poseEstimate.tagCount > 0
                     && Math.abs(Units.radiansToRotations(swerveDrive.getRobotVelocity().omegaRadiansPerSecond)) < 2) {
                 // Add it to the pose estimator.
                 swerveDrive.addVisionMeasurement(poseEstimate.pose.toPose2d(), poseEstimate.timestampSeconds,
                         getEstimationStdDevsLimelightMT2(poseEstimate, isLL4));
+                updated = true;
             }
-        });
+        }
+
+        return updated;
 
         // Only if is limelight 4, add MT1 yaw measurement to the estimator
         // if (isLL4) {

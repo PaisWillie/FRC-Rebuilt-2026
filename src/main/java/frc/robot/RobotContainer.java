@@ -459,8 +459,11 @@ public class RobotContainer {
     }
 
     public void updateLocalization() {
-        m_limelightA.updateLocalization(m_swerveSubsystem.getSwerveDrive());
-        m_limelightB.updateLocalization(m_swerveSubsystem.getSwerveDrive());
+        for (LimelightWrapper limelight : new LimelightWrapper[] { m_limelightA, m_limelightB }) {
+            if (limelight.updateLocalization(m_swerveSubsystem.getSwerveDrive())) {
+                break; // Stop once a limelight successfully localizes
+            }
+        }
     }
 
     public Command stopAllSubsystems() {
