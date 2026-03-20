@@ -192,6 +192,10 @@ public class ElevatorSubsystem extends SubsystemBase {
         return m_climb.getHeight();
     }
 
+    public boolean isClimberUp() {
+        return getPosition().gt(ElevatorConstants.FIRST_LEVEL_HEIGHT);
+    }
+
     public Optional<Distance> getSetpoint() {
         Optional<Angle> angleSetpoint = m_climb.getMechanismSetpoint();
         if (!angleSetpoint.isPresent()) {

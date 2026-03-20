@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -37,14 +38,17 @@ public class Robot extends TimedRobot {
 
     @Override
     public void autonomousInit() {
-        // Check the linear intake position and set the encoder position accordingly
-        m_robotContainer.calibrateLinearIntakePosition();
-
         // Zero gyro (shooter must face away from driver, towards opponent wall)
         m_robotContainer.zeroGyroWithAlliance();
 
+        // Check the linear intake position and set the encoder position accordingly
+        m_robotContainer.calibrateLinearIntakePosition();
+
         // Start the flywheel at the default RPM when teleop starts
-        CommandScheduler.getInstance().schedule(m_robotContainer.startFlywheelDefaultRPM());
+        CommandScheduler.getInstance().schedule(m_robotContainer.m_shooterSubsystem.startFlywheelDefaultRPM());
+
+        // Extend the intake to lower the hopper enough to go underneath the trench
+        CommandScheduler.getInstance().schedule(m_robotContainer.m_linearIntakeSubsystem.midpoint());
     }
 
     @Override
@@ -53,6 +57,7 @@ public class Robot extends TimedRobot {
 
     @Override
     public void autonomousExit() {
+        m_robotContainer.driveAngularVelocity.driveToPoseEnabled(false);
     }
 
     @Override
@@ -61,13 +66,17 @@ public class Robot extends TimedRobot {
             m_autonomousCommand.cancel();
         }
 
-        CommandScheduler.getInstance().schedule(m_robotContainer.stopAllSubsystems());
-
-        // Start the flywheel at the default RPM when teleop starts
-        CommandScheduler.getInstance().schedule(m_robotContainer.startFlywheelDefaultRPM());
-
         // Check the linear intake position and set the encoder position accordingly
         m_robotContainer.calibrateLinearIntakePosition();
+
+        CommandScheduler.getInstance().schedule(m_robotContainer.stopAllSubsystems());
+        m_robotContainer.driveAngularVelocity.driveToPoseEnabled(false);
+
+        // Start the flywheel at the default RPM when teleop starts
+        CommandScheduler.getInstance().schedule(m_robotContainer.m_shooterSubsystem.startFlywheelDefaultRPM());
+
+        // Extend the intake to lower the hopper enough to go underneath the trench
+        CommandScheduler.getInstance().schedule(m_robotContainer.m_linearIntakeSubsystem.midpoint());
     }
 
     @Override

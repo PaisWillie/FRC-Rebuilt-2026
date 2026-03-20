@@ -7,17 +7,13 @@ package frc.robot.subsystems;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Meter;
 import static edu.wpi.first.units.Units.Meters;
-import static edu.wpi.first.units.Units.RadiansPerSecond;
 
 import java.io.File;
 import java.util.Arrays;
-import java.util.Optional;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
 import choreo.trajectory.SwerveSample;
-import edu.wpi.first.math.Matrix;
-import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -26,10 +22,7 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.numbers.N1;
-import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.trajectory.Trajectory;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
@@ -39,15 +32,11 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
+import frc.robot.AutoConstants;
 import frc.robot.Constants;
 import frc.robot.Constants.SwerveConstants;
-import frc.robot.Constants.VisionConstants;
 import frc.robot.FieldConstants;
-import limelight.Limelight;
 import limelight.networktables.PoseEstimate;
-import limelight.networktables.AngularVelocity3d;
-import limelight.networktables.LimelightSettings.LEDMode;
-import limelight.networktables.Orientation3d;
 import swervelib.SwerveController;
 import swervelib.SwerveDrive;
 import swervelib.SwerveDriveTest;
@@ -67,7 +56,7 @@ public class SwerveSubsystem extends SubsystemBase {
 
     private Rotation2d autoAimTargetRotation = new Rotation2d();
 
-    private Pose2d m_selectedClimbPose;
+    private Pose2d m_driveToWaypoint;
 
     private final PIDController m_choreoControllerX = new PIDController(10.0, 0.0, 0.0);
     private final PIDController m_choreoControllerY = new PIDController(10.0, 0.0, 0.0);
@@ -113,11 +102,7 @@ public class SwerveSubsystem extends SubsystemBase {
         // over the internal encoder and push the offsets onto it. Throws warning if not
         // possible
 
-        if (isRedAlliance()) {
-            m_selectedClimbPose = SwerveConstants.RED_LEFT_TOWER_CLIMB_POS;
-        } else {
-            m_selectedClimbPose = SwerveConstants.BLUE_LEFT_TOWER_CLIMB_POS;
-        }
+        m_driveToWaypoint = getPose();
 
         m_choreoControllerHeading.enableContinuousInput(-Math.PI, Math.PI);
     }
@@ -753,30 +738,58 @@ public class SwerveSubsystem extends SubsystemBase {
 
     public void setSelectedClimbPose(boolean isLeft) {
         if (isRedAlliance()) {
-            m_selectedClimbPose = isLeft ? SwerveConstants.RED_LEFT_TOWER_CLIMB_POS
-                    : SwerveConstants.RED_RIGHT_TOWER_CLIMB_POS;
+            setDriveToWaypoint(isLeft ? SwerveConstants.RED_LEFT_TOWER_CLIMB_POS
+                    : SwerveConstants.RED_RIGHT_TOWER_CLIMB_POS);
         } else {
-            m_selectedClimbPose = isLeft ? SwerveConstants.BLUE_LEFT_TOWER_CLIMB_POS
-                    : SwerveConstants.BLUE_RIGHT_TOWER_CLIMB_POS;
+            setDriveToWaypoint(isLeft ? SwerveConstants.BLUE_LEFT_TOWER_CLIMB_POS
+                    : SwerveConstants.BLUE_RIGHT_TOWER_CLIMB_POS);
         }
     }
 
-    public Pose2d getSelectedClimbPose() {
-        return m_selectedClimbPose;
+    public void setDriveToWaypoint(Pose2d waypoint) {
+        m_driveToWaypoint = waypoint;
+    }
+
+    public Pose2d getDriveToWaypoint() {
+        return m_driveToWaypoint;
+    }
+
+    public boolean isAtWaypoint() {
+        return m_driveToWaypoint.minus(getPose()).getTranslation()
+                .getNorm() < AutoConstants.DEFAULT_WAYPOINT_TOLERANCE;
+    }
+
+    public boolean isAtWaypoint(double translationToleranceMeters) {
+        return m_driveToWaypoint.minus(getPose()).getTranslation()
+                .getNorm() < translationToleranceMeters;
+    }
+
+    public boolean isAtWaypoint(double translationToleranceMeters, double rotationToleranceDegrees) {
+        Translation2d translationError = m_driveToWaypoint.minus(getPose()).getTranslation();
+        Rotation2d rotationError = m_driveToWaypoint.getRotation().minus(getPose().getRotation());
+
+        return translationError.getNorm() < translationToleranceMeters
+                && Math.abs(rotationError.getDegrees()) < rotationToleranceDegrees;
     }
 
     @Override
     public void periodic() {
         if (Constants.TELEMETRY && !DriverStation.isFMSAttached()) {
-            SmartDashboard.putNumber("autoAimHeading", getAutoAimHeading().getDegrees());
-            SmartDashboard.putNumber("currentHeading", getHeading().getDegrees());
-            SmartDashboard.putBoolean("isAutoAimReady", isAutoAimOnTarget());
+            SmartDashboard.putNumber("swerve/autoAimHeading", getAutoAimHeading().getDegrees());
+            SmartDashboard.putNumber("swerve/currentHeading", getHeading().getDegrees());
+            SmartDashboard.putBoolean("swerve/isAutoAimReady", isAutoAimOnTarget());
+            SmartDashboard.putNumber("swerve/distToWaypoint (m)",
+                    m_driveToWaypoint.minus(getPose()).getTranslation().getNorm());
+            SmartDashboard.putNumber("swerve/rotToWaypoint (deg)",
+                    m_driveToWaypoint.getRotation().minus(getPose().getRotation()).getDegrees());
+            SmartDashboard.putBoolean("swerve/isAtWaypoint", isAtWaypoint());
         }
     }
 
     @Override
     public void simulationPeriodic() {
-        SmartDashboard.putBoolean("isAutoAimReady", isAutoAimOnTarget());
-        SmartDashboard.putString("currentZone", getCurrentZone().toString());
+        SmartDashboard.putBoolean("swerve/isAutoAimReady", isAutoAimOnTarget());
+        SmartDashboard.putString("swerve/currentZone", getCurrentZone().toString());
+        SmartDashboard.putString("swerve/currentWaypoint", getDriveToWaypoint().toString());
     }
 }

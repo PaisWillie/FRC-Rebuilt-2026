@@ -172,20 +172,25 @@ public class LinearIntakeSubsystem extends SubsystemBase {
         return setPosition(LinearIntakeConstants.EXTENDED_POSITION);
     }
 
-    public Command retract() {
+    public Command midpoint() {
         return setPosition(LinearIntakeConstants.MIDPOINT_POSITION);
     }
 
-    public Command fullyRetract() {
+    public Command retract() {
         return setPosition(LinearIntakeConstants.RETRACTED_POSITION);
     }
 
     public Command shuffle() {
         return Commands.sequence(
-                setPosition(LinearIntakeConstants.SHUFFLE_POSITION),
-                Commands.waitSeconds(0.25),
-                retract(),
-                Commands.waitSeconds(0.25)).repeatedly();
+                Commands.waitSeconds(2),
+                setPosition(LinearIntakeConstants.SHUFFLE_FAR_POSITION).withTimeout(0.5),
+                setPosition(LinearIntakeConstants.SHUFFLE_CLOSE_POSITION).withTimeout(0.5),
+                setPosition(LinearIntakeConstants.SHUFFLE_FAR_POSITION).withTimeout(0.5),
+                setPosition(LinearIntakeConstants.SHUFFLE_CLOSE_POSITION).withTimeout(0.5),
+                Commands.sequence(
+                        midpoint().withTimeout(0.5),
+                        retract().withTimeout(0.5))
+                        .repeatedly());
     }
 
     public Command set(double dutycycle) {

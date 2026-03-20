@@ -29,10 +29,10 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
-import frc.robot.Constants.FlywheelConstants;
-import frc.robot.Constants.HoodConstants;
 import frc.robot.Constants.MechanismPositionConstants;
-import frc.robot.Constants.HoodConstants.FlywheelSpeedZone;
+import frc.robot.Constants.ShooterConstants;
+import frc.robot.Constants.ShooterConstants.FlywheelConstants;
+import frc.robot.Constants.ShooterConstants.ShooterZone;
 import yams.gearing.MechanismGearing;
 import yams.mechanisms.config.FlyWheelConfig;
 import yams.mechanisms.config.MechanismPositionConfig;
@@ -114,7 +114,7 @@ public class FlywheelSubsystem extends SubsystemBase {
      */
     public Command sysId() {
         return m_flywheel.sysId(
-                Volts.of(10), Volts.of(1).per(Second), Second.of(20))
+                Volts.of(12), Volts.of(1).per(Second), Second.of(10))
                 .beforeStarting(
                         () -> SignalLogger.start())
                 .finallyDo(() -> SignalLogger.stop());
@@ -232,12 +232,12 @@ public class FlywheelSubsystem extends SubsystemBase {
     }
 
     public AngularVelocity getTargetVelocity(Distance distanceToTarget) {
-        FlywheelSpeedZone zone = HoodConstants.MIN_DISTANCE_TO_FLYWHEEL_SPEED_ZONE.entrySet().stream()
+        ShooterZone zone = ShooterConstants.MIN_DISTANCE_TO_FLYWHEEL_SPEED_ZONE.entrySet().stream()
                 .filter(entry -> distanceToTarget.in(Meters) >= entry.getKey().in(Meters))
                 .max((a, b) -> Double.compare(a.getKey().in(Meters), b.getKey().in(Meters)))
                 .map(Map.Entry::getValue)
-                .orElse(FlywheelSpeedZone.ZONE_1);
-        return HoodConstants.SHOOTER_MIN_DISTANCE_TO_FLYWHEEL_RPM.getOrDefault(zone,
+                .orElse(ShooterZone.ZONE_1);
+        return ShooterConstants.SHOOTER_MIN_DISTANCE_TO_FLYWHEEL_RPM.getOrDefault(zone,
                 FlywheelConstants.DEFAULT_VELOCITY);
     }
 }

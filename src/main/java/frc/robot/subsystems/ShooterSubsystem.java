@@ -17,11 +17,12 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Robot;
 import frc.robot.Constants;
-import frc.robot.Constants.HoodConstants.FlywheelSpeedZone;
+import frc.robot.Constants.ShooterConstants.ShooterZone;
 import frc.robot.subsystems.shooter.FeederSubsystem;
 import frc.robot.subsystems.shooter.FlywheelSubsystem;
 import frc.robot.subsystems.shooter.HoodSubsystem;
@@ -71,7 +72,7 @@ public class ShooterSubsystem extends SubsystemBase {
         return Commands.parallel(
                 m_hoodSubsystem.setAngle(() -> {
                     Distance distance = getDistanceToTarget.get();
-                    FlywheelSpeedZone zone = m_hoodSubsystem.getSpeedZone(distance);
+                    ShooterZone zone = m_hoodSubsystem.getSpeedZone(distance);
                     return m_hoodSubsystem.getAngleToTarget(distance, zone);
                 }),
                 m_flywheelSubsystem.setSpeed(() -> m_flywheelSubsystem.getTargetVelocity(getDistanceToTarget.get())),
@@ -82,17 +83,38 @@ public class ShooterSubsystem extends SubsystemBase {
                 .withName("SHTR - Aim and Shoot");
     }
 
+    public Command aimAndShoot(Supplier<Distance> getDistanceToTarget, Supplier<Boolean> isAutoAimReady,
+            boolean stationaryShooting) {
+        return Commands.parallel(
+                m_hoodSubsystem.setAngle(() -> {
+                    Distance distance = getDistanceToTarget.get();
+                    ShooterZone zone = m_hoodSubsystem.getSpeedZone(distance);
+                    return m_hoodSubsystem.getAngleToTarget(distance, zone);
+                }),
+                m_flywheelSubsystem.setSpeed(() -> m_flywheelSubsystem.getTargetVelocity(getDistanceToTarget.get())),
+                stationaryShooting ? Commands.sequence(
+                        Commands.waitSeconds(0.25),
+                        Commands.waitUntil(() -> isAutoAimReady.get() && isShooterReady())
+                                .andThen(m_feederSubsystem.feed()))
+                        : new ConditionalCommand(
+                                m_feederSubsystem.feed(),
+                                m_feederSubsystem.stop(),
+                                () -> isAutoAimReady.get() && isShooterReady()).repeatedly())
+                .withName("SHTR - Aim and Shoot Stationary");
+    }
+
     public Command aimAndShootIgnoreCheck(Supplier<Distance> getDistanceToTarget) {
         return Commands.parallel(
                 m_hoodSubsystem.setAngle(() -> {
                     Distance distance = getDistanceToTarget.get();
-                    FlywheelSpeedZone zone = m_hoodSubsystem.getSpeedZone(distance);
+                    ShooterZone zone = m_hoodSubsystem.getSpeedZone(distance);
                     return m_hoodSubsystem.getAngleToTarget(distance, zone);
                 }),
                 m_flywheelSubsystem.setSpeed(() -> m_flywheelSubsystem.getTargetVelocity(getDistanceToTarget.get())),
-                new WaitCommand(2),
-                m_feederSubsystem.feed())
+                new WaitCommand(2).andThen(
+                        m_feederSubsystem.feed()))
                 .withName("SHTR - Aim and Shoot");
+
     }
     // TODO: What if we get pushed while we're auto-aiming? This may 'cause
     // isAutoAimReady to never be true. Maybe lock swerve pose?
@@ -101,8 +123,7 @@ public class ShooterSubsystem extends SubsystemBase {
         return Commands.parallel(
                 m_hoodSubsystem.setDefaultAngle(),
                 m_flywheelSubsystem.setDefaultRPM(),
-                new ConditionalCommand(m_feederSubsystem.feed(), m_feederSubsystem.stop(), this::isShooterReady)
-                        .repeatedly());
+                Commands.waitSeconds(1).andThen(m_feederSubsystem.feed()));
     }
 
     public Command shootWith(Angle angle, AngularVelocity RPM) {
@@ -120,16 +141,15 @@ public class ShooterSubsystem extends SubsystemBase {
      * @return a Command that stops the shooting process when executed
      */
     public Command stopShooting() {
-        return Commands.parallel(
-                m_hoodSubsystem.lowerHood(),
-                m_flywheelSubsystem.setDefaultRPM(),
-                Commands.sequence(
-                        m_feederSubsystem.stop(),
-                        Commands.deadline(
-                                Commands.waitSeconds(0.5),
-                                m_feederSubsystem.reverse()),
-                        m_feederSubsystem.stop()))
-                .withName("SHTR - Stop Shooting");
+        return Commands.sequence(
+                m_feederSubsystem.stop(),
+                Commands.deadline(
+                        Commands.waitSeconds(0.5),
+                        m_feederSubsystem.reverse()),
+                new ParallelCommandGroup(
+                        m_hoodSubsystem.lowerHood(),
+                        m_flywheelSubsystem.setDefaultRPM(),
+                        m_feederSubsystem.stop()).withName("SHTR - Stop Shooting"));
     }
 
     /**
@@ -145,6 +165,10 @@ public class ShooterSubsystem extends SubsystemBase {
                 stopFeeder ? m_feederSubsystem.stop() : Commands.none(),
                 stopFlywheel ? m_flywheelSubsystem.stop() : m_flywheelSubsystem.setDefaultRPM())
                 .withName("SHTR - Stop Shooting");
+    }
+
+    public Command stopFeeder() {
+        return m_feederSubsystem.stop();
     }
 
     /**
