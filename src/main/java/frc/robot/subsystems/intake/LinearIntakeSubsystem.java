@@ -6,6 +6,7 @@ package frc.robot.subsystems.intake;
 
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Second;
+import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 
 import java.util.Optional;
@@ -22,6 +23,7 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants;
@@ -137,7 +139,11 @@ public class LinearIntakeSubsystem extends SubsystemBase {
 
     public Command setPosition(Distance position) {
         return m_linearIntake.runTo(position, LinearIntakeConstants.POSITION_TARGET_ERROR)
-                .andThen(stop());
+                .withTimeout(Seconds.of(3)).finallyDo(
+                        () -> {
+                            m_smartMotorController.stopClosedLoopController();
+                            m_smartMotorController.setDutyCycle(0);
+                        });
     }
 
     public Distance getPosition() {
@@ -172,20 +178,65 @@ public class LinearIntakeSubsystem extends SubsystemBase {
         return setPosition(LinearIntakeConstants.EXTENDED_POSITION);
     }
 
-    public Command retract() {
+    public Command midpoint() {
         return setPosition(LinearIntakeConstants.MIDPOINT_POSITION);
     }
 
-    public Command fullyRetract() {
+    public Command retract() {
         return setPosition(LinearIntakeConstants.RETRACTED_POSITION);
+    }
+
+    /**
+     * Shuffle the intake back and forth to help dislodge any stuck game pieces. (If
+     * hopper is full)
+     * 
+     * @return
+     */
+    private Command shuffleFar() {
+        return Commands.sequence(
+                Commands.deadline(
+                        Commands.waitSeconds(2),
+                        Commands.sequence(
+                                setPosition(LinearIntakeConstants.SHUFFLE_FURTHEST_POSITION).withTimeout(0.25),
+                                setPosition(LinearIntakeConstants.EXTENDED_POSITION).withTimeout(0.25))
+                                .repeatedly()),
+                setPosition(LinearIntakeConstants.SHUFFLE_FAR_POSITION).withTimeout(0.5),
+                setPosition(LinearIntakeConstants.SHUFFLE_CLOSE_POSITION).withTimeout(0.5),
+                setPosition(LinearIntakeConstants.SHUFFLE_FAR_POSITION).withTimeout(0.5),
+                setPosition(LinearIntakeConstants.SHUFFLE_CLOSE_POSITION).withTimeout(0.5),
+                Commands.sequence(
+                        midpoint().withTimeout(0.5),
+                        retract().withTimeout(0.5))
+                        .repeatedly());
     }
 
     public Command shuffle() {
         return Commands.sequence(
-                setPosition(LinearIntakeConstants.SHUFFLE_POSITION),
-                Commands.waitSeconds(0.25),
-                retract(),
-                Commands.waitSeconds(0.25)).repeatedly();
+                Commands.deadline(
+                        Commands.waitSeconds(2),
+                        new ConditionalCommand(
+                                // Full hopper (which intake cannot close past midpoint)
+                                Commands.sequence(
+                                        setPosition(LinearIntakeConstants.SHUFFLE_FURTHEST_POSITION).withTimeout(0.25),
+                                        setPosition(LinearIntakeConstants.EXTENDED_POSITION).withTimeout(0.25))
+                                        .repeatedly(),
+                                // Not full hopper (which intake can close past midpoint, so shuffle closer to
+                                // midpoint)
+                                Commands.sequence(
+                                        setPosition(LinearIntakeConstants.SHUFFLE_FAR_POSITION).withTimeout(0.25),
+                                        setPosition(LinearIntakeConstants.MIDPOINT_POSITION).withTimeout(0.25))
+                                        .repeatedly(),
+                                () -> getPosition().gt(
+                                        LinearIntakeConstants.MIDPOINT_POSITION
+                                                .plus(LinearIntakeConstants.POSITION_TARGET_ERROR)))),
+                setPosition(LinearIntakeConstants.SHUFFLE_FAR_POSITION).withTimeout(0.5),
+                setPosition(LinearIntakeConstants.SHUFFLE_CLOSE_POSITION).withTimeout(0.5),
+                setPosition(LinearIntakeConstants.SHUFFLE_FAR_POSITION).withTimeout(0.5),
+                setPosition(LinearIntakeConstants.SHUFFLE_CLOSE_POSITION).withTimeout(0.5),
+                Commands.sequence(
+                        midpoint().withTimeout(0.5),
+                        retract().withTimeout(0.5))
+                        .repeatedly());
     }
 
     public Command set(double dutycycle) {

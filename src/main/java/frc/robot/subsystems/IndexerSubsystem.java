@@ -72,7 +72,7 @@ public class IndexerSubsystem extends SubsystemBase {
 
     // Helper method to alternate between full and half speed every 0.125 seconds
     private boolean useFullSpeed() {
-        double secondFraction = Timer.getFPGATimestamp() % 1.0;
+        double secondFraction = Timer.getFPGATimestamp() % 2.0;
         return secondFraction >= 0.125;
     }
 
