@@ -5,23 +5,27 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.MatchConstants;
 
 public class DashboardSubsystem extends SubsystemBase {
+  private static final double DASHBOARD_UPDATE_PERIOD_SECONDS = 0.1;
 
   private Color colorInactive;
   private Color color;
   private double timeLeft;
   private double previousTime;
+  private double lastPublishTimestamp;
 
   /** Creates a new DashboardSubsystem. */
   public DashboardSubsystem() {
     color = Color.BOTH;
     timeLeft = 0;
     previousTime = 0;
+    lastPublishTimestamp = Double.NEGATIVE_INFINITY;
   }
   private enum Color {
     RED,
@@ -42,7 +46,7 @@ public class DashboardSubsystem extends SubsystemBase {
     return "#FFFFFF";
   }
 
-  private void getAllianceShift() {
+  private void updateAllianceShift() {
     double matchTime = DriverStation.getMatchTime();
     previousTime = timeLeft;
     if (DriverStation.isAutonomous()) {
@@ -60,13 +64,20 @@ public class DashboardSubsystem extends SubsystemBase {
         color = (color == Color.RED) ? Color.BLUE : Color.RED;
       }
     }
-    SmartDashboard.putNumber("Shift time", timeLeft);
-    SmartDashboard.putString("Alliance Shift Color", getColorCode(color));
-    SmartDashboard.putNumber("Match Time", matchTime);
   }
 
   @Override
   public void periodic() {
-    getAllianceShift();
+    updateAllianceShift();
+
+    double now = Timer.getFPGATimestamp();
+    if (now - lastPublishTimestamp < DASHBOARD_UPDATE_PERIOD_SECONDS) {
+      return;
+    }
+
+    lastPublishTimestamp = now;
+    SmartDashboard.putNumber("Shift time", timeLeft);
+    SmartDashboard.putString("Alliance Shift Color", getColorCode(color));
+    SmartDashboard.putNumber("Match Time", DriverStation.getMatchTime());
   }
 }

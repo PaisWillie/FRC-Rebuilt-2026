@@ -11,7 +11,6 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.IndexerConstants;
 
@@ -67,7 +66,10 @@ public class IndexerSubsystem extends SubsystemBase {
      * Stops the indexer motor.
      */
     public Command stop() {
-        return this.runOnce(() -> m_motor.stopMotor());
+        return this.runOnce(() -> {
+            m_targetSpeed = Double.NaN;
+            m_motor.stopMotor();
+        });
     }
 
     // Helper method to alternate between full and half speed every 0.125 seconds
@@ -79,17 +81,11 @@ public class IndexerSubsystem extends SubsystemBase {
     // TODO: Understand why alternating between two constants doesn't pulse in
     // simulation, but alternating between a constant and zero does.
     public Command run() {
-        return new ConditionalCommand(
-                this.runOnce(() -> setSpeed(IndexerConstants.INDEXER_FULL_SPEED)),
-                this.runOnce(() -> setSpeed(0)),
-                this::useFullSpeed).repeatedly();
+        return this.run(() -> setSpeed(useFullSpeed() ? IndexerConstants.INDEXER_FULL_SPEED : 0));
     }
 
     public Command reverse() {
-        return new ConditionalCommand(
-                this.runOnce(() -> setSpeed(-IndexerConstants.INDEXER_FULL_SPEED)),
-                this.runOnce(() -> setSpeed(0)),
-                this::useFullSpeed).repeatedly();
+        return this.run(() -> setSpeed(useFullSpeed() ? -IndexerConstants.INDEXER_FULL_SPEED : 0));
     }
 
     @Override

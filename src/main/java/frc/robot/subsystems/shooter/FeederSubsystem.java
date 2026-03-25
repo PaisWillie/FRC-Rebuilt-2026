@@ -191,9 +191,8 @@ public class FeederSubsystem extends SubsystemBase {
      */
     @Override
     public void periodic() {
-        m_feeder.updateTelemetry();
-
         if (Constants.TELEMETRY && !DriverStation.isFMSAttached()) {
+            m_feeder.updateTelemetry();
             SmartDashboard.putNumber("FeederMech/linearVelocity (fps)", getLinearVelocity().in(FeetPerSecond));
             SmartDashboard.putNumber("FeederMech/velocity (RPM)", getAngularVelocity().in(RPM));
             SmartDashboard.putNumber("FeederMech/setpoint (RPM)",

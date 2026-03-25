@@ -210,9 +210,8 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        m_climb.updateTelemetry();
-
         if (Constants.TELEMETRY && !DriverStation.isFMSAttached()) {
+            m_climb.updateTelemetry();
             SmartDashboard.putNumber("Elevator/position (m)", m_climb.getHeight().in(Meters));
             SmartDashboard.putNumber("Elevator/setpoint (m)",
                     getSetpoint().map(pos -> pos.in(Meters)).orElse(Double.NaN));

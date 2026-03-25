@@ -1,7 +1,5 @@
 package frc.robot.utils;
 
-import static edu.wpi.first.units.Units.RadiansPerSecond;
-
 import java.util.Optional;
 
 import edu.wpi.first.math.Matrix;
@@ -11,7 +9,6 @@ import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
 import frc.robot.Constants.VisionConstants;
 import limelight.Limelight;
-import limelight.networktables.AngularVelocity3d;
 import limelight.networktables.Orientation3d;
 import limelight.networktables.PoseEstimate;
 import swervelib.SwerveDrive;
@@ -21,6 +18,7 @@ public class LimelightWrapper extends Limelight {
     private final boolean isLL4;
     private final PoseEstimate poseEstimateMt2;
     private final PoseEstimate poseEstimateMt1;
+    private double lastPoseEstimateTimestampSeconds = Double.NaN;
 
     public LimelightWrapper(String limelightName, boolean isLL4) {
         super(limelightName);
@@ -148,26 +146,28 @@ public class LimelightWrapper extends Limelight {
      * @param swerveDrive
      * @return true if the pose was updated with vision data, false otherwise
      */
-    public boolean updateLocalization(SwerveDrive swerveDrive) {
+    public boolean updateLocalization(SwerveDrive swerveDrive, Orientation3d robotOrientation,
+            double omegaRadiansPerSecond) {
         getSettings()
-                .withRobotOrientation(new Orientation3d(swerveDrive.getGyroRotation3d(),
-                        new AngularVelocity3d(RadiansPerSecond.of(swerveDrive.getRobotVelocity().omegaRadiansPerSecond),
-                                RadiansPerSecond.of(0),
-                                RadiansPerSecond.of(0))))
+                .withRobotOrientation(robotOrientation)
                 .save();
 
-        Optional<PoseEstimate> visionEstimateMt2 = Optional.of(poseEstimateMt2).get().getPoseEstimate();
+        Optional<PoseEstimate> visionEstimateMt2 = poseEstimateMt2.getPoseEstimate();
 
         boolean updated = false;
 
         if (visionEstimateMt2.isPresent()) {
             limelight.networktables.PoseEstimate poseEstimate = visionEstimateMt2.get();
+            if (Math.abs(poseEstimate.timestampSeconds - lastPoseEstimateTimestampSeconds) < 1e-6) {
+                return false;
+            }
             // If we see >0 tags and robot rotates <2 rotations per second
             if (poseEstimate.tagCount > 0
-                    && Math.abs(Units.radiansToRotations(swerveDrive.getRobotVelocity().omegaRadiansPerSecond)) < 2) {
+                    && Math.abs(Units.radiansToRotations(omegaRadiansPerSecond)) < 2) {
                 // Add it to the pose estimator.
                 swerveDrive.addVisionMeasurement(poseEstimate.pose.toPose2d(), poseEstimate.timestampSeconds,
                         getEstimationStdDevsLimelightMT2(poseEstimate, isLL4));
+                lastPoseEstimateTimestampSeconds = poseEstimate.timestampSeconds;
                 updated = true;
             }
         }

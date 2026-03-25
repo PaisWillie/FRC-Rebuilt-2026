@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
 
 import java.io.File;
@@ -44,7 +45,9 @@ import frc.robot.subsystems.intake.IntakeRollerSubsystem;
 import frc.robot.subsystems.intake.LinearIntakeSubsystem;
 import frc.robot.subsystems.intake.LinearIntakeSubsystem.LinearIntakePosition;
 import frc.robot.utils.LimelightWrapper;
+import limelight.networktables.AngularVelocity3d;
 import limelight.networktables.LimelightSettings.ImuMode;
+import limelight.networktables.Orientation3d;
 import swervelib.SwerveInputStream;
 import swervelib.simulation.ironmaple.simulation.SimulatedArena;
 import swervelib.simulation.ironmaple.simulation.seasonspecific.rebuilt2026.RebuiltFuelOnField;
@@ -68,6 +71,7 @@ public class RobotContainer {
 
     private final LimelightWrapper m_limelightA;
     private final LimelightWrapper m_limelightB;
+    private final LimelightWrapper[] m_limelights;
 
     // Choreo
     public final AutoFactory m_autoFactory = new AutoFactory(
@@ -187,6 +191,7 @@ public class RobotContainer {
 
         m_limelightA = new LimelightWrapper("limelight-a", true);
         m_limelightB = new LimelightWrapper("limelight-b", true);
+        m_limelights = new LimelightWrapper[] { m_limelightB, m_limelightA };
 
         // Only do this for LL4, so we use heading readings from MT1 from 3G?
         m_limelightA.getSettings().withImuMode(ImuMode.ExternalImu).save();
@@ -507,9 +512,18 @@ public class RobotContainer {
     }
 
     public void updateLocalization() {
+        var swerveDrive = m_swerveSubsystem.getSwerveDrive();
+        double omegaRadiansPerSecond = swerveDrive.getRobotVelocity().omegaRadiansPerSecond;
+        var robotOrientation = new Orientation3d(
+                swerveDrive.getGyroRotation3d(),
+                new AngularVelocity3d(
+                        RadiansPerSecond.of(omegaRadiansPerSecond),
+                        RadiansPerSecond.zero(),
+                        RadiansPerSecond.zero()));
+
         // TODO: Prioritize LL4 over LL3G
-        for (LimelightWrapper limelight : new LimelightWrapper[] { m_limelightB, m_limelightA }) {
-            if (limelight.updateLocalization(m_swerveSubsystem.getSwerveDrive())) {
+        for (LimelightWrapper limelight : m_limelights) {
+            if (limelight.updateLocalization(swerveDrive, robotOrientation, omegaRadiansPerSecond)) {
                 break; // Stop once a limelight successfully localizes
             }
         }

@@ -9,7 +9,6 @@ import static edu.wpi.first.units.Units.Meter;
 import static edu.wpi.first.units.Units.Meters;
 
 import java.io.File;
-import java.util.Arrays;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
@@ -46,6 +45,8 @@ import swervelib.parser.SwerveParser;
 import swervelib.telemetry.SwerveDriveTelemetry;
 
 public class SwerveSubsystem extends SubsystemBase {
+    private static final Rotation2d QUARTER_TURN = Rotation2d.fromDegrees(90);
+
     /**
      * Swerve drive object.
      */
@@ -57,6 +58,17 @@ public class SwerveSubsystem extends SubsystemBase {
     private Rotation2d autoAimTargetRotation = new Rotation2d();
 
     private Pose2d m_driveToWaypoint;
+
+    private boolean m_targetingCacheInitialized;
+    private boolean m_cachedRedAlliance;
+    private Zone m_cachedZone = Zone.BLUE_ALLIANCE_RIGHT;
+    private Translation2d m_cachedAutoAimTarget = FieldConstants.BLUE_HUB_CENTER;
+    private double m_cachedDistanceToTargetMeters;
+    private double m_cachedCompensatedDistanceToTargetMeters;
+    private double m_cachedDistanceToWaypointMeters;
+    private double m_cachedRotationToWaypointDegrees;
+    private boolean m_cachedAutoAimOnTarget;
+    private boolean m_cachedAtWaypoint;
 
     private final PIDController m_choreoControllerX = new PIDController(10.0, 0.0, 0.0);
     private final PIDController m_choreoControllerY = new PIDController(10.0, 0.0, 0.0);
@@ -77,7 +89,9 @@ public class SwerveSubsystem extends SubsystemBase {
                         Rotation2d.fromDegrees(180));
         // Configure the Telemetry before creating the SwerveDrive to avoid unnecessary
         // objects being created.
-        SwerveDriveTelemetry.verbosity = Constants.SWERVE_TELEMETRY_VERBOSITY;
+        SwerveDriveTelemetry.verbosity = Constants.TELEMETRY
+                ? Constants.SWERVE_TELEMETRY_VERBOSITY
+                : SwerveDriveTelemetry.TelemetryVerbosity.NONE;
         try {
             swerveDrive = new SwerveParser(directory).createSwerveDrive(SwerveConstants.MAX_SPEED, startingPose);
             // Alternative method if you don't want to supply the conversion factor via JSON
@@ -139,8 +153,11 @@ public class SwerveSubsystem extends SubsystemBase {
      * @return a Command that centers the modules of the SwerveDrive subsystem
      */
     public Command centerModulesCommand() {
-        return run(() -> Arrays.asList(swerveDrive.getModules())
-                .forEach(it -> it.setAngle(0.0)));
+        return run(() -> {
+            for (var module : swerveDrive.getModules()) {
+                module.setAngle(0.0);
+            }
+        });
     }
 
     /**
@@ -341,6 +358,9 @@ public class SwerveSubsystem extends SubsystemBase {
      */
     public void resetOdometry(Pose2d initialHolonomicPose) {
         swerveDrive.resetOdometry(initialHolonomicPose);
+        if (m_driveToWaypoint != null) {
+            updateTargetingCache();
+        }
     }
 
     /**
@@ -377,6 +397,7 @@ public class SwerveSubsystem extends SubsystemBase {
      */
     public void zeroGyro() {
         swerveDrive.zeroGyro();
+        m_targetingCacheInitialized = false;
     }
 
     /**
@@ -397,8 +418,8 @@ public class SwerveSubsystem extends SubsystemBase {
      *         available.
      */
     public boolean isRedAlliance() {
-        var alliance = DriverStation.getAlliance();
-        return alliance.isPresent() ? alliance.get() == DriverStation.Alliance.Red : false;
+        ensureTargetingCache();
+        return m_cachedRedAlliance;
     }
 
     /**
@@ -582,35 +603,8 @@ public class SwerveSubsystem extends SubsystemBase {
      * @return The current zone of the robot as a Zone enum.
      */
     public Zone getCurrentZone() {
-        Translation2d position = getPose().getTranslation();
-
-        if (position.getX() < FieldConstants.BLUE_STARTING_LINE_X
-                + SwerveConstants.ALLIANCE_ZONE_TOLERANCE_TO_STARTING_LINE) {
-            if (position.getY() < FieldConstants.FIELD_WIDTH / 2) {
-                return Zone.BLUE_ALLIANCE_RIGHT;
-            } else {
-                return Zone.BLUE_ALLIANCE_LEFT;
-            }
-        } else if (position.getX() > FieldConstants.RED_STARTING_LINE_X
-                - SwerveConstants.ALLIANCE_ZONE_TOLERANCE_TO_STARTING_LINE) {
-            if (position.getY() < FieldConstants.FIELD_WIDTH / 2) {
-                return Zone.RED_ALLIANCE_LEFT;
-            } else {
-                return Zone.RED_ALLIANCE_RIGHT;
-            }
-        } else if (position.getX() < (FieldConstants.FIELD_LENGTH / 2)) {
-            if (position.getY() < FieldConstants.FIELD_WIDTH / 2) {
-                return Zone.NEUTRAL_ZONE_BLUE_RIGHT;
-            } else {
-                return Zone.NEUTRAL_ZONE_BLUE_LEFT;
-            }
-        } else {
-            if (position.getY() < FieldConstants.FIELD_WIDTH / 2) {
-                return Zone.NEUTRAL_ZONE_RED_LEFT;
-            } else {
-                return Zone.NEUTRAL_ZONE_RED_RIGHT;
-            }
-        }
+        ensureTargetingCache();
+        return m_cachedZone;
     }
 
     public boolean isInZone(Zone zone) {
@@ -632,19 +626,8 @@ public class SwerveSubsystem extends SubsystemBase {
      * @return the distance to the hub to the center of the robot in meters
      */
     public Distance getDistanceToTarget() {
-        Translation2d position = getPose().getTranslation();
-        return Meters.of(position.getDistance(getAutoAimTarget()));
-    }
-
-    private Translation2d getFutureTranslation() {
-        Translation2d robotTranslation = getPose().getTranslation();
-
-        ChassisSpeeds fieldRelativeChassisSpeeds = getFieldVelocity();
-
-        Translation2d deltaPos = new Translation2d(fieldRelativeChassisSpeeds.vxMetersPerSecond,
-                fieldRelativeChassisSpeeds.vyMetersPerSecond);
-
-        return robotTranslation.plus(deltaPos.times(SwerveConstants.AUTO_AIM_VELOCITY_COMPENSATION_FACTOR));
+        ensureTargetingCache();
+        return Meters.of(m_cachedDistanceToTargetMeters);
     }
 
     /**
@@ -653,8 +636,10 @@ public class SwerveSubsystem extends SubsystemBase {
      * @return the distance to the hub to the center of the robot in meters
      */
     public Distance getDistanceToTarget(boolean useVelocityCompensation) {
-        Translation2d position = useVelocityCompensation ? getFutureTranslation() : getPose().getTranslation();
-        return Meters.of(position.getDistance(getAutoAimTarget()));
+        ensureTargetingCache();
+        return Meters.of(useVelocityCompensation
+                ? m_cachedCompensatedDistanceToTargetMeters
+                : m_cachedDistanceToTargetMeters);
     }
 
     /**
@@ -664,8 +649,36 @@ public class SwerveSubsystem extends SubsystemBase {
      * @return The target translation for auto-aiming.
      */
     private Translation2d getAutoAimTarget() {
-        if (isRedAlliance()) {
-            switch (getCurrentZone()) {
+        ensureTargetingCache();
+        return m_cachedAutoAimTarget;
+    }
+
+    private Zone calculateZone(Translation2d position) {
+        if (position.getX() < FieldConstants.BLUE_STARTING_LINE_X
+                + SwerveConstants.ALLIANCE_ZONE_TOLERANCE_TO_STARTING_LINE) {
+            return position.getY() < FieldConstants.FIELD_WIDTH / 2
+                    ? Zone.BLUE_ALLIANCE_RIGHT
+                    : Zone.BLUE_ALLIANCE_LEFT;
+        }
+        if (position.getX() > FieldConstants.RED_STARTING_LINE_X
+                - SwerveConstants.ALLIANCE_ZONE_TOLERANCE_TO_STARTING_LINE) {
+            return position.getY() < FieldConstants.FIELD_WIDTH / 2
+                    ? Zone.RED_ALLIANCE_LEFT
+                    : Zone.RED_ALLIANCE_RIGHT;
+        }
+        if (position.getX() < (FieldConstants.FIELD_LENGTH / 2)) {
+            return position.getY() < FieldConstants.FIELD_WIDTH / 2
+                    ? Zone.NEUTRAL_ZONE_BLUE_RIGHT
+                    : Zone.NEUTRAL_ZONE_BLUE_LEFT;
+        }
+        return position.getY() < FieldConstants.FIELD_WIDTH / 2
+                ? Zone.NEUTRAL_ZONE_RED_LEFT
+                : Zone.NEUTRAL_ZONE_RED_RIGHT;
+    }
+
+    private Translation2d calculateAutoAimTarget(boolean isRedAlliance, Zone currentZone) {
+        if (isRedAlliance) {
+            switch (currentZone) {
                 case NEUTRAL_ZONE_RED_LEFT:
                 case NEUTRAL_ZONE_BLUE_RIGHT:
                 case BLUE_ALLIANCE_RIGHT:
@@ -679,7 +692,7 @@ public class SwerveSubsystem extends SubsystemBase {
                     return FieldConstants.RED_HUB_CENTER;
             }
         } else {
-            switch (getCurrentZone()) {
+            switch (currentZone) {
                 case NEUTRAL_ZONE_RED_RIGHT:
                 case NEUTRAL_ZONE_BLUE_LEFT:
                 case RED_ALLIANCE_RIGHT:
@@ -694,30 +707,50 @@ public class SwerveSubsystem extends SubsystemBase {
             }
         }
 
-        // Default to hub center if something goes wrong
-        return isRedAlliance()
-                ? FieldConstants.RED_HUB_CENTER
-                : FieldConstants.BLUE_HUB_CENTER;
+        return isRedAlliance ? FieldConstants.RED_HUB_CENTER : FieldConstants.BLUE_HUB_CENTER;
     }
 
-    /**
-     * Calculates the target rotation for auto-aiming based on the current position
-     * and
-     * velocity of the robot, and the target translation for auto-aiming.
-     */
-    private void calculateAutoAimHeading() {
-
-        Translation2d target = getAutoAimTarget();
-
-        if (isRedAlliance()) {
-            target = target.minus(FieldConstants.AUTO_AIM_OFFSET);
-        } else {
-            target = target.plus(FieldConstants.AUTO_AIM_OFFSET);
+    private void ensureTargetingCache() {
+        if (!m_targetingCacheInitialized) {
+            updateTargetingCache();
         }
+    }
 
-        Translation2d delta = target.minus(getFutureTranslation());
+    private void updateTargetingCache() {
+        Pose2d currentPose = getPose();
+        Translation2d currentTranslation = currentPose.getTranslation();
+        Rotation2d currentHeading = currentPose.getRotation();
 
-        autoAimTargetRotation = delta.getAngle().minus(Rotation2d.fromDegrees(90));
+        m_cachedRedAlliance = DriverStation.getAlliance()
+                .map(alliance -> alliance == DriverStation.Alliance.Red)
+                .orElse(false);
+        m_cachedZone = calculateZone(currentTranslation);
+        m_cachedAutoAimTarget = calculateAutoAimTarget(m_cachedRedAlliance, m_cachedZone);
+
+        ChassisSpeeds fieldRelativeChassisSpeeds = getFieldVelocity();
+        Translation2d futureTranslation = currentTranslation.plus(
+                new Translation2d(fieldRelativeChassisSpeeds.vxMetersPerSecond,
+                        fieldRelativeChassisSpeeds.vyMetersPerSecond)
+                        .times(SwerveConstants.AUTO_AIM_VELOCITY_COMPENSATION_FACTOR));
+
+        m_cachedDistanceToTargetMeters = currentTranslation.getDistance(m_cachedAutoAimTarget);
+        m_cachedCompensatedDistanceToTargetMeters = futureTranslation.getDistance(m_cachedAutoAimTarget);
+
+        Translation2d adjustedTarget = m_cachedRedAlliance
+                ? m_cachedAutoAimTarget.minus(FieldConstants.AUTO_AIM_OFFSET)
+                : m_cachedAutoAimTarget.plus(FieldConstants.AUTO_AIM_OFFSET);
+        Translation2d autoAimDelta = adjustedTarget.minus(futureTranslation);
+        autoAimTargetRotation = autoAimDelta.getAngle().minus(QUARTER_TURN);
+
+        double angleError = Math.abs(currentHeading.minus(autoAimTargetRotation.plus(QUARTER_TURN)).getDegrees());
+        m_cachedAutoAimOnTarget = angleError < SwerveConstants.AUTO_AIM_ANGLE_TARGET_ERROR.in(Degrees);
+
+        Translation2d translationError = m_driveToWaypoint.getTranslation().minus(currentTranslation);
+        Rotation2d rotationError = m_driveToWaypoint.getRotation().minus(currentHeading);
+        m_cachedDistanceToWaypointMeters = translationError.getNorm();
+        m_cachedRotationToWaypointDegrees = rotationError.getDegrees();
+        m_cachedAtWaypoint = m_cachedDistanceToWaypointMeters < AutoConstants.DEFAULT_WAYPOINT_TOLERANCE;
+        m_targetingCacheInitialized = true;
     }
 
     /**
@@ -729,11 +762,8 @@ public class SwerveSubsystem extends SubsystemBase {
      * @return true if the robot is on target for auto-aiming, false otherwise
      */
     public boolean isAutoAimOnTarget() {
-        Rotation2d currentHeading = getHeading();
-        calculateAutoAimHeading();
-        double angleError = Math
-                .abs(currentHeading.minus(autoAimTargetRotation.plus(Rotation2d.fromDegrees(90))).getDegrees());
-        return angleError < SwerveConstants.AUTO_AIM_ANGLE_TARGET_ERROR.in(Degrees);
+        ensureTargetingCache();
+        return m_cachedAutoAimOnTarget;
     }
 
     /**
@@ -742,7 +772,7 @@ public class SwerveSubsystem extends SubsystemBase {
      * @return The target rotation for auto-aiming.
      */
     public Rotation2d getAutoAimHeading() {
-        calculateAutoAimHeading();
+        ensureTargetingCache();
         return autoAimTargetRotation;
     }
 
@@ -758,6 +788,9 @@ public class SwerveSubsystem extends SubsystemBase {
 
     public void setDriveToWaypoint(Pose2d waypoint) {
         m_driveToWaypoint = waypoint;
+        if (m_targetingCacheInitialized) {
+            updateTargetingCache();
+        }
     }
 
     public Pose2d getDriveToWaypoint() {
@@ -765,41 +798,39 @@ public class SwerveSubsystem extends SubsystemBase {
     }
 
     public boolean isAtWaypoint() {
-        return m_driveToWaypoint.minus(getPose()).getTranslation()
-                .getNorm() < AutoConstants.DEFAULT_WAYPOINT_TOLERANCE;
+        ensureTargetingCache();
+        return m_cachedAtWaypoint;
     }
 
     public boolean isAtWaypoint(double translationToleranceMeters) {
-        return m_driveToWaypoint.minus(getPose()).getTranslation()
-                .getNorm() < translationToleranceMeters;
+        ensureTargetingCache();
+        return m_cachedDistanceToWaypointMeters < translationToleranceMeters;
     }
 
     public boolean isAtWaypoint(double translationToleranceMeters, double rotationToleranceDegrees) {
-        Translation2d translationError = m_driveToWaypoint.minus(getPose()).getTranslation();
-        Rotation2d rotationError = m_driveToWaypoint.getRotation().minus(getPose().getRotation());
-
-        return translationError.getNorm() < translationToleranceMeters
-                && Math.abs(rotationError.getDegrees()) < rotationToleranceDegrees;
+        ensureTargetingCache();
+        return m_cachedDistanceToWaypointMeters < translationToleranceMeters
+                && Math.abs(m_cachedRotationToWaypointDegrees) < rotationToleranceDegrees;
     }
 
     @Override
     public void periodic() {
+        updateTargetingCache();
+
         if (Constants.TELEMETRY && !DriverStation.isFMSAttached()) {
-            SmartDashboard.putNumber("swerve/autoAimHeading", getAutoAimHeading().getDegrees());
+            SmartDashboard.putNumber("swerve/autoAimHeading", autoAimTargetRotation.getDegrees());
             SmartDashboard.putNumber("swerve/currentHeading", getHeading().getDegrees());
-            SmartDashboard.putBoolean("swerve/isAutoAimReady", isAutoAimOnTarget());
-            SmartDashboard.putNumber("swerve/distToWaypoint (m)",
-                    m_driveToWaypoint.minus(getPose()).getTranslation().getNorm());
-            SmartDashboard.putNumber("swerve/rotToWaypoint (deg)",
-                    m_driveToWaypoint.getRotation().minus(getPose().getRotation()).getDegrees());
-            SmartDashboard.putBoolean("swerve/isAtWaypoint", isAtWaypoint());
+            SmartDashboard.putBoolean("swerve/isAutoAimReady", m_cachedAutoAimOnTarget);
+            SmartDashboard.putNumber("swerve/distToWaypoint (m)", m_cachedDistanceToWaypointMeters);
+            SmartDashboard.putNumber("swerve/rotToWaypoint (deg)", m_cachedRotationToWaypointDegrees);
+            SmartDashboard.putBoolean("swerve/isAtWaypoint", m_cachedAtWaypoint);
         }
     }
 
     @Override
     public void simulationPeriodic() {
-        SmartDashboard.putBoolean("swerve/isAutoAimReady", isAutoAimOnTarget());
-        SmartDashboard.putString("swerve/currentZone", getCurrentZone().toString());
+        SmartDashboard.putBoolean("swerve/isAutoAimReady", m_cachedAutoAimOnTarget);
+        SmartDashboard.putString("swerve/currentZone", m_cachedZone.toString());
         SmartDashboard.putString("swerve/currentWaypoint", getDriveToWaypoint().toString());
     }
 }

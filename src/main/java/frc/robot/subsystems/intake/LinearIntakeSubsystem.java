@@ -283,9 +283,8 @@ public class LinearIntakeSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        m_linearIntake.updateTelemetry();
-
         if (Constants.TELEMETRY && !DriverStation.isFMSAttached()) {
+            m_linearIntake.updateTelemetry();
             SmartDashboard.putNumber("LinearIntakeMech/position (m)", getPosition().in(Meters));
             SmartDashboard.putNumber("LinearIntakeMech/setpoint (m)",
                     getSetpoint().map(pos -> pos.in(Meters)).orElse(Double.NaN));

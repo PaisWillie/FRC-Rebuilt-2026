@@ -25,6 +25,7 @@ import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -37,8 +38,11 @@ import swervelib.simulation.ironmaple.simulation.seasonspecific.rebuilt2026.Rebu
 import swervelib.simulation.ironmaple.simulation.seasonspecific.rebuilt2026.RebuiltFuelOnFly;
 
 public class SimSubsystem extends SubsystemBase {
+    private static final double SIM_TELEMETRY_UPDATE_PERIOD_SECONDS = 0.1;
+
     /** Creates a new FuelSimSubsystem. */
     private final IntakeSimulation intakeSimulation;
+    private double lastTelemetryPublishTimestamp = Double.NEGATIVE_INFINITY;
 
     public SimSubsystem(AbstractDriveTrainSimulation driveTrainSimulation) {
         intakeSimulation = IntakeSimulation.OverTheBumperIntake(
@@ -159,6 +163,12 @@ public class SimSubsystem extends SubsystemBase {
 
     @Override
     public void simulationPeriodic() {
+        double now = Timer.getFPGATimestamp();
+        if (now - lastTelemetryPublishTimestamp < SIM_TELEMETRY_UPDATE_PERIOD_SECONDS) {
+            return;
+        }
+        lastTelemetryPublishTimestamp = now;
+
         this.fuelPoses.accept(SimulatedArena.getInstance()
                 .getGamePiecesArrayByType("Fuel"));
 

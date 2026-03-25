@@ -257,6 +257,21 @@ public final class Constants {
             return map;
         }
 
+        public static ShooterZone getShooterZone(Distance distanceToTarget) {
+            double distanceMeters = distanceToTarget.in(Meters);
+
+            if (distanceMeters >= 12.40575) {
+                return ShooterZone.ZONE_4;
+            }
+            if (distanceMeters >= 8.2705) {
+                return ShooterZone.ZONE_3;
+            }
+            if (distanceMeters >= 3.6212) {
+                return ShooterZone.ZONE_2;
+            }
+            return ShooterZone.ZONE_1;
+        }
+
         public static final class FlywheelConstants {
             public static final int LEADER_MOTOR_CAN_ID = 20;
             public static final int FOLLOWER_MOTOR_CAN_ID = 21;
@@ -545,10 +560,13 @@ public final class Constants {
         public static final double MATCH_TIME_END_GAME_END = 0;
     }
 
+    public static final boolean TELEMETRY = false; // Set to false for competition to reduce network traffic
+
     // Consider setting to LOW or MEDIUM for competition to reduce network traffic
     // Set the telemetry verbosity for YAMS subsystems
     public static final SmartMotorControllerConfig.TelemetryVerbosity TELEMETRY_VERBOSITY = SmartMotorControllerConfig.TelemetryVerbosity.LOW;
 
-    public static final SwerveDriveTelemetry.TelemetryVerbosity SWERVE_TELEMETRY_VERBOSITY = SwerveDriveTelemetry.TelemetryVerbosity.POSE;
-    public static final boolean TELEMETRY = false; // Set to false for competition to reduce network traffic
+    public static final SwerveDriveTelemetry.TelemetryVerbosity SWERVE_TELEMETRY_VERBOSITY = TELEMETRY
+            ? SwerveDriveTelemetry.TelemetryVerbosity.POSE
+            : SwerveDriveTelemetry.TelemetryVerbosity.NONE;
 }

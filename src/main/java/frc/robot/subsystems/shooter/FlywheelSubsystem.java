@@ -12,7 +12,6 @@ import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 
-import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -189,35 +188,26 @@ public class FlywheelSubsystem extends SubsystemBase {
         return Optional.of(setpoint.get().times(FlywheelConstants.GEARBOX.getInputToOutputConversionFactor()));
     }
 
-    public boolean isAtTargetRPM() {
+    private boolean isAtTargetRPM(AngularVelocity tolerance) {
         Optional<AngularVelocity> setpoint = getSetpointVelocity();
 
-        if (!setpoint.isPresent())
+        if (setpoint.isEmpty()) {
             return false;
+        }
 
-        return m_atRPMDebouncer.calculate(
-                setpoint.get().times(FlywheelConstants.GEARBOX.getOutputToInputConversionFactor()).isNear(
-                        getAngularVelocity(),
-                        FlywheelConstants.RPM_TARGET_ERROR));
+        AngularVelocity targetVelocity = setpoint.get()
+                .times(FlywheelConstants.GEARBOX.getOutputToInputConversionFactor());
+        return m_atRPMDebouncer.calculate(targetVelocity.isNear(getAngularVelocity(), tolerance));
+    }
+
+    public boolean isAtTargetRPM() {
+        return isAtTargetRPM(FlywheelConstants.RPM_TARGET_ERROR);
     }
 
     public boolean isAtTargetRPM(boolean isFeeding) {
-        Optional<AngularVelocity> setpoint = getSetpointVelocity();
-
-        if (!setpoint.isPresent())
-            return false;
-
-        if (isFeeding) {
-            return m_atRPMDebouncer.calculate(
-                    setpoint.get().times(FlywheelConstants.GEARBOX.getOutputToInputConversionFactor()).isNear(
-                            getAngularVelocity(),
-                            FlywheelConstants.RPM_TARGET_ERROR_WHILE_FEEDING));
-        }
-
-        return m_atRPMDebouncer.calculate(
-                setpoint.get().times(FlywheelConstants.GEARBOX.getOutputToInputConversionFactor()).isNear(
-                        getAngularVelocity(),
-                        FlywheelConstants.RPM_TARGET_ERROR));
+        return isAtTargetRPM(isFeeding
+                ? FlywheelConstants.RPM_TARGET_ERROR_WHILE_FEEDING
+                : FlywheelConstants.RPM_TARGET_ERROR);
     }
 
     public Command stop() {
@@ -232,17 +222,16 @@ public class FlywheelSubsystem extends SubsystemBase {
      */
     @Override
     public void periodic() {
-        m_flywheel.updateTelemetry();
-
-        if (Constants.TELEMETRY && !DriverStation.isFMSAttached()) {
+        boolean telemetryEnabled = Constants.TELEMETRY && !DriverStation.isFMSAttached();
+        if (telemetryEnabled) {
+            m_flywheel.updateTelemetry();
             SmartDashboard.putNumber("FlywheelMech/linearVelocity (fps)", getLinearVelocity().in(FeetPerSecond));
+            SmartDashboard.putNumber("FlywheelMech/velocity (RPM)", getAngularVelocity().in(RPM));
+            SmartDashboard.putNumber("FlywheelMech/setpoint (RPM)",
+                    getSetpointVelocity().map(
+                            setpoint -> setpoint.in(RPM) * FlywheelConstants.GEARBOX.getOutputToInputConversionFactor())
+                            .orElse(Double.NaN));
         }
-
-        SmartDashboard.putNumber("FlywheelMech/velocity (RPM)", getAngularVelocity().in(RPM));
-        SmartDashboard.putNumber("FlywheelMech/setpoint (RPM)",
-                getSetpointVelocity().map(
-                        setpoint -> setpoint.in(RPM) * FlywheelConstants.GEARBOX.getOutputToInputConversionFactor())
-                        .orElse(Double.NaN));
     }
 
     @Override
@@ -252,11 +241,7 @@ public class FlywheelSubsystem extends SubsystemBase {
     }
 
     public AngularVelocity getTargetVelocity(Distance distanceToTarget) {
-        ShooterZone zone = ShooterConstants.MIN_DISTANCE_TO_FLYWHEEL_SPEED_ZONE.entrySet().stream()
-                .filter(entry -> distanceToTarget.in(Meters) >= entry.getKey().in(Meters))
-                .max((a, b) -> Double.compare(a.getKey().in(Meters), b.getKey().in(Meters)))
-                .map(Map.Entry::getValue)
-                .orElse(ShooterZone.ZONE_1);
+        ShooterZone zone = ShooterConstants.getShooterZone(distanceToTarget);
         return ShooterConstants.SHOOTER_MIN_DISTANCE_TO_FLYWHEEL_RPM.getOrDefault(zone,
                 FlywheelConstants.DEFAULT_VELOCITY);
     }

@@ -13,8 +13,10 @@ import com.thethriftybot.devices.ThriftyNova.MotorType;
 
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 import frc.robot.Constants.ClimbConstants.TongueConstants;
 import frc.robot.Constants.MechanismPositionConstants;
 import frc.robot.Robot;
@@ -103,7 +105,9 @@ public class TongueSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        m_tongue.updateTelemetry();
+        if (Constants.TELEMETRY && !DriverStation.isFMSAttached()) {
+            m_tongue.updateTelemetry();
+        }
     }
 
     @Override

@@ -9,7 +9,6 @@ import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Volts;
 
-import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -170,39 +169,28 @@ public class HoodSubsystem extends SubsystemBase {
         return m_hood.getMechanismSetpoint();
     }
 
-    public boolean isAtTargetAngle() {
-
+    private boolean isAtTargetAngle(Angle tolerance) {
         Optional<Angle> setpoint = getAngleSetpoint();
 
-        if (!setpoint.isPresent())
+        if (setpoint.isEmpty()) {
             return false;
+        }
 
-        return m_atAngleDebouncer.calculate(
-                getAngleSetpoint().get().isNear(m_hood.getAngle(), HoodConstants.ANGLE_TARGET_ERROR));
+        return m_atAngleDebouncer.calculate(setpoint.get().isNear(m_hood.getAngle(), tolerance));
+    }
+
+    public boolean isAtTargetAngle() {
+        return isAtTargetAngle(HoodConstants.ANGLE_TARGET_ERROR);
     }
 
     public boolean isAtTargetAngle(boolean isFeeding) {
-
-        Optional<Angle> setpoint = getAngleSetpoint();
-
-        if (!setpoint.isPresent())
-            return false;
-
-        if (isFeeding) {
-            return m_atAngleDebouncer.calculate(
-                    getAngleSetpoint().get().isNear(m_hood.getAngle(), HoodConstants.ANGLE_TARGET_ERROR_WHILE_FEEDING));
-        }
-
-        return m_atAngleDebouncer.calculate(
-                getAngleSetpoint().get().isNear(m_hood.getAngle(), HoodConstants.ANGLE_TARGET_ERROR));
+        return isAtTargetAngle(isFeeding
+                ? HoodConstants.ANGLE_TARGET_ERROR_WHILE_FEEDING
+                : HoodConstants.ANGLE_TARGET_ERROR);
     }
 
     public ShooterZone getSpeedZone(Distance distanceToTarget) {
-        return ShooterConstants.MIN_DISTANCE_TO_FLYWHEEL_SPEED_ZONE.entrySet().stream()
-                .filter(entry -> distanceToTarget.in(Meters) >= entry.getKey().in(Meters))
-                .max((a, b) -> Double.compare(a.getKey().in(Meters), b.getKey().in(Meters)))
-                .map(Map.Entry::getValue)
-                .orElse(ShooterZone.ZONE_1);
+        return ShooterConstants.getShooterZone(distanceToTarget);
     }
 
     public Angle getAngleToTarget(Distance distanceToTarget, ShooterZone zone) {
@@ -251,9 +239,8 @@ public class HoodSubsystem extends SubsystemBase {
      */
     @Override
     public void periodic() {
-        m_hood.updateTelemetry();
-
         if (Constants.TELEMETRY && !DriverStation.isFMSAttached()) {
+            m_hood.updateTelemetry();
             SmartDashboard.putNumber("HoodMech/angle (deg)", getAngle().in(Degrees));
             SmartDashboard.putNumber("HoodMech/setpoint (deg)",
                     getAngleSetpoint().map(angle -> angle.in(Degrees)).orElse(Double.NaN));
